@@ -993,6 +993,12 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 
 .orgs .orgh{margin:16px 0 4px;font-size:15px;color:var(--trc);border-bottom:2px solid color-mix(in srgb,var(--trc) 35%,transparent);padding-bottom:3px}
 .orgl b{color:color-mix(in srgb,var(--trc) 60%,var(--ink))}
+
+/* 형광펜: 엄청 중요한 사건 */
+.tl>li.hlt h3{display:inline;background:linear-gradient(transparent 52%,color-mix(in srgb,#ffe14d 85%,transparent) 52%,color-mix(in srgb,#ffe14d 85%,transparent) 92%,transparent 92%);padding:0 3px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.tl>li.hlt h3::after{content:'★';font-size:.8em;color:#d97706;margin-left:4px}
+.tl>li.hlt h3+*{margin-top:4px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tl>li.hlt h3{background:linear-gradient(transparent 52%,rgb(255 214 0/.35) 52%,rgb(255 214 0/.35) 92%,transparent 92%)}}
 </style>
 
 <div class="app">
@@ -1658,8 +1664,13 @@ const EVENTS=[
 {y:1914,t:'대한 광복군 정부',s:'대한 광복군 정부',p:'블라디보스토크',ll:[131.89,43.12],tp:['ind'],x:'이상설·이동휘 등이 연해주에서 세운 망명 정부이다.'},
 {y:1915,t:'대한 광복회 조직',tp:['ind'],x:'박상진이 대구에서 조직한 비밀 결사로, 공화 정체를 지향하였다.'},
 {y:1919,m:2,d:8,t:'2·8 독립 선언',s:'2·8 독립 선언',p:'도쿄',ll:[139.74,35.7],tp:['ind'],x:'도쿄의 조선인 유학생들이 독립 선언서를 발표하였다.'},
+{y:1919,m:2,t:'대한 독립 선언 (무오 독립 선언)',s:'대한 독립 선언',p:'만주 지린',ll:[126.55,43.84],tp:['ind'],x:'만주·연해주의 독립운동가 39명이 지린에서 발표한 독립 선언. 무장 투쟁으로 독립을 이루자고 강조하였다.'},
 {y:1919,m:3,d:1,t:'3·1 운동',s:'3·1 운동',p:'탑골 공원',ll:[126.988,37.571],tp:['ind'],x:'민족 대표 33인이 독립 선언서를 발표하고 학생과 시민이 탑골 공원에서 만세 시위를 벌였다. 시위는 전국과 해외로 퍼졌다.'},
 {y:1919,m:4,d:11,t:'대한민국 임시 정부 수립',s:'임시 정부 수립',p:'상하이',ll:[121.47,31.23],tp:['ind'],x:'민주 공화제 정부를 세웠다. 연통제·교통국을 운영하고 독립신문을 발행하였으며 구미 위원부를 두었다.'},
+{y:1919,m:3,d:13,t:'용정 3·13 만세 운동',s:'용정 만세 운동',p:'간도 용정',ll:[129.42,42.77],tp:['ind'],x:'3·1 운동이 나라 밖으로 퍼져 간도 용정에서 수만 명이 독립 만세를 외쳤다.'},
+{y:1919,m:3,d:17,t:'연해주 만세 운동',s:'연해주 만세 운동',p:'연해주',ll:[131.89,43.12],tp:['ind'],x:'연해주의 한인들이 독립 선언서를 발표하고 만세 시위를 벌였다.'},
+{y:1919,m:4,d:1,t:'아우내 장터 만세 운동',s:'아우내 장터 만세',p:'천안 병천',ll:[127.3,36.76],tp:['ind'],x:'유관순 등이 천안 아우내 장터에서 만세 시위를 이끌었다. 유관순은 체포되어 서대문 형무소에서 순국하였다(1920).',pp:'유관순'},
+{y:1919,m:4,d:14,t:'필라델피아 한인 자유 대회',s:'한인 자유 대회',p:'미국 필라델피아',ll:[-75.16,39.95],tp:['ind'],x:'서재필·이승만 등이 미국 필라델피아에서 한인 자유 대회를 열어 3·1 운동을 세계에 알렸다.',pp:'서재필, 이승만'},
 {y:1919,m:4,d:15,t:'제암리 학살',s:'제암리 학살',p:'화성 제암리',ll:[126.86,37.17],tp:['ind'],x:'일본군이 주민을 교회에 가두고 불을 질러 학살하였다.'},
 {y:1920,m:6,t:'봉오동 전투',s:'봉오동 전투',p:'봉오동',ll:[129.85,42.97],tp:['ind'],x:'홍범도의 대한 독립군 등이 봉오동에서 일본군을 크게 물리쳤다.'},
 {y:1920,m:10,t:'청산리 대첩',s:'청산리 대첩',p:'청산리',ll:[128.95,42.55],tp:['ind'],x:'김좌진의 북로 군정서와 홍범도의 연합 부대가 백운평·어랑촌 등에서 일본군을 크게 무찔렀다. 일본군은 보복으로 간도 참변을 일으켰다.'},
@@ -2433,6 +2444,10 @@ const ORGS=[
   [1944,'조선 건국 동맹','여운형','국내에서 비밀리에 조직, 광복 뒤 조선 건국 준비 위원회로 이어짐']]]];
 function orgsHTML(){const n=ORGS.reduce((s,g)=>s+g[1].length,0);
   return `<section class="laws orgs"><h2>독립운동 단체 · 조직 <small>${n}개</small></h2>${ORGS.map(([gn,list])=>`<h4 class="orgh">${esc(gn)}</h4><ol class="lawl orgl">${list.map(([y,nm,by,c])=>`<li><span class="ly">${y}</span><div><b>${esc(nm)}</b>${by?`<em>${esc(by)}</em>`:''}<p>${glx(c)}</p></div></li>`).join('')}</ol>`).join('')}</section>`}
+
+/* 엄청 중요한 사건: 연표에서 형광펜 */
+const TOP_EV=new Set(['고조선 건국','위만, 고조선의 왕이 됨','고조선 멸망, 한 군현 설치','광개토 대왕 즉위','장수왕, 평양 천도','기벌포 전투 · 삼국 통일','발해 건국','고려 건국','일리천 전투 · 후삼국 통일','서희의 외교 담판','귀주 대첩','무신 정변','강화도 천도','공민왕의 반원 개혁','조선 건국','훈민정음 창제','임진왜란 발발','병자호란','대동법 실시','영조, 탕평책','홍경래의 난','병인양요','신미양요','강화도 조약','임오군란','갑신정변','고부 농민 봉기','갑오개혁 시작','을미사변','아관 파천','대한 제국 수립','을사늑약','국권 피탈','3·1 운동','대한민국 임시 정부 수립','6·10 만세 운동','광주 학생 항일 운동','8·15 광복','대한민국 정부 수립','6·25 전쟁 발발','인천 상륙 작전','정전 협정 조인','4·19 혁명','5·16 군사 정변','유신 헌법','5·18 민주화 운동','6월 민주 항쟁','6·15 남북 공동 선언']);
+EVENTS.forEach(e=>{if(TOP_EV.has(e.t))e.top=true});
 /* ───────── 계산 도우미 ───────── */
 const KX=78.80107536067219;
 const X=lon=>(lon-123)*KX, Y=lat=>(44-lat)*100;
@@ -2668,7 +2683,7 @@ function placeLabels(){
   // 2) 보이는 핀과 도읍 표시 자리
   // 겹친 핀은 오래된 것부터 흐리게 (새 사건·고른 사건이 위)
   const all=OV.filter(o=>o.pin&&!o.g.classList.contains('hide')&&!o.g.classList.contains('wait')&&!o.g.classList.contains('stale'));
-  all.sort((a,b)=>(b.pin.id===selId)-(a.pin.id===selId)||(b.g.classList.contains('fresh'))-(a.g.classList.contains('fresh'))||(a.pin.tp[0]==='wld')-(b.pin.tp[0]==='wld')||b.pin.T-a.pin.T);
+  all.sort((a,b)=>(b.pin.id===selId)-(a.pin.id===selId)||(b.g.classList.contains('fresh'))-(a.g.classList.contains('fresh'))||(a.pin.tp[0]==='wld')-(b.pin.tp[0]==='wld')||(isMajor(b.pin)-isMajor(a.pin))||(Math.abs(a.pin.T-curT())-Math.abs(b.pin.T-curT())));
   const kept=[];all.forEach(o=>{const [sx,sy]=toS(o.x,o.y);let near=0,tight=false;for(const q of kept){const d=Math.hypot(q[0]-sx,q[1]-sy);if(d<12)tight=true;if(d<30)near++}
     const bur=o.pin.id!==selId&&(tight||(o.pin.tp[0]==='wld'&&near>0));o.g.classList.toggle('buried',bur);if(!bur)kept.push([sx,sy])});
   const isW=o=>o.pin.tp[0]==='wld';
@@ -2696,7 +2711,7 @@ function placeLabels(){
     const L=Math.hypot(dx,dy),sh=(L-6)/L;o.ln.setAttribute('x2',(dx*sh).toFixed(1));o.ln.setAttribute('y2',(dy*sh).toFixed(1));o.g.classList.add('out')}
   // 3) 글씨: 중요한 것부터, 오른쪽이 막히면 왼쪽에
   const cand=[];
-  pins.forEach(o=>cand.push({o,pr:o.pin.id===selId?9:(isW(o)?0.5:(o.g.classList.contains('fresh')?8:(o.pin.tp[0]==='war'?4:3)))}));
+  pins.forEach(o=>cand.push({o,pr:o.pin.id===selId?9:(isW(o)?0.5:(o.g.classList.contains('fresh')?8:(isMajor(o.pin)?6:(o.pin.tp[0]==='war'?4:3))))}));
   capItems.forEach(o=>cand.push({o,pr:5}));
   nbItems.forEach(o=>cand.push({o,pr:2}));if(typeof chItems!=='undefined'&&chItems)chItems.forEach(o=>cand.push({o,pr:1.2}));
   OV.forEach(o=>{if((o.kind==='riv'&&!o.off)||o.kind==='mt')cand.push({o,pr:o.kind==='mt'?1.5:1})});
@@ -2706,9 +2721,12 @@ function placeLabels(){
     if(o.kind==='riv'){const w=n*10.5;const b=[sx+5,sy-14,sx+5+w,sy-1];const ok=!hit(b);o.t.classList.toggle('nolab',!ok);if(ok)boxes.push(b);continue}
     if(o.kind==='mt'){const w=n*10.5;const b=[sx+8,sy-8,sx+8+w,sy+5];const ok=!hit(b);o.t.classList.toggle('nolab',!ok);if(ok)boxes.push(b);continue}
     const fs=11.5,w=n*fs+2,po=o.pin&&o.pin.tp[0]==='war'&&!o.pin.found&&!o.pin.fall?14:12;const right=o.cap?[sx+7,sy-18,sx+8+w,sy-3]:[sx+po-1,sy-8,sx+po+w,sy+8];const left=o.cap?[sx-8-w,sy-18,sx-7,sy-3]:[sx-po-w,sy-8,sx-po+1,sy+8];
-    let side=null;if(!hit(right))side='r';else if(!hit(left))side='l';
+    const below=[sx-w/2,sy+10,sx+w/2,sy+26],above=[sx-w/2,sy-(o.pin&&o.g.classList.contains('flagpin')?44:30),sx+w/2,sy-(o.pin&&o.g.classList.contains('flagpin')?28:14)];
+    if(o.t.dataset.y0==null)o.t.dataset.y0=o.t.getAttribute('y')||'';
+    let side=null;if(!hit(right))side='r';else if(!hit(left))side='l';else if(o.pin&&!hit(below))side='b';else if(o.pin&&!hit(above))side='a';
     o.t.classList.toggle('nolab',!side);
-    if(side){boxes.push(side==='r'?right:left);o.t.setAttribute('x',side==='r'?(o.cap?8:po):(o.cap?-8:-po));o.t.setAttribute('text-anchor',side==='r'?'start':'end')}}
+    if(side==='b'||side==='a'){boxes.push(side==='b'?below:above);o.t.setAttribute('x',0);o.t.setAttribute('y',side==='b'?22:(above[3]-sy-3));o.t.setAttribute('text-anchor','middle')}
+    else if(side){boxes.push(side==='r'?right:left);if(o.t.dataset.y0)o.t.setAttribute('y',o.t.dataset.y0);else o.t.removeAttribute('y');o.t.setAttribute('x',side==='r'?(o.cap?8:po):(o.cap?-8:-po));o.t.setAttribute('text-anchor',side==='r'?'start':'end')}}
 }
 
 /* 끌기·집기 확대 */
@@ -2754,7 +2772,9 @@ function updateInset(){
   insvg.setAttribute('viewBox',`${b.x+b.w/2-W*s/2} ${b.y+b.h/2-H*s/2} ${W*s} ${H*s}`);
   const g=$('inpins');g.innerHTML='';
   if(!abroad){const vbx=b.x+b.w/2-W*s/2,cx0=b.x+b.w/2;outPins.forEach(e=>{const px=X(e.ll[0]),py=Y(e.ll[1]);el('circle',{cx:px,cy:py,r:4.5*s,style:`fill:var(--t-${e.tp[0]});stroke:var(--panel);stroke-width:${1.5*s}`},g);const right=px>cx0;const tx=el('text',{x:px+(right?-6:6)*s,y:py+4*s,'text-anchor':right?'end':'start',style:`font-size:${10.5*s}px;stroke-width:${2.5*s}px`},g);tx.textContent=e.s||e.t;
-    try{const bb=tx.getBBox();const L=vbx+2*s,Rr=vbx+W*s-2*s;if(bb.x<L)tx.setAttribute('x',+tx.getAttribute('x')+(L-bb.x));else if(bb.x+bb.width>Rr)tx.setAttribute('x',+tx.getAttribute('x')-(bb.x+bb.width-Rr))}catch(_){}})}
+    try{const bb=tx.getBBox();const L=vbx+2*s,Rr=vbx+W*s-2*s;if(bb.x<L)tx.setAttribute('x',+tx.getAttribute('x')+(L-bb.x));else if(bb.x+bb.width>Rr)tx.setAttribute('x',+tx.getAttribute('x')-(bb.x+bb.width-Rr))}catch(_){}});
+    /* 작은 지도 안에서 이름끼리 겹치면 나중 것은 숨김 */
+    {const kept=[];[...g.querySelectorAll('text')].forEach(t=>{try{const b=t.getBBox();const pad=1.5*s;const hitK=kept.some(c=>b.x<c.x+c.width+pad&&b.x+b.width+pad>c.x&&b.y<c.y+c.height&&b.y+b.height>c.y);if(hitK)t.style.display='none';else kept.push(b)}catch(_){}})}}
   placeInset();
   const nm0=[...new Set(outPins.map(e=>(e.p||'').split(' ')[0]).filter(Boolean))];const names=nm0.length?nm0[0]+(nm0.length>1?` 외 ${nm0.length-1}곳`:''):'';
   $('inlab').textContent=abroad?'한반도로 돌아가기':'해외 · '+names;
@@ -2765,7 +2785,7 @@ function placeInset(){const wrap=svg.getBoundingClientRect();if(!wrap.width)retu
   const dock=$('dock')?$('dock').getBoundingClientRect():{top:wrap.bottom};const card=$('fcard')?$('fcard').getBoundingClientRect():{bottom:wrap.top+90,right:wrap.left+280};
   const bottomY=Math.min(wrap.height,dock.top-wrap.top)-ih-52,topY=Math.max(12,card.bottom-wrap.top+10);
   const hb=document.querySelector('header.top').getBoundingClientRect().bottom-wrap.top;const C={br:[wrap.width-iw-12,bottomY],bl:[12,bottomY],tr:[wrap.width-iw-60,Math.max(12,hb+10)],tl:[12,Math.max(topY,hb+10)]};
-  const pts=[];document.querySelectorAll('#pins .pin:not(.hide):not(.wait):not(.stale):not(.buried):not(.gone), #ovl text:not(.hide)').forEach(g=>{const r=g.getBoundingClientRect();if(r.width)pts.push([r.left-wrap.left,r.top-wrap.top,r.right-wrap.left,r.bottom-wrap.top])});
+  const pts=[];document.querySelectorAll('#pins .pin:not(.hide):not(.wait):not(.stale):not(.buried):not(.gone), #ovl text:not(.hide)').forEach(g=>{const r=g.getBoundingClientRect();if(r.width){const lab=g.matches('.pin')?110:0;pts.push([r.left-wrap.left-(lab?40:0),r.top-wrap.top,r.right-wrap.left+lab,r.bottom-wrap.top])}});
   const score=k=>{const [x,y]=C[k];if(y<0||x<0)return 1e9;let s=0;pts.forEach(([a,b,c,d])=>{if(c>x-4&&a<x+iw+4&&d>y-4&&b<y+ih+4)s++});return s};
   let best=insetCorner,bs=score(insetCorner);['br','bl','tr','tl'].forEach(k=>{const s=score(k);if(s<bs){bs=s;best=k}});insetCorner=best;
   const [x,y]=C[best];inset.style.left=x+'px';inset.style.top=y+'px';inset.style.right='auto';inset.style.bottom='auto'}
@@ -2974,7 +2994,7 @@ function rowsHTML(evs){const out=[];const done=new Set();
     const grp=evs.filter(x=>isSiteEv(x)&&x.f===e.f);grp.forEach(x=>done.add(x.id));const F=FRAMES[e.f];const nm=F.title.replace(' 시대','').replace(/의 성립과 발전$/,'');
     out.push(`<li data-ids="${grp.map(x=>x.id).join(',')}" class="sgrp"><div class="d">${esc(nm)}<small>유적</small></div><div><h3>${esc(nm)} 유적</h3><p class="sline">${grp.map(x=>esc(x.t.replace(/ 유적| · .*$/g,''))).join(' - ')}</p><ul class="sites">${grp.map(x=>`<li data-sid="${x.id}"><div class="sh"><b>${esc(x.t)}</b><span>${esc(x.p||'')}${x.yl?' · '+esc(x.yl):''}</span>${x.ll?`<button class="go" data-go="${x.id}" type="button">${PIN_IC}지도</button>`:''}</div><p>${glx(x.x)}</p></li>`).join('')}</ul></div></li>`)});
   return out.join('')}
-function rowHTML(e){return `<li data-id="${e.id}" style="--tc:var(--t-${e.tp[0]})"><div class="d">${esc(e.yl?e.yl:(e.y<0?(-e.y):e.y))}${e.yl?'':`<small>${e.y<0?'기원전':(e.m&&e.y>=1880?e.m+'월'+(e.d&&e.y>=1945?' '+e.d+'일':''):'')}</small>`}</div><div><h3>${esc(e.t)}</h3>${e.vs?`<div class="rvs">${e.treaty?'<i class="tseal">조</i>'+esc(e.vs.replace(' vs ',' · ')):esc(e.vs)}</div>`:''}<p>${glx(e.x)}</p>${whoHTML(e,'who sm')}<div class="m">${e.tp.map(tg).join('')}${e.p?`<span>${esc(e.p)}</span>`:''}${e.ll?`<button class="go" data-go="${e.id}" type="button">${PIN_IC}지도</button>`:''}${hbtn(e,1)}</div></div></li>`}
+function rowHTML(e){return `<li data-id="${e.id}" class="${e.top?'hlt':''}" style="--tc:var(--t-${e.tp[0]})"><div class="d">${esc(e.yl?e.yl:(e.y<0?(-e.y):e.y))}${e.yl?'':`<small>${e.y<0?'기원전':(e.m&&e.y>=1880?e.m+'월'+(e.d&&e.y>=1945?' '+e.d+'일':''):'')}</small>`}</div><div><h3>${esc(e.t)}</h3>${e.vs?`<div class="rvs">${e.treaty?'<i class="tseal">조</i>'+esc(e.vs.replace(' vs ',' · ')):esc(e.vs)}</div>`:''}<p>${glx(e.x)}</p>${whoHTML(e,'who sm')}<div class="m">${e.tp.map(tg).join('')}${e.p?`<span>${esc(e.p)}</span>`:''}${e.ll?`<button class="go" data-go="${e.id}" type="button">${PIN_IC}지도</button>`:''}${hbtn(e,1)}</div></div></li>`}
 function buildTL(){
   const chips=$('tlchips');chips.innerHTML=`<button class="chip" data-k="" aria-pressed="true">전체</button>`+TOPICS.map(t=>`<button class="chip" data-k="${t.k}" aria-pressed="false" style="--tc:var(--t-${t.k})"><i></i>${t.n}</button>`).join('');
   chips.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{if(c.hasAttribute('data-heart')){tlHeart=!tlHeart;renderTLFilter();return}const k=c.dataset.k;if(!k)tlFilter.clear();else tlFilter.has(k)?tlFilter.delete(k):tlFilter.add(k);renderTLFilter()});
@@ -3065,7 +3085,7 @@ function drawAll(){
   $('ovsum').innerHTML=`<p class="ovhint">시대 띠를 누르면 그 시대의 자세한 연대표가 열리고, 장면 카드를 누르면 지도에서 그 장면을 보여 줍니다.</p>`;
 }
 
-const isMajor=e=>e.found||e.fall||e.treaty||/건국|멸망|전쟁|정변|반정|혁명|천도|병합|피탈|광복|수립|대첩|사화|환국|침입|란$|의 난/.test(e.t);
+const isMajor=e=>e.found||e.fall||e.treaty||/건국|멸망|전쟁|정변|반정|혁명|천도|병합|피탈|광복|수립|대첩|사화|환국|침입|란$|의 난|^3·1 운동$|6·10 만세|광주 학생 항일/.test(e.t);
 /* 시대별 연대표: 화면 너비에 맞춰 여러 줄로 접어 아래로 내려 읽는다 */
 const isSiteO=e=>(e.era==='prehist'||e.era==='pre')&&/유적|동굴|패총|암각화|고인돌/.test(e.t);
 const UPT=new Set(['pol','eco','cul']);
@@ -3853,8 +3873,8 @@ function layHZ(k,SC){
   kr.forEach(({D,rs},j)=>rs.forEach(r=>{const a=xT(Math.max(r.s,t0)),bb=xT(Math.min(r.e,t1));if(bb-a<2)return;const n=r.name.replace('대통령 ','');b+=`<div class="hzk" data-king="${esc(D.n)}|${D.r.indexOf(r)}" style="left:${a}px;top:${6+j*20}px;width:${bb-a-2}px;--rc:var(--c-${D.c})"><span>${esc(n)}</span></div>`}));
   const KH=kr.length*20+12;
   const shownT=new Set(tops.filter(o=>o.li<TLc&&o.e).map(o=>o.e.id));
-  const shownL=new Set([...upN.filter(o=>o.row>=0),...nm.filter(o=>o.li<NLc)].map(o=>o.e.id));const det=[...evs.filter(e=>HZ_NOTES[e.t]||(isMajor(e)&&!shownT.has(e.id)&&!shownL.has(e.id))).map(e=>fitSep({e,a:xT(e.T)-120,b:xT(e.T)+120},xT(e.T))),...tops.filter(o=>o.li>=TLc&&o.kind==='r').map(o=>fitSep({r:o,a:xT(o.t)-120,b:xT(o.t)+120},xT(o.t)))].sort((p,q)=>p.a-q.a);const DL=lanes(det,14);
-  const DB=84;const DLc=DL;det.filter(o=>o.li<DLc).forEach(o=>{if(o.r){b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><b class="rfh">* ${esc(o.r.title)} <em>(${yrTxt(Math.floor(o.r.t))})</em></b><em>${esc(o.r.by)}</em><p>${esc(o.r.body)}</p></div>`;return}b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><button data-ev="${o.e.id}" style="--tc:var(--t-${o.e.tp[0]})">* ${esc(o.e.t)}</button>${o.e.pp?`<em>${esc(o.e.pp)}</em>`:''}${HZ_NOTES[o.e.t]?`<ul>${HZ_NOTES[o.e.t].map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`:`<p>${esc(o.e.x)}</p>`}</div>`});
+  const shownL=new Set([...upN.filter(o=>o.row>=0),...nm.filter(o=>o.li<NLc)].map(o=>o.e.id));const det=[...evs.filter(e=>HZ_NOTES[e.t]||(isMajor(e)&&!shownT.has(e.id)&&!shownL.has(e.id))).map(e=>fitSep({e,a:xT(e.T)-120,b:xT(e.T)+120},xT(e.T))),...tops.filter(o=>o.li>=TLc&&o.kind==='r').map(o=>fitSep({r:o,a:xT(o.t)-120,b:xT(o.t)+120},xT(o.t)))].sort((p,q)=>p.a-q.a);let DL=lanes(det,14);if(HZ_ONLY[k]){det.forEach((o,i)=>{o.li=i;const w=o.b-o.a;o.a=Math.max(6,(o.e?xT(o.e.T):o.a)-16);o.b=o.a+w});DL=det.length}
+  const DB=HZ_ONLY[k]?124:84;const DLc=DL;det.filter(o=>o.li<DLc).forEach(o=>{if(o.r){b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><b class="rfh">* ${esc(o.r.title)} <em>(${yrTxt(Math.floor(o.r.t))})</em></b><em>${esc(o.r.by)}</em><p>${esc(o.r.body)}</p></div>`;return}b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><button data-ev="${o.e.id}" style="--tc:var(--t-${o.e.tp[0]})">* ${esc(o.e.t)}</button>${o.e.pp?`<em>${esc(o.e.pp)}</em>`:''}${HZ_NOTES[o.e.t]?`<ul>${HZ_NOTES[o.e.t].map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`:`<p>${esc(o.e.x)}</p>`}</div>`});
   rg.forEach(r=>{stH+=`<i class="hzsep" style="left:${r.a}px"></i>`});
   const usedB=KH+(det.length?DL*DB+4:0);if(!ALL&&!HZ_ONLY[k])b+=`<div class="hzsum" style="margin-top:${usedB}px">${sumHTML(E)}</div>`;
   const botH=Math.max(KH+DB,HZAV-topH-4);

@@ -46,7 +46,7 @@ function drawAll(){
   $('ovsum').innerHTML=`<p class="ovhint">시대 띠를 누르면 그 시대의 자세한 연대표가 열리고, 장면 카드를 누르면 지도에서 그 장면을 보여 줍니다.</p>`;
 }
 
-const isMajor=e=>e.found||e.fall||e.treaty||/건국|멸망|전쟁|정변|반정|혁명|천도|병합|피탈|광복|수립|대첩|사화|환국|침입|란$|의 난/.test(e.t);
+const isMajor=e=>e.found||e.fall||e.treaty||/건국|멸망|전쟁|정변|반정|혁명|천도|병합|피탈|광복|수립|대첩|사화|환국|침입|란$|의 난|^3·1 운동$|6·10 만세|광주 학생 항일/.test(e.t);
 /* 시대별 연대표: 화면 너비에 맞춰 여러 줄로 접어 아래로 내려 읽는다 */
 const isSiteO=e=>(e.era==='prehist'||e.era==='pre')&&/유적|동굴|패총|암각화|고인돌/.test(e.t);
 const UPT=new Set(['pol','eco','cul']);

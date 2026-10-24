@@ -233,7 +233,7 @@ function placeLabels(){
   // 2) 보이는 핀과 도읍 표시 자리
   // 겹친 핀은 오래된 것부터 흐리게 (새 사건·고른 사건이 위)
   const all=OV.filter(o=>o.pin&&!o.g.classList.contains('hide')&&!o.g.classList.contains('wait')&&!o.g.classList.contains('stale'));
-  all.sort((a,b)=>(b.pin.id===selId)-(a.pin.id===selId)||(b.g.classList.contains('fresh'))-(a.g.classList.contains('fresh'))||(a.pin.tp[0]==='wld')-(b.pin.tp[0]==='wld')||b.pin.T-a.pin.T);
+  all.sort((a,b)=>(b.pin.id===selId)-(a.pin.id===selId)||(b.g.classList.contains('fresh'))-(a.g.classList.contains('fresh'))||(a.pin.tp[0]==='wld')-(b.pin.tp[0]==='wld')||(isMajor(b.pin)-isMajor(a.pin))||(Math.abs(a.pin.T-curT())-Math.abs(b.pin.T-curT())));
   const kept=[];all.forEach(o=>{const [sx,sy]=toS(o.x,o.y);let near=0,tight=false;for(const q of kept){const d=Math.hypot(q[0]-sx,q[1]-sy);if(d<12)tight=true;if(d<30)near++}
     const bur=o.pin.id!==selId&&(tight||(o.pin.tp[0]==='wld'&&near>0));o.g.classList.toggle('buried',bur);if(!bur)kept.push([sx,sy])});
   const isW=o=>o.pin.tp[0]==='wld';
@@ -261,7 +261,7 @@ function placeLabels(){
     const L=Math.hypot(dx,dy),sh=(L-6)/L;o.ln.setAttribute('x2',(dx*sh).toFixed(1));o.ln.setAttribute('y2',(dy*sh).toFixed(1));o.g.classList.add('out')}
   // 3) 글씨: 중요한 것부터, 오른쪽이 막히면 왼쪽에
   const cand=[];
-  pins.forEach(o=>cand.push({o,pr:o.pin.id===selId?9:(isW(o)?0.5:(o.g.classList.contains('fresh')?8:(o.pin.tp[0]==='war'?4:3)))}));
+  pins.forEach(o=>cand.push({o,pr:o.pin.id===selId?9:(isW(o)?0.5:(o.g.classList.contains('fresh')?8:(isMajor(o.pin)?6:(o.pin.tp[0]==='war'?4:3))))}));
   capItems.forEach(o=>cand.push({o,pr:5}));
   nbItems.forEach(o=>cand.push({o,pr:2}));if(typeof chItems!=='undefined'&&chItems)chItems.forEach(o=>cand.push({o,pr:1.2}));
   OV.forEach(o=>{if((o.kind==='riv'&&!o.off)||o.kind==='mt')cand.push({o,pr:o.kind==='mt'?1.5:1})});
@@ -271,9 +271,12 @@ function placeLabels(){
     if(o.kind==='riv'){const w=n*10.5;const b=[sx+5,sy-14,sx+5+w,sy-1];const ok=!hit(b);o.t.classList.toggle('nolab',!ok);if(ok)boxes.push(b);continue}
     if(o.kind==='mt'){const w=n*10.5;const b=[sx+8,sy-8,sx+8+w,sy+5];const ok=!hit(b);o.t.classList.toggle('nolab',!ok);if(ok)boxes.push(b);continue}
     const fs=11.5,w=n*fs+2,po=o.pin&&o.pin.tp[0]==='war'&&!o.pin.found&&!o.pin.fall?14:12;const right=o.cap?[sx+7,sy-18,sx+8+w,sy-3]:[sx+po-1,sy-8,sx+po+w,sy+8];const left=o.cap?[sx-8-w,sy-18,sx-7,sy-3]:[sx-po-w,sy-8,sx-po+1,sy+8];
-    let side=null;if(!hit(right))side='r';else if(!hit(left))side='l';
+    const below=[sx-w/2,sy+10,sx+w/2,sy+26],above=[sx-w/2,sy-(o.pin&&o.g.classList.contains('flagpin')?44:30),sx+w/2,sy-(o.pin&&o.g.classList.contains('flagpin')?28:14)];
+    if(o.t.dataset.y0==null)o.t.dataset.y0=o.t.getAttribute('y')||'';
+    let side=null;if(!hit(right))side='r';else if(!hit(left))side='l';else if(o.pin&&!hit(below))side='b';else if(o.pin&&!hit(above))side='a';
     o.t.classList.toggle('nolab',!side);
-    if(side){boxes.push(side==='r'?right:left);o.t.setAttribute('x',side==='r'?(o.cap?8:po):(o.cap?-8:-po));o.t.setAttribute('text-anchor',side==='r'?'start':'end')}}
+    if(side==='b'||side==='a'){boxes.push(side==='b'?below:above);o.t.setAttribute('x',0);o.t.setAttribute('y',side==='b'?22:(above[3]-sy-3));o.t.setAttribute('text-anchor','middle')}
+    else if(side){boxes.push(side==='r'?right:left);if(o.t.dataset.y0)o.t.setAttribute('y',o.t.dataset.y0);else o.t.removeAttribute('y');o.t.setAttribute('x',side==='r'?(o.cap?8:po):(o.cap?-8:-po));o.t.setAttribute('text-anchor',side==='r'?'start':'end')}}
 }
 
 /* 끌기·집기 확대 */
@@ -319,7 +322,9 @@ function updateInset(){
   insvg.setAttribute('viewBox',`${b.x+b.w/2-W*s/2} ${b.y+b.h/2-H*s/2} ${W*s} ${H*s}`);
   const g=$('inpins');g.innerHTML='';
   if(!abroad){const vbx=b.x+b.w/2-W*s/2,cx0=b.x+b.w/2;outPins.forEach(e=>{const px=X(e.ll[0]),py=Y(e.ll[1]);el('circle',{cx:px,cy:py,r:4.5*s,style:`fill:var(--t-${e.tp[0]});stroke:var(--panel);stroke-width:${1.5*s}`},g);const right=px>cx0;const tx=el('text',{x:px+(right?-6:6)*s,y:py+4*s,'text-anchor':right?'end':'start',style:`font-size:${10.5*s}px;stroke-width:${2.5*s}px`},g);tx.textContent=e.s||e.t;
-    try{const bb=tx.getBBox();const L=vbx+2*s,Rr=vbx+W*s-2*s;if(bb.x<L)tx.setAttribute('x',+tx.getAttribute('x')+(L-bb.x));else if(bb.x+bb.width>Rr)tx.setAttribute('x',+tx.getAttribute('x')-(bb.x+bb.width-Rr))}catch(_){}})}
+    try{const bb=tx.getBBox();const L=vbx+2*s,Rr=vbx+W*s-2*s;if(bb.x<L)tx.setAttribute('x',+tx.getAttribute('x')+(L-bb.x));else if(bb.x+bb.width>Rr)tx.setAttribute('x',+tx.getAttribute('x')-(bb.x+bb.width-Rr))}catch(_){}});
+    /* 작은 지도 안에서 이름끼리 겹치면 나중 것은 숨김 */
+    {const kept=[];[...g.querySelectorAll('text')].forEach(t=>{try{const b=t.getBBox();const pad=1.5*s;const hitK=kept.some(c=>b.x<c.x+c.width+pad&&b.x+b.width+pad>c.x&&b.y<c.y+c.height&&b.y+b.height>c.y);if(hitK)t.style.display='none';else kept.push(b)}catch(_){}})}}
   placeInset();
   const nm0=[...new Set(outPins.map(e=>(e.p||'').split(' ')[0]).filter(Boolean))];const names=nm0.length?nm0[0]+(nm0.length>1?` 외 ${nm0.length-1}곳`:''):'';
   $('inlab').textContent=abroad?'한반도로 돌아가기':'해외 · '+names;
@@ -330,7 +335,7 @@ function placeInset(){const wrap=svg.getBoundingClientRect();if(!wrap.width)retu
   const dock=$('dock')?$('dock').getBoundingClientRect():{top:wrap.bottom};const card=$('fcard')?$('fcard').getBoundingClientRect():{bottom:wrap.top+90,right:wrap.left+280};
   const bottomY=Math.min(wrap.height,dock.top-wrap.top)-ih-52,topY=Math.max(12,card.bottom-wrap.top+10);
   const hb=document.querySelector('header.top').getBoundingClientRect().bottom-wrap.top;const C={br:[wrap.width-iw-12,bottomY],bl:[12,bottomY],tr:[wrap.width-iw-60,Math.max(12,hb+10)],tl:[12,Math.max(topY,hb+10)]};
-  const pts=[];document.querySelectorAll('#pins .pin:not(.hide):not(.wait):not(.stale):not(.buried):not(.gone), #ovl text:not(.hide)').forEach(g=>{const r=g.getBoundingClientRect();if(r.width)pts.push([r.left-wrap.left,r.top-wrap.top,r.right-wrap.left,r.bottom-wrap.top])});
+  const pts=[];document.querySelectorAll('#pins .pin:not(.hide):not(.wait):not(.stale):not(.buried):not(.gone), #ovl text:not(.hide)').forEach(g=>{const r=g.getBoundingClientRect();if(r.width){const lab=g.matches('.pin')?110:0;pts.push([r.left-wrap.left-(lab?40:0),r.top-wrap.top,r.right-wrap.left+lab,r.bottom-wrap.top])}});
   const score=k=>{const [x,y]=C[k];if(y<0||x<0)return 1e9;let s=0;pts.forEach(([a,b,c,d])=>{if(c>x-4&&a<x+iw+4&&d>y-4&&b<y+ih+4)s++});return s};
   let best=insetCorner,bs=score(insetCorner);['br','bl','tr','tl'].forEach(k=>{const s=score(k);if(s<bs){bs=s;best=k}});insetCorner=best;
   const [x,y]=C[best];inset.style.left=x+'px';inset.style.top=y+'px';inset.style.right='auto';inset.style.bottom='auto'}
@@ -539,7 +544,7 @@ function rowsHTML(evs){const out=[];const done=new Set();
     const grp=evs.filter(x=>isSiteEv(x)&&x.f===e.f);grp.forEach(x=>done.add(x.id));const F=FRAMES[e.f];const nm=F.title.replace(' 시대','').replace(/의 성립과 발전$/,'');
     out.push(`<li data-ids="${grp.map(x=>x.id).join(',')}" class="sgrp"><div class="d">${esc(nm)}<small>유적</small></div><div><h3>${esc(nm)} 유적</h3><p class="sline">${grp.map(x=>esc(x.t.replace(/ 유적| · .*$/g,''))).join(' - ')}</p><ul class="sites">${grp.map(x=>`<li data-sid="${x.id}"><div class="sh"><b>${esc(x.t)}</b><span>${esc(x.p||'')}${x.yl?' · '+esc(x.yl):''}</span>${x.ll?`<button class="go" data-go="${x.id}" type="button">${PIN_IC}지도</button>`:''}</div><p>${glx(x.x)}</p></li>`).join('')}</ul></div></li>`)});
   return out.join('')}
-function rowHTML(e){return `<li data-id="${e.id}" style="--tc:var(--t-${e.tp[0]})"><div class="d">${esc(e.yl?e.yl:(e.y<0?(-e.y):e.y))}${e.yl?'':`<small>${e.y<0?'기원전':(e.m&&e.y>=1880?e.m+'월'+(e.d&&e.y>=1945?' '+e.d+'일':''):'')}</small>`}</div><div><h3>${esc(e.t)}</h3>${e.vs?`<div class="rvs">${e.treaty?'<i class="tseal">조</i>'+esc(e.vs.replace(' vs ',' · ')):esc(e.vs)}</div>`:''}<p>${glx(e.x)}</p>${whoHTML(e,'who sm')}<div class="m">${e.tp.map(tg).join('')}${e.p?`<span>${esc(e.p)}</span>`:''}${e.ll?`<button class="go" data-go="${e.id}" type="button">${PIN_IC}지도</button>`:''}${hbtn(e,1)}</div></div></li>`}
+function rowHTML(e){return `<li data-id="${e.id}" class="${e.top?'hlt':''}" style="--tc:var(--t-${e.tp[0]})"><div class="d">${esc(e.yl?e.yl:(e.y<0?(-e.y):e.y))}${e.yl?'':`<small>${e.y<0?'기원전':(e.m&&e.y>=1880?e.m+'월'+(e.d&&e.y>=1945?' '+e.d+'일':''):'')}</small>`}</div><div><h3>${esc(e.t)}</h3>${e.vs?`<div class="rvs">${e.treaty?'<i class="tseal">조</i>'+esc(e.vs.replace(' vs ',' · ')):esc(e.vs)}</div>`:''}<p>${glx(e.x)}</p>${whoHTML(e,'who sm')}<div class="m">${e.tp.map(tg).join('')}${e.p?`<span>${esc(e.p)}</span>`:''}${e.ll?`<button class="go" data-go="${e.id}" type="button">${PIN_IC}지도</button>`:''}${hbtn(e,1)}</div></div></li>`}
 function buildTL(){
   const chips=$('tlchips');chips.innerHTML=`<button class="chip" data-k="" aria-pressed="true">전체</button>`+TOPICS.map(t=>`<button class="chip" data-k="${t.k}" aria-pressed="false" style="--tc:var(--t-${t.k})"><i></i>${t.n}</button>`).join('');
   chips.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{if(c.hasAttribute('data-heart')){tlHeart=!tlHeart;renderTLFilter();return}const k=c.dataset.k;if(!k)tlFilter.clear();else tlFilter.has(k)?tlFilter.delete(k):tlFilter.add(k);renderTLFilter()});

@@ -993,6 +993,12 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 
 .orgs .orgh{margin:16px 0 4px;font-size:15px;color:var(--trc);border-bottom:2px solid color-mix(in srgb,var(--trc) 35%,transparent);padding-bottom:3px}
 .orgl b{color:color-mix(in srgb,var(--trc) 60%,var(--ink))}
+
+/* 형광펜: 엄청 중요한 사건 */
+.tl>li.hlt h3{display:inline;background:linear-gradient(transparent 52%,color-mix(in srgb,#ffe14d 85%,transparent) 52%,color-mix(in srgb,#ffe14d 85%,transparent) 92%,transparent 92%);padding:0 3px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.tl>li.hlt h3::after{content:'★';font-size:.8em;color:#d97706;margin-left:4px}
+.tl>li.hlt h3+*{margin-top:4px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tl>li.hlt h3{background:linear-gradient(transparent 52%,rgb(255 214 0/.35) 52%,rgb(255 214 0/.35) 92%,transparent 92%)}}
 </style>
 
 <div class="app">
