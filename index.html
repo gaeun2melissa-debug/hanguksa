@@ -2475,7 +2475,7 @@ document.addEventListener('click',ev=>{const h=ev.target.closest('[data-h]');if(
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* 준비: 장면·사건 */
-FRAMES.forEach(f=>{if(!f.st.length||!f.view)return;let a=1e9,b=1e9,cc=-1e9,d=-1e9;f.st.forEach(s=>s[3].forEach(([lo,la])=>{a=Math.min(a,lo);cc=Math.max(cc,lo);b=Math.min(b,la);d=Math.max(d,la)}));const px=(cc-a)*.04+.25,py=(d-b)*.04+.2;const v=f.view;f.view=[Math.min(v[0],a-px),Math.min(v[1],b-py,32.75),Math.max(v[2],cc+px),Math.max(v[3],d+py)]});
+FRAMES.forEach(f=>{if(!f.st.length||!f.view||f.view===VS||(f.era==='contemp'&&f.y>=1953))return;let a=1e9,b=1e9,cc=-1e9,d=-1e9;f.st.forEach(s=>s[3].forEach(([lo,la])=>{a=Math.min(a,lo);cc=Math.max(cc,lo);b=Math.min(b,la);d=Math.max(d,la)}));const px=(cc-a)*.04+.25,py=(d-b)*.04+.2;const v=f.view;f.view=[Math.min(v[0],a-px),Math.min(v[1],b-py,32.75),Math.max(v[2],cc+px),Math.max(v[3],d+py)]});
 FRAMES.forEach(f=>{if(f.view&&f.view[1]>32.75)f.view=[f.view[0],32.75,f.view[2],f.view[3]]});
 FRAMES.forEach((f,i)=>{f.i=i;f.t=tOf(f);f.w=f.w||1;f.st=f.st.map(s=>({id:s[0],name:s[1],c:s[2],d:P(s[3]),area:(()=>{const xs=s[3].map(p=>X(p[0])),ys=s[3].map(p=>Y(p[1]));return Math.min(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys))})(),lab:[X(s[4][0]),Y(s[4][1])],from:(s[5]||{}).from,hatch:(s[5]||{}).hatch}))});
 FRAMES.forEach((f,i)=>{f.t2=i<FRAMES.length-1?FRAMES[i+1].t:END_T});
@@ -2725,8 +2725,8 @@ window.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;const
 function endPtr(e){if(ptrs.has(e.pointerId))schedRecenter();ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(!ptrs.size){svg.classList.remove('drag');setTimeout(()=>dragMoved=false,0)}}
 window.addEventListener('pointerup',endPtr);window.addEventListener('pointercancel',endPtr);
 /* 지도를 많이 벗어나면 잠시 뒤 제자리로 */
-let recT=0;function schedRecenter(){clearTimeout(recT);recT=setTimeout(recenterIfLost,2200)}
-function recenterIfLost(){return;if(ptrs.size||bubId!=null||$('v-map').hidden)return;
+let recT=0;function schedRecenter(){clearTimeout(recT);recT=setTimeout(recenterIfLost,4000)}
+function recenterIfLost(){if(ptrs.size||bubId!=null||$('v-map').hidden)return;
   const b=abroad&&outPins.length?box(outBox()):box(FRAMES[pos.i].view);
   const ix=Math.max(0,Math.min(vb.x+vb.w,b.x+b.w)-Math.max(vb.x,b.x)),iy=Math.max(0,Math.min(vb.y+vb.h,b.y+b.h)-Math.max(vb.y,b.y));
   const seen=ix*iy/(vb.w*vb.h),cover=ix*iy/(b.w*b.h);
