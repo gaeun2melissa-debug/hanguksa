@@ -228,5 +228,7 @@ Object.assign(GLOSS,{
 /* 정규식 다시 만들기 */
 GLRE_SET();
 function GLRE_SET(){window.GLRE2=new RegExp('('+Object.keys(GLOSS).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g')}
-glx=function(s,skip){const seen=new Set();return esc(s).replace(GLRE2,m=>{if(seen.has(m)||(skip&&skip.includes(m)))return m;seen.add(m);return `<span class="gw${TREE_OF[m]?' tr':''}" role="button" tabindex="0" data-gl="${m}">${m}</span>`})};
+/* 낱말이 더 긴 다른 말의 일부일 때는 표시하지 않음 (동인도의 '동인' 등) */
+const GL_NOT={'동인':/^도/,'서인':/^도|^주/,'남인':/^도/,'북인':/^도/,'노론':/^문/,'사림':/^원/};
+glx=function(s,skip){const seen=new Set();return esc(s).replace(GLRE2,(m,...a)=>{const off=a[a.length-2],str=a[a.length-1];const nx=str.slice(off+m.length,off+m.length+2);if(GL_NOT[m]&&GL_NOT[m].test(nx))return m;if(seen.has(m)||(skip&&skip.includes(m)))return m;seen.add(m);return `<span class="gw${TREE_OF[m]?' tr':''}" role="button" tabindex="0" data-gl="${m}">${m}</span>`})};
 
