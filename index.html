@@ -1000,6 +1000,10 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 .tl>li.hlt h3::after{content:'★';font-size:.8em;color:#d97706;margin-left:4px}
 .tl>li.hlt h3+*{margin-top:4px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tl>li.hlt h3{background:linear-gradient(transparent 52%,rgb(255 214 0/.35) 52%,rgb(255 214 0/.35) 92%,transparent 92%)}}
+
+.hzd.hzg{border-left:3px solid #6d28d9;padding-left:8px}
+.hzd.hzg b.gw{display:block;font-size:13px;color:#6d28d9;text-decoration:none!important;cursor:pointer}
+.hzd.hzg em{font-size:11px}
 </style>
 
 <div class="app">
@@ -3826,6 +3830,9 @@ function dcShow(){const b=$('dcbody');if(b.dataset.built)return;try{GLOSS;TREE_O
 /* ───────── 연대표 가로: 필기 노트처럼 (위: 조약·개혁안 / 가운데: 시기·축·사건 이름 / 아래: 왕·주요 사건 풀이) ───────── */
 function drawHZ(k){$('v-ov').classList.add('hzsplit');const sr=$('ovscroll').getBoundingClientRect();const avail=Math.max(300,(sr.top>0?innerHeight-sr.top:$('ovscroll').clientHeight)-14);HZAV=avail;let sc=1,res=layHZ(k,1);for(let it=0;it<9&&res&&res.H>avail;it++){sc*=1.3;const nx=layHZ(k,sc);if(nx.H>=res.H-2)break;res=nx}if(res){$('ovchart').innerHTML=res.html;$('v-ov').classList.add('hzsplit');$('ovsum').innerHTML=''}}
 let HZAV=9999;
+/* 연대표 아래 칸: 사건 설명 속 꼭 알아 둘 낱말(척화비 같은 것)을 그 사건 자리에 */
+function hzTerms(evs,xT,fitSep){if(typeof GLOSS==='undefined')return [];const used=new Set(),out=[];const titles=evs.map(e=>e.t);
+  evs.forEach(e=>{if(!e.x||isSiteO(e))return;const tmp=document.createElement('div');tmp.innerHTML=glx(e.x);[...tmp.querySelectorAll('[data-gl]')].slice(0,2).forEach(s=>{const k=s.dataset.gl;if(used.has(k)||titles.some(t=>t.includes(k)))return;used.add(k);const x=xT(e.T);out.push(fitSep({g:k,from:e.t,a:x-120,b:x+120},x))})});return out}
 const HZ_ONLY={prehist:['구석기','신석기']};
 const HZ_NOTES={'구석기':['뗀석기 — 주먹도끼, 찍개, 슴베찌르개','동굴·바위 그늘·막집에서 삶','무리 지어 이동, 사냥·채집','평등한 사회'],
  '신석기':['간석기 — 갈판·갈돌, 돌괭이','빗살무늬 토기 (암사동)','강가·바닷가 움집, 정착 생활','농경 시작 (조·피), 가락바퀴·뼈바늘','씨족 → 부족, 평등 사회']};
@@ -3880,8 +3887,8 @@ function layHZ(k,SC){
   kr.forEach(({D,rs},j)=>rs.forEach(r=>{const a=xT(Math.max(r.s,t0)),bb=xT(Math.min(r.e,t1));if(bb-a<2)return;const n=r.name.replace('대통령 ','');b+=`<div class="hzk" data-king="${esc(D.n)}|${D.r.indexOf(r)}" style="left:${a}px;top:${6+j*20}px;width:${bb-a-2}px;--rc:var(--c-${D.c})"><span>${esc(n)}</span></div>`}));
   const KH=kr.length*20+12;
   const shownT=new Set(tops.filter(o=>o.li<TLc&&o.e).map(o=>o.e.id));
-  const shownL=new Set([...upN.filter(o=>o.row>=0),...nm.filter(o=>o.li<NLc)].map(o=>o.e.id));const det=[...evs.filter(e=>HZ_NOTES[e.t]||(isMajor(e)&&!shownT.has(e.id)&&!shownL.has(e.id))).map(e=>fitSep({e,a:xT(e.T)-120,b:xT(e.T)+120},xT(e.T))),...tops.filter(o=>o.li>=TLc&&o.kind==='r').map(o=>fitSep({r:o,a:xT(o.t)-120,b:xT(o.t)+120},xT(o.t)))].sort((p,q)=>p.a-q.a);let DL=lanes(det,14);if(HZ_ONLY[k]){det.forEach((o,i)=>{o.li=i;const w=o.b-o.a;o.a=Math.max(6,(o.e?xT(o.e.T):o.a)-16);o.b=o.a+w});DL=det.length}
-  const DB=HZ_ONLY[k]?124:84;const DLc=DL;det.filter(o=>o.li<DLc).forEach(o=>{if(o.r){b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><b class="rfh">* ${esc(o.r.title)} <em>(${yrTxt(Math.floor(o.r.t))})</em></b><em>${esc(o.r.by)}</em><p>${esc(o.r.body)}</p></div>`;return}b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><button data-ev="${o.e.id}" style="--tc:var(--t-${o.e.tp[0]})">* ${esc(o.e.t)}</button>${o.e.pp?`<em>${esc(o.e.pp)}</em>`:''}${HZ_NOTES[o.e.t]?`<ul>${HZ_NOTES[o.e.t].map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`:`<p>${esc(o.e.x)}</p>`}</div>`});
+  const shownL=new Set([...upN.filter(o=>o.row>=0),...nm.filter(o=>o.li<NLc)].map(o=>o.e.id));const det=[...evs.filter(e=>HZ_NOTES[e.t]||(isMajor(e)&&!shownT.has(e.id)&&!shownL.has(e.id))).map(e=>fitSep({e,a:xT(e.T)-120,b:xT(e.T)+120},xT(e.T))),...tops.filter(o=>o.li>=TLc&&o.kind==='r').map(o=>fitSep({r:o,a:xT(o.t)-120,b:xT(o.t)+120},xT(o.t))),...hzTerms(evs,xT,fitSep)].sort((p,q)=>p.a-q.a);let DL=lanes(det,14);if(HZ_ONLY[k]){det.forEach((o,i)=>{o.li=i;const w=o.b-o.a;o.a=Math.max(6,(o.e?xT(o.e.T):o.a)-16);o.b=o.a+w});DL=det.length}
+  const DB=HZ_ONLY[k]?124:84;const DLc=DL;det.filter(o=>o.li<DLc).forEach(o=>{if(o.g){b+=`<div class="hzd hzg" style="left:${o.a}px;top:${KH+o.li*DB}px"><b data-gl="${esc(o.g)}" class="gw">${esc(o.g)}</b><em>${esc(o.from)}</em><p>${esc(GLOSS[o.g])}</p></div>`;return}if(o.r){b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><b class="rfh">* ${esc(o.r.title)} <em>(${yrTxt(Math.floor(o.r.t))})</em></b><em>${esc(o.r.by)}</em><p>${esc(o.r.body)}</p></div>`;return}b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><button data-ev="${o.e.id}" style="--tc:var(--t-${o.e.tp[0]})">* ${esc(o.e.t)}</button>${o.e.pp?`<em>${esc(o.e.pp)}</em>`:''}${HZ_NOTES[o.e.t]?`<ul>${HZ_NOTES[o.e.t].map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`:`<p>${esc(o.e.x)}</p>`}</div>`});
   rg.forEach(r=>{stH+=`<i class="hzsep" style="left:${r.a}px"></i>`});
   const usedB=KH+(det.length?DL*DB+4:0);if(!ALL&&!HZ_ONLY[k])b+=`<div class="hzsum" style="margin-top:${usedB}px">${sumHTML(E)}</div>`;
   const botH=Math.max(KH+DB,HZAV-topH-4);
