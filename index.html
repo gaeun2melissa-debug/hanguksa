@@ -1029,6 +1029,17 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 #iconleg .lgt>b{display:block;margin-bottom:5px;color:var(--muted)}
 #iconleg .lgt div{display:flex;flex-wrap:wrap;gap:4px 10px}
 #iconleg .lgt i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+
+/* 연대표: 시대끼리 끊기지 않고 한 줄로 이어 보이게 */
+.hsec+.hsec{border-left:0!important}
+.vsec{margin-bottom:0!important}
+.ovsech2{position:sticky;left:0;display:flex;align-items:baseline;gap:8px;padding:6px 16px 2px;font-size:13px;color:var(--muted);border-top:1px dashed var(--rule)}
+.ovsech2 b{color:var(--ink);font-size:14.5px}
+.sumtg{margin-left:auto;border:1px solid var(--rule);background:var(--panel);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--muted);cursor:pointer}
+.vsec .ovsecsum{padding:6px 16px 10px}
+
+/* 화살표 머리와 선 사이 흰 틈 없애기: 머리의 흰 테두리를 빼고 선과 같은 굵기로 */
+.ahd path.ahb{display:none!important}
 </style>
 
 <div class="app">
@@ -2856,7 +2867,7 @@ function fmtNow(t,F){
   const segCol={prehist:'dongye',pre:'gojoseon',early:'buyeo',three:'goguryeo',nsk:'silla',hsk:'baekje',goryeo:'goryeo',joseon1:'joseon',joseon2:'joseon',modern1:'han',colonial:'japan',contemp:'south'};
   FRAMES.forEach((f,i)=>{const s=cum[i]/TOT*100;const w=f.w/TOT*100;const sg=h('div','seg');sg.style.left=s+'%';sg.style.width=w+'%';sg.style.background=`var(--c-${segCol[f.era]})`;sg.style.opacity=i%2?.55:.8;trk.insertBefore(sg,trk.firstChild);
     if(i){const t=h('div','tick');t.style.left=s+'%';tk.appendChild(t)}});
-  const labs=[[0,'선사'],[2,'고조선'],[4,'삼국'],[8,'남북국'],[10,'후삼국'],[11,'고려'],[16,'조선'],[20,'근대'],[23,'일제'],[24,'현대']];
+  const labs=[[0,'선사'],[2,'고조선'],[4,'삼국'],[8,'남북국'],[11,'고려'],[16,'조선'],[20,'근대'],[23,'일제'],[24,'현대']];
   const add=()=>{tk.querySelectorAll('.elab').forEach(x=>x.remove());const W=$('slider').clientWidth||300;let last=-99;
     labs.forEach(([i,n])=>{const px=cum[i]/TOT*W+(FRAMES[i].w/TOT*W)/2;const x=i===0?Math.max(px,16):px;if(x-last<40)return;last=x;const l=h('div','elab',n);l.style.left=x+'px';tk.appendChild(l)})};
   add();new ResizeObserver(add).observe($('slider'));
@@ -3954,7 +3965,7 @@ let ovCont=null,ovBuilding=false;
 function ovSecs(){return [...$('ovchart').querySelectorAll('.ovsec')]}
 function buildCont(){const H=ovDir==='h',sc=$('ovscroll'),parts=[];ovBuilding=true;
   try{for(const E of ERAS){drawEra(E.k);const html=$('ovchart').innerHTML;
-    parts.push(H?`<section class="ovsec hsec" data-sec="${E.k}">${html}</section>`:`<section class="ovsec vsec" data-sec="${E.k}"><div class="ovsumh ovsech"><h2>${esc(E.n)}</h2><span>${esc(E.rg)}</span></div>${html}<div class="ovsecsum">${sumHTML(E)}</div></section>`)}}
+    parts.push(H?`<section class="ovsec hsec" data-sec="${E.k}">${html}</section>`:`<section class="ovsec vsec" data-sec="${E.k}"><div class="ovsech2"><b>${esc(E.n)}</b><span>${esc(E.rg)}</span><button type="button" class="sumtg" aria-expanded="false">요약 보기</button></div><div class="ovsecsum" hidden>${sumHTML(E)}</div>${html}</section>`)}}
   finally{ovBuilding=false}
   $('v-ov').classList.toggle('hzsplit',H);
   $('ovchart').innerHTML=H?`<div class="hzall">${parts.join('')}</div>`:parts.join('');
@@ -3966,7 +3977,7 @@ function ovGoSec(k,smooth){const s=$('ovchart').querySelector(`.ovsec[data-sec="
 {const prev=drawEra;drawEra=function(k){if(ovBuilding||k==='all'||k==='heart'||!ERA[k]){if(!ovBuilding)ovCont=null;return prev(k)}
   const sc=$('ovscroll');if(!ovCont||ovCont.dir!==ovDir||ovCont.dirty||Math.abs(sc.clientWidth-ovCont.w)>24||!$('ovchart').querySelector('.ovsec'))buildCont();
   requestAnimationFrame(()=>ovGoSec(k))}}
-{const os=ovShow;ovShow=function(k,keep){if(ovCont&&typeof ovDirty!=='undefined'&&ovDirty)ovCont.dirty=true;os(k,keep);if(ovCont&&ERA[k]&&!keep){ovGoSec(k);requestAnimationFrame(()=>ovGoSec(k))}}}
+{const os=ovShow;ovShow=function(k,keep){if(ovCont&&typeof ovDirty!=='undefined'&&ovDirty)ovCont.dirty=true;const had=!!(ovCont&&$('ovchart').querySelector('.ovsec'));const sc=$('ovscroll'),rd=$('ovread'),sl=sc.scrollLeft,st=rd.scrollTop;os(k,keep);if(ovCont&&ERA[k]&&!keep){if(had){sc.scrollLeft=sl;rd.scrollTop=st;requestAnimationFrame(()=>ovGoSec(k,true))}else{ovGoSec(k);requestAnimationFrame(()=>ovGoSec(k))}}}}
 /* 스크롤하면 지금 보이는 시대 버튼에 불 켜기 */
 let ovSpyT=0;function ovSpy(){if(!ovCont)return;clearTimeout(ovSpyT);ovSpyT=setTimeout(()=>{const H=ovDir==='h',ref=H?$('ovscroll').getBoundingClientRect().left+60:$('ovread').getBoundingClientRect().top+80;let cur=null;
   for(const s of ovSecs()){const r=s.getBoundingClientRect();if((H?r.left:r.top)<=ref)cur=s.dataset.sec}if(!cur||cur===ovSel)return;ovSel=cur;store.set('overa',cur);
@@ -4022,6 +4033,8 @@ const SR_COL={'인물':'#047857','왕':'#7c3aed','구조도':'#c2410c','낱말':
  pop.innerHTML=`<div class="lghd"><b>지도 아이콘</b><button type="button" class="lgx" aria-label="닫기">✕</button></div><ul>${rows.map(([n,s])=>`<li>${s}<span>${n}</span></li>`).join('')}</ul>${tps?`<div class="lgt"><b>그 밖의 점 색 = 주제</b><div>${tps}</div></div>`:''}`;
  $('zleg').onclick=e=>{e.stopPropagation();pop.hidden=!pop.hidden};pop.querySelector('.lgx').onclick=()=>pop.hidden=true;
  document.addEventListener('pointerdown',e=>{if(!pop.hidden&&!e.target.closest('#iconleg,#zleg'))pop.hidden=true})}}
+
+document.addEventListener('click',e=>{const b=e.target.closest('.sumtg');if(!b)return;const s=b.closest('.ovsec').querySelector('.ovsecsum');s.hidden=!s.hidden;b.setAttribute('aria-expanded',!s.hidden);b.textContent=s.hidden?'요약 보기':'요약 접기'});
 </script>
 <script type="module">
 /* 구글 로그인 + 하트·책갈피·설정 동기화 (GitHub 사이트 전용) */

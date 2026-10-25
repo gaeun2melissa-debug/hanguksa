@@ -367,7 +367,7 @@ function fmtNow(t,F){
   const segCol={prehist:'dongye',pre:'gojoseon',early:'buyeo',three:'goguryeo',nsk:'silla',hsk:'baekje',goryeo:'goryeo',joseon1:'joseon',joseon2:'joseon',modern1:'han',colonial:'japan',contemp:'south'};
   FRAMES.forEach((f,i)=>{const s=cum[i]/TOT*100;const w=f.w/TOT*100;const sg=h('div','seg');sg.style.left=s+'%';sg.style.width=w+'%';sg.style.background=`var(--c-${segCol[f.era]})`;sg.style.opacity=i%2?.55:.8;trk.insertBefore(sg,trk.firstChild);
     if(i){const t=h('div','tick');t.style.left=s+'%';tk.appendChild(t)}});
-  const labs=[[0,'선사'],[2,'고조선'],[4,'삼국'],[8,'남북국'],[10,'후삼국'],[11,'고려'],[16,'조선'],[20,'근대'],[23,'일제'],[24,'현대']];
+  const labs=[[0,'선사'],[2,'고조선'],[4,'삼국'],[8,'남북국'],[11,'고려'],[16,'조선'],[20,'근대'],[23,'일제'],[24,'현대']];
   const add=()=>{tk.querySelectorAll('.elab').forEach(x=>x.remove());const W=$('slider').clientWidth||300;let last=-99;
     labs.forEach(([i,n])=>{const px=cum[i]/TOT*W+(FRAMES[i].w/TOT*W)/2;const x=i===0?Math.max(px,16):px;if(x-last<40)return;last=x;const l=h('div','elab',n);l.style.left=x+'px';tk.appendChild(l)})};
   add();new ResizeObserver(add).observe($('slider'));

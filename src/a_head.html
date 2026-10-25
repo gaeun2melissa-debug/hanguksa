@@ -1028,6 +1028,17 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 #iconleg .lgt>b{display:block;margin-bottom:5px;color:var(--muted)}
 #iconleg .lgt div{display:flex;flex-wrap:wrap;gap:4px 10px}
 #iconleg .lgt i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+
+/* 연대표: 시대끼리 끊기지 않고 한 줄로 이어 보이게 */
+.hsec+.hsec{border-left:0!important}
+.vsec{margin-bottom:0!important}
+.ovsech2{position:sticky;left:0;display:flex;align-items:baseline;gap:8px;padding:6px 16px 2px;font-size:13px;color:var(--muted);border-top:1px dashed var(--rule)}
+.ovsech2 b{color:var(--ink);font-size:14.5px}
+.sumtg{margin-left:auto;border:1px solid var(--rule);background:var(--panel);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--muted);cursor:pointer}
+.vsec .ovsecsum{padding:6px 16px 10px}
+
+/* 화살표 머리와 선 사이 흰 틈 없애기: 머리의 흰 테두리를 빼고 선과 같은 굵기로 */
+.ahd path.ahb{display:none!important}
 </style>
 
 <div class="app">
