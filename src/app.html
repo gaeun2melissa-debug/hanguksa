@@ -10,7 +10,7 @@
   --c-gojoseon:#bf8538; --c-buyeo:#8b78cc; --c-goguryeo:#cc4848; --c-baekje:#3a7cc2; --c-silla:#d39b16; --c-gaya:#37966a;
   --c-okjeo:#5e9e98; --c-dongye:#a1825f; --c-han:#7b848b; --c-balhae:#7655bf; --c-goryeo:#25958a; --c-joseon:#3f5aa8;--c-daehan:#c9a006;
   --c-japan:#6b5050; --c-south:#3a6cc2; --c-north:#c64848; --c-us:#4b78b8; --c-ussr:#b85454;
-  --t-pol:#3d5a80; --t-war:#b23a48; --t-eco:#a8871a; --t-soc:#6a9f1e; --t-cul:#7a4ea6; --t-ind:#147486; --t-mod:#4c5a63; --t-wld:#8a7a5c;
+  --t-pol:#3d5a80; --t-war:#b23a48; --t-eco:#a8871a; --t-soc:#6a9f1e; --t-cul:#7a4ea6; --t-ind:#147486; --t-mod:#4c5a63; --t-wld:#8a8f96;
   --fillop:.46; --coast:#4a5156; --sea2:#e6eff2; --shadow:rgb(40 60 70/.13); --tline:rgb(255 255 255/.85);
   --a-jp:#d6336c; --a-cn:#7a5230; --a-west:#0e8a8c; --a-north:#c0392b; --a-south:#1f5fbf; --g1:#7fb3e0; --g2:#e6a157; --g3:#b39ddb; --g4:#8cc9a0; --g5:#e57f7f;
   --display:var(--ui);
@@ -23,7 +23,7 @@
   --c-gojoseon:#d9a45c; --c-buyeo:#a593e4; --c-goguryeo:#e46b63; --c-baekje:#5e9ce0; --c-silla:#e9b93e; --c-gaya:#4fbf88;
   --c-okjeo:#7cc0b8; --c-dongye:#c4a283; --c-han:#9aa3aa; --c-balhae:#9a7fe0; --c-goryeo:#3cc0b0; --c-joseon:#7390e0;--c-daehan:#f0c93a;
   --c-japan:#b99a9a; --c-south:#5e90e0; --c-north:#e46b63; --c-us:#6f98d6; --c-ussr:#d87777;
-  --t-pol:#8ea9d6; --t-war:#e47584; --t-eco:#d9bc5c; --t-soc:#a8d562; --t-cul:#b28be2; --t-ind:#50c3d3; --t-mod:#a6b4bc; --t-wld:#c4b08a;
+  --t-pol:#8ea9d6; --t-war:#e47584; --t-eco:#d9bc5c; --t-soc:#a8d562; --t-cul:#b28be2; --t-ind:#50c3d3; --t-mod:#a6b4bc; --t-wld:#9ca3ab;
   --fillop:.5; --coast:#8b969b; --sea2:#14232a; --shadow:rgb(0 0 0/.35); --tline:rgb(20 26 29/.85); --a-jp:#f06595; --a-cn:#c8955f; --a-west:#3cc7c9; --a-north:#ff6b5e; --a-south:#6fa0ff; --g1:#4f8fc8; --g2:#c98236; --g3:#8f78c4; --g4:#5aa776; --g5:#d06060; color-scheme:dark } }
 :root[data-theme="dark"]{
   --sea:#0e191e; --land:#222a2e; --river:#3d6c82; --grid:#1d2c33;
@@ -32,7 +32,7 @@
   --c-gojoseon:#d9a45c; --c-buyeo:#a593e4; --c-goguryeo:#e46b63; --c-baekje:#5e9ce0; --c-silla:#e9b93e; --c-gaya:#4fbf88;
   --c-okjeo:#7cc0b8; --c-dongye:#c4a283; --c-han:#9aa3aa; --c-balhae:#9a7fe0; --c-goryeo:#3cc0b0; --c-joseon:#7390e0;
   --c-japan:#b99a9a; --c-south:#5e90e0; --c-north:#e46b63; --c-us:#6f98d6; --c-ussr:#d87777;
-  --t-pol:#8ea9d6; --t-war:#e47584; --t-eco:#d9bc5c; --t-soc:#a8d562; --t-cul:#b28be2; --t-ind:#50c3d3; --t-mod:#a6b4bc; --t-wld:#c4b08a;
+  --t-pol:#8ea9d6; --t-war:#e47584; --t-eco:#d9bc5c; --t-soc:#a8d562; --t-cul:#b28be2; --t-ind:#50c3d3; --t-mod:#a6b4bc; --t-wld:#9ca3ab;
   --fillop:.5; --coast:#8b969b; --sea2:#14232a; --shadow:rgb(0 0 0/.35); --tline:rgb(20 26 29/.85); --a-jp:#f06595; --a-cn:#c8955f; --a-west:#3cc7c9; --a-north:#ff6b5e; --a-south:#6fa0ff; --g1:#4f8fc8; --g2:#c98236; --g3:#8f78c4; --g4:#5aa776; --g5:#d06060; color-scheme:dark }
 
 *{box-sizing:border-box}
@@ -1051,6 +1051,15 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 #arrleg[hidden]{display:none}
 #arrleg div{display:flex;align-items:center;gap:6px;white-space:nowrap}
 #arrleg svg{width:28px;height:10px;flex:none}#arrleg path{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* 구조도: 옆자리가 남으면 다음 카드를 나란히 */
+#trbody{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+#trbody>.trcard{flex:0 1 auto;width:fit-content;max-width:100%;margin:0!important;min-width:0;box-sizing:border-box}
+#trbody>#tree-laws,#trbody>#tree-orgs,#trbody>.trintro{flex-basis:100%}
+#trbody .htree{max-width:100%}
+
+#trbody .trcard .trflow,#trbody .trcard .trh span{width:0;min-width:100%;box-sizing:border-box}
+#trbody .trcard .tree{min-width:240px}
 </style>
 
 <div class="app">
@@ -1273,7 +1282,7 @@ const ERAS=[
   pol:['부여: 5부족 연맹, 왕 아래 마가·우가·저가·구가가 사출도를 다스림.','고구려: 5부족 연맹, 제가 회의. 태조왕 때 옥저 정복·계루부 고씨 왕위 세습, 고국천왕 때 부자 상속.','옥저·동예: 왕이 없이 읍군·삼로 등 군장이 다스림. 삼한: 신지·읍차 + 제사장 천군이 소도를 관리.','백제 고이왕(관등·공복), 신라 내물 마립간(김씨 왕위 세습) 때 중앙 집권의 기틀을 닦았다.'],
   soc:['부여: 영고(12월), 1책 12법, 순장. 고구려: 동맹(10월), 서옥제.','옥저: 민며느리제, 가족 공동 무덤. 동예: 무천(10월), 책화, 족외혼. 삼한: 수릿날(5월)·계절제(10월).'],
   eco:['부여는 반농반목(말·주옥·모피), 고구려는 약탈 경제(부경), 동예는 단궁·과하마·반어피.','변한은 철을 많이 생산해 낙랑과 왜에 수출하였다.','고구려 고국천왕의 진대법(194).']}},
- {k:'three',n:'삼국의 발전과 통일 전쟁',rg:'4세기 후반 ~ 676년',s:{
+ {k:'three',n:'삼국의 전성기와 통일 전쟁',rg:'4세기 후반 ~ 676년',s:{
   pol:['고구려: 소수림왕(불교·태학·율령) → 광개토 대왕·장수왕 전성기(평양 천도 427, 한성 함락 475).','백제: 근초고왕 전성기(4세기) → 웅진 천도(475) → 무령왕(22담로)·성왕(사비 천도 538, 한강 일시 회복).','신라: 지증왕(국호·왕 칭호, 우산국) → 법흥왕(율령·불교 공인·금관가야 병합) → 진흥왕(한강 장악·대가야 정복·순수비·화랑도).'],
   war:['나제 동맹(433)이 신라의 한강 하류 장악(553)으로 깨지고 관산성 전투(554)에서 성왕이 전사하였다.','고구려가 수(살수 대첩 612)와 당(안시성 645)의 침략을 막아 냈다.','나당 연합군이 백제(660)와 고구려(668)를 멸망시키고, 신라가 매소성(675)·기벌포(676) 승리로 당을 몰아냈다.'],
   eco:['신라 지증왕 때 우경 장려, 동시(시장) 설치.'],
@@ -1348,7 +1357,7 @@ const FRAMES=[
   cap:'광개토 대왕은 요동과 만주를 차지하고 신라에 들어온 왜를 물리쳤습니다. 장수왕은 평양으로 도읍을 옮기고 한성을 함락해 남한강 유역까지 내려왔습니다(지도는 475년 이후).',
   st:[['goguryeo','고구려','goguryeo',GOG475,[126.0,41.5]],['baekje','백제','baekje',BAE475,[126.9,35.8]],['silla','신라','silla',SIL475,[128.95,36.0]],['gaya','가야','gaya',GAYA,[128.15,35.15]]],
   caps:[['평양',125.75,39.02],['웅진',127.12,36.46],['금성',129.21,35.83],['대가야',128.26,35.73]],nb:[['북위',118.6,40.8],['왜',131.3,33.3]]},
- {y:500,era:'three',title:'6세기 · 신라의 팽창',per:'500 ~ 598',view:VF,
+ {y:500,era:'three',title:'6세기 · 신라의 전성기',per:'500 ~ 598',view:VF,
   cap:'신라는 법흥왕 때 체제를 정비하고, 진흥왕 때 한강 유역과 함경도 해안, 대가야까지 차지했습니다. 백제는 사비로 옮겨 중흥을 꾀했습니다(지도는 562년 이후).',
   st:[['goguryeo','고구려','goguryeo',GOG562,[125.8,41.5]],['baekje','백제','baekje',BAE475,[126.9,35.7]],['silla','신라','silla',SIL562,[128.6,36.6]]],
   caps:[['평양',125.75,39.02],['사비',126.91,36.28],['금성',129.21,35.83]],nb:[['북조',118.6,40.8],['왜',131.3,33.3]]},
@@ -1991,6 +2000,7 @@ EVENTS.forEach(e=>Object.assign(e,EXTRA[e.t]||{}));
 
 /* 시기 띠: 연도 옆에 색으로 보여 줄 정권·통치 시기 */
 const REGIMES=[
+ [346,391,'백제 전성기 (근초고왕)',2],[391,540,'고구려 전성기 (광개토·장수왕)',5],[540,598,'신라 전성기 (진흥왕)',3],[598,676.9,'삼국 통일 전쟁',4],
  [918.5,1170.7,'호족 통합·문벌 귀족',1],[1170.7,1270.4,'무신 정권',2],[1270.4,1351.8,'원 간섭기',3],[1351.8,1392.55,'공민왕 개혁·고려 말',4],
  [1392.55,1470,'체제 정비기',1],[1470,1567,'사림의 성장·사화',2],[1567,1592.3,'붕당 정치 시작',3],
  [1592.3,1598.9,'임진왜란',5],[1598.9,1680,'붕당 정치·호란',3],[1680,1724.7,'환국',4],[1724.7,1800.5,'탕평 정치',1],[1800.5,1863.95,'세도 정치',2],
@@ -3915,7 +3925,7 @@ function layHZ(k,SC){
   const t0=fs[0].t,t1=fs[fs.length-1].t2;
   const tw=s=>s.length*13.2+8,twe=e=>tw(e.t)+(e.treaty?20:0);
   // 1) 사건마다 x: 같은 해는 붙여서, 해가 바뀌면 조금 띄움
-  const xs=[];let x=40,prevY=null;evs.forEach((e,i)=>{const y=Math.floor(e.T+1e-6);if(i){x+=HZ_ONLY[k]?380:(y===prevY?30:Math.min(90,Math.max(46,yrTxt(y).length*9+18))*SC)}xs.push(x);prevY=y});
+  const xs=[];let x=40,prevY=null;evs.forEach((e,i)=>{const y=Math.floor(e.T+1e-6);if(i){const fast=(['pre','early'].includes(k)?.7:1)*((isMajor(e)||e.top)?1:.85);x+=HZ_ONLY[k]?380:(y===prevY?26:Math.min(90,Math.max(40,yrTxt(y).length*8.5+14))*SC*fast)}xs.push(x);prevY=y});
   const W=Math.max(x+260,$('ovscroll').clientWidth||0);
   const xT=t=>{if(t<=evs[0].T)return xs[0]-30;for(let i=1;i<evs.length;i++)if(t<=evs[i].T)return xs[i-1]+(xs[i]-xs[i-1])*(t-evs[i-1].T)/Math.max(1e-6,evs[i].T-evs[i-1].T);return xs[xs.length-1]+40};
   const lanes=(items,gap=10)=>{const ends=[];items.forEach(it=>{let li=ends.findIndex(v=>v<=it.a-gap);if(li<0){li=ends.length;ends.push(-1e9)}ends[li]=it.b;it.li=li});return ends.length};
