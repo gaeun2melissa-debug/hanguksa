@@ -54,7 +54,7 @@ const yrO=e=>esc(e.yl?e.yl.replace('기원전 ','BC '):(e.y<0?'BC '+(-e.y):Strin
 function cardO(e,w,pos){const hc=HEARTS.has(e.t)?' hearted':'',tr=e.treaty?'<i class="tseal">조</i>':'',st=`width:${w}px;--tc:var(--t-${e.tp[0]});${pos||''}`;
   return `<button class="${UPT.has(e.tp[0])?'ocard dt':'fev'}${hc}" data-ev="${e.id}" style="${st}"><span class="h"><b>${yrO(e)}</b>${tr}${nbT(esc(e.t))}<i class="hm"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg></i></span></button>`}
 function stackO(items){const placed=[];items.sort((a,b)=>a.left-b.left).forEach(it=>{let y=0,mv=true;while(mv){mv=false;for(const p of placed){if(p.left<it.left+it.w+6&&it.left<p.left+p.w+6&&p.y<y+it.h+6&&y<p.y+p.h+6){y=p.y+p.h+6;mv=true}}}it.y=y;placed.push(it)});return placed.reduce((m,p)=>Math.max(m,p.y+p.h),0)}
-let ovW=0,ovDir=store.get('ovdir','v');
+let ovW=0,ovDir=(innerHeight>innerWidth*1.05)?'v':'h';
 function drawEra(k){
   const HE=k==='heart',ALL=k==='all'||HE;
   const E=ALL?{n:HE?'하트한 사건':'전체 흐름',rg:'',s:{}}:ERA[k];const fs=ALL?FRAMES:FRAMES.filter(f=>f.era===k);
@@ -107,7 +107,7 @@ function drawEra(k){
     for(let i=s;i<=e;i++){const x=loc(i);if(i>s&&brk.has(i))h+=`<span class="obrk" style="left:${(loc(i-1)+x)/2}px;top:${axisY-9}px">≈</span>`;
       const at=sev.filter(x=>Math.abs(Tk(x)-A[i])<1e-6);const isEv=at.length>0;if(isEv)h+=at.some(isMajor)?`<span class="fx" style="left:${x}px;top:${axisY}px">×</span>`:`<span class="ftk" style="left:${x}px;top:${axisY-5}px"></span>`;
       if(!(i>s&&LBL[i]===LBL[i-1]))h+=`<span class="fyr${isEv?' ev':''}" style="left:${x}px;top:${yrY}px">${LBL[i]}</span>`}
-    const SEPX=rgs.filter(r=>inR(r.s,r.e)).map(r=>xL(Math.max(r.s,ta)));[...up,...dn].forEach(it=>{for(const a of SEPX){if(it.left<a+5&&it.left+it.w>a-2){if(it.x>=a-1)it.left=a+6;else if(it.x-(a-6-it.w)<it.w)it.left=Math.max(0,a-6-it.w)}}});
+    const SEPX=rgs.filter(r=>inR(r.s,r.e)).map(r=>xL(Math.max(r.s,ta)));[...up,...dn].forEach(it=>{for(const a of SEPX){if(it.left<a+5&&it.left+it.w>a-2){if(it.x>=a-4)it.left=a+6;else if(it.x-(a-6-it.w)<it.w)it.left=Math.max(0,a-6-it.w)}}});
     up.forEach(it=>{const top=upBase-it.y-it.h;h+=`<i class="flead" style="left:${it.x}px;top:${top+it.h}px;height:${bandY-top-it.h}px"></i>`+cardO(it.e,it.w,`left:${it.left}px;top:${top}px`)});
     dn.forEach(it=>{const top=dnTop+it.y;h+=`<i class="flead dn" style="left:${it.x}px;top:${axisY+6}px;height:${top-axisY-6}px"></i>`+cardO(it.e,it.w,`left:${it.left}px;top:${top}px`)});
     out+=`<div class="oseg" style="height:${H}px;${HZ?`width:${SWs}px`:''}">${h}</div>`;

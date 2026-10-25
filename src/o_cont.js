@@ -1,14 +1,28 @@
 /* ───────── 연대표: 시대 버튼 = 전체 속에서 그 시대로 이동 (한 줄로 이어 그림) ───────── */
 let ovCont=null,ovBuilding=false;
 function ovSecs(){return [...$('ovchart').querySelectorAll('.ovsec')]}
-function buildCont(){const H=ovDir==='h',sc=$('ovscroll'),parts=[];ovBuilding=true;
+function buildCont(){const V=ovDir==='v',sc=$('ovscroll'),parts=[];ovBuilding=true;if(V)ovDir='h';
   try{for(const E of ERAS){drawEra(E.k);const html=$('ovchart').innerHTML;
-    parts.push(H?`<section class="ovsec hsec" data-sec="${E.k}">${html}</section>`:`<section class="ovsec vsec" data-sec="${E.k}"><div class="ovsech2"><b>${esc(E.n)}</b><span>${esc(E.rg)}</span><button type="button" class="sumtg" aria-expanded="false">요약 보기</button></div><div class="ovsecsum" hidden>${sumHTML(E)}</div>${html}</section>`)}}
-  finally{ovBuilding=false}
-  $('v-ov').classList.toggle('hzsplit',H);
-  $('ovchart').innerHTML=H?`<div class="hzall">${parts.join('')}</div>`:parts.join('');
+    parts.push(`<section class="ovsec hsec" data-sec="${E.k}">${html}</section>`)}}
+  finally{ovBuilding=false;if(V)ovDir='v'}
+  $('v-ov').classList.add('hzsplit');
+  $('ovchart').innerHTML=`<div class="hzall">${parts.join('')}</div>`;
   $('ovsum').innerHTML='';$('ovside').innerHTML='';
-  ovCont={dir:ovDir,w:sc.clientWidth,dirty:false};if(H)hzSync()}
+  if(V)vSlice();else hzAlign();
+  ovCont={dir:ovDir,w:sc.clientWidth,dirty:false};if(!V)hzSync()}
+/* 세로: 가로 연대표를 화면 폭만큼 잘라 줄줄이 쌓기 (글자 안 잘리는 자리에서 자름) */
+function vSlice(){const sc=$('ovscroll'),cw=Math.max(280,sc.clientWidth-20),out=[];
+  for(const s of $('ovchart').querySelectorAll('.hsec')){const top=s.querySelector('.hztop');if(!top)continue;const r0=top.getBoundingClientRect(),W=top.scrollWidth||r0.width,H=top.offsetHeight;
+    const iv=[],bx=[];top.querySelectorAll('*').forEach(el=>{if(el.children.length&&!(el instanceof SVGElement))return;const r=el.getBoundingClientRect();if(!r.width||!r.height)return;const L=r.left-r0.left,T=r.top-r0.top;if(r.height<H*.8)bx.push([L,L+r.width,T,T+r.height]);if(r.width>cw*.6)return;iv.push([L-3,L+r.width+3])});
+    const ok=x=>!iv.some(([a,b])=>x>a&&x<b);const Wc=Math.min(W,Math.max(0,...iv.map(q=>q[1]))+12);let x0=0;const rows=[];
+    while(x0<Wc-2){let x1=Math.min(Wc,x0+cw);if(x1<Wc){let c=x1;while(c>x0+cw*.45&&!ok(c))c-=4;if(c>x0+cw*.45)x1=c}rows.push([x0,x1]);x0=x1}
+    const inner=top.outerHTML;
+    out.push(`<section class="ovsec vsec vcut" data-sec="${s.dataset.sec}">${rows.map(([a,b])=>{const ys=bx.filter(q=>q[1]>a&&q[0]<b);const y0=Math.max(0,Math.min(...ys.map(q=>q[2]))-6),y1=Math.min(H,Math.max(...ys.map(q=>q[3]))+6);const t=isFinite(y0)?y0:0,h=isFinite(y1)?y1-t:H;return `<div class="vrow" style="width:${Math.ceil(b-a)}px;height:${h}px"><div class="vrin" style="left:${-a}px;top:${-t}px;width:${W}px;height:${H}px">${inner}</div></div>`}).join('')}</section>`)}
+  $('v-ov').classList.remove('hzsplit');$('ovchart').innerHTML=out.join('')}
+/* 가로: 시대마다 연도 줄 높이를 맞춰 한 줄로 이어지게 */
+function hzAlign(){const secs=[...$('ovchart').querySelectorAll('.hsec')];const ys=secs.map(s=>{const a=s.querySelector('.hzax');return a?a.getBoundingClientRect().top:null});const mx=Math.max(...ys.filter(v=>v!=null));
+  secs.forEach((s,i)=>{if(ys[i]==null)return;const d=mx-ys[i];if(d<1)return;const top=s.querySelector('.hztop');const inner=top&&top.querySelector(':scope>div[style*="left:0;right:0"]');if(!inner)return;inner.style.top=(parseFloat(inner.style.top)||0)+d+'px';top.style.height=(top.offsetHeight+d)+'px'});
+  const hs=secs.map(s=>s.querySelector('.hztop').offsetHeight);const mh=Math.max(...hs);secs.forEach((s,i)=>{const t=s.querySelector('.hztop');if(hs[i]<mh)t.style.height=mh+'px'})}
 function ovGoSec(k,smooth){const s=$('ovchart').querySelector(`.ovsec[data-sec="${k}"]`);if(!s)return;
   if(ovDir==='h'){const sc=$('ovscroll');sc.scrollTo({left:s.getBoundingClientRect().left-sc.getBoundingClientRect().left+sc.scrollLeft,behavior:smooth?'smooth':'auto'})}
   else{const rd=$('ovread');const hd=$('v-ov').querySelector('.rhead');const top=Math.max(rd.getBoundingClientRect().top,hd&&hd.offsetHeight?hd.getBoundingClientRect().bottom:0);const y=s.getBoundingClientRect().top-top+rd.scrollTop-6;rd.scrollTo({top:y,behavior:smooth?'smooth':'auto'})}}
@@ -91,3 +105,6 @@ function arrName(c,e){const y=e.y;const k=n=>n;
  window.updArrLeg=function(){const seen=new Map();(byFrame[pos.i]||[]).forEach(e=>{const ps=arrOf.get(e.id);if(!ps)return;ps.forEach(p=>{const cl=p.g.classList;if(cl.contains('hide')||cl.contains('gone')||cl.contains('stale'))return;const nm=arrName(p.c,e);const key=nm+'|'+p.dash;if(!seen.has(key))seen.set(key,{nm,col:acol(p.c),dash:p.dash})})});
    if(!seen.size||$('v-map').hidden){lg.hidden=true;return}lg.hidden=false;{const dk=$('dock'),vm=$('v-map');if(dk&&vm){const a=vm.getBoundingClientRect(),b2=dk.getBoundingClientRect();lg.style.bottom=Math.max(10,a.bottom-b2.top+10)+'px'}}lg.innerHTML=[...seen.values()].slice(0,6).map(o=>`<div><svg viewBox="0 0 30 10"><path d="M2 5H24M19 1.5L25 5L19 8.5" style="stroke:${o.col}"${o.dash?' stroke-dasharray="4 3"':''}/></svg>${esc(o.nm)} ${o.dash?'이동':'진로'}</div>`).join('')};
  const ut=updateTime;updateTime=function(ch){ut(ch);clearTimeout(updArrLeg.t);updArrLeg.t=setTimeout(updArrLeg,60)}}
+
+/* 연대표 방향: 화면이 가로면 가로, 세로로 세우면 세로 (자동) */
+{const fit=()=>{const want=(innerHeight>innerWidth*1.05)?'v':'h';if(want===ovDir)return;ovDir=want;ovCont=null;if(!$('v-ov').hidden&&ovSel)ovShow(ovSel)};let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(fit,250)});addEventListener('orientationchange',()=>setTimeout(fit,300))}
