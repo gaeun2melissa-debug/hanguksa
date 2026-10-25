@@ -41,7 +41,7 @@ function layHZ(k,SC){
   let y0=TOPH+38+used*RH+(used?10:0);
   const rowY=k=>y0-10-(k+1)*RH+3;const gcAt=x=>{const r=rg.find(r=>x>=r.a&&x<r.b);return r?`var(--g${r.c})`:'transparent'};
   og.forEach(o=>{h+=`<div class="hzog" style="left:${o.a}px;top:${rowY(o.li)}px;width:${Math.max(8,o.b-o.a)}px;--tc:var(--t-${o.c})"><span>${esc(o.n)}</span></div>`});
-  let rgH='',stH='';rg.forEach(r=>{stH+=`<div class="hzst" style="left:${r.a}px;width:${Math.max(0,r.b-r.a)}px;--gc:var(--g${r.c})"></div>`;rgH+=`<div class="hzrg" style="left:${r.a}px;top:4px;width:${Math.max(8,r.b-r.a-3)}px;--gc:var(--g${r.c})"><span>${esc(r.n)}</span></div><i class="hzsep" style="left:${r.a}px"></i>`});
+  let rgH='',stH='';rg.forEach((r,ri)=>{const rb=ri===rg.length-1?Math.max(r.b,W):r.b;stH+=`<div class="hzst" style="left:${ri?r.a:Math.min(r.a,0)}px;width:${Math.max(0,rb-(ri?r.a:Math.min(r.a,0)))}px;--gc:var(--g${r.c})"></div>`;rgH+=`<div class="hzrg" style="left:${r.a}px;top:4px;width:${Math.max(8,rb-r.a-6)}px;--gc:var(--g${r.c})"><span>${esc(r.n)}</span></div><i class="hzsep" style="left:${r.a}px"></i>`});
   const axY=y0+22;
   // 축 · 연도 · 표시
   h+=`<div class="hzax" style="top:${axY}px;width:${W}px"></div>`;
@@ -62,7 +62,7 @@ function layHZ(k,SC){
   const shownL=new Set([...upN.filter(o=>o.row>=0),...nm.filter(o=>o.li<NLc)].map(o=>o.e.id));const det=[...evs.filter(e=>HZ_NOTES[e.t]||(isMajor(e)&&!shownT.has(e.id)&&!shownL.has(e.id))).map(e=>fitSep({e,a:xT(e.T)-120,b:xT(e.T)+120},xT(e.T))),...tops.filter(o=>o.li>=TLc&&o.kind==='r').map(o=>fitSep({r:o,a:xT(o.t)-120,b:xT(o.t)+120},xT(o.t))),].sort((p,q)=>p.a-q.a);let DL=lanes(det,14);if(HZ_ONLY[k]){det.forEach((o,i)=>{o.li=0;const w=o.b-o.a;o.a=Math.max(6,(o.e?xT(o.e.T):o.a)+8);o.b=o.a+w});DL=1}
   const DB=HZ_ONLY[k]?120:(evs.some(e=>HZ_NOTES[e.t])?76:62);const DLc=DL;det.filter(o=>o.li<DLc).forEach(o=>{if(o.g){b+=`<div class="hzd hzg" style="left:${o.a}px;top:${KH+o.li*DB}px"><b data-gl="${esc(o.g)}" class="gw">${esc(o.g)}</b><em>${esc(o.from)}</em><p>${esc(hzShort(GLOSS[o.g]))}</p></div>`;return}if(o.r){b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><b class="rfh">* ${esc(o.r.title)} <em>(${yrTxt(Math.floor(o.r.t))})</em></b><em>${esc(o.r.by)}</em><p>${esc(hzShort(o.r.body))}</p></div>`;return}b+=`<div class="hzd" style="left:${o.a}px;top:${KH+o.li*DB}px"><button data-ev="${o.e.id}" style="--tc:var(--t-${o.e.tp[0]})">* ${esc(o.e.t)}</button>${o.e.pp?`<em>${esc(o.e.pp)}</em>`:''}${HZ_NOTES[o.e.t]?`<div class="hzkw">${HZ_NOTES[o.e.t].map(v=>`<span>${esc(v)}</span>`).join('')}</div>`:`<p>${esc(hzShort(o.e.x))}</p>`}</div>`});
   rg.forEach(r=>{stH+=`<i class="hzsep" style="left:${r.a}px"></i>`});
-  const usedB=KH+(det.length?DL*DB+4:0);if(!ALL&&!HZ_ONLY[k])b+=`<div class="hzsum" style="margin-top:${usedB}px">${sumHTML(E)}</div>`;
+  const usedB=KH+(det.length?DL*DB+4:0);if(false)b+=`<div class="hzsum" style="margin-top:${usedB}px">${sumHTML(E)}</div>`;
   const botH=Math.max(KH+DB,HZAV-topH-4);
   return {H:topH+botH+4,html:`<div class="hzwrap" style="width:${W}px">${stH}<div class="hztop" style="height:${topH}px">${rgH}<div style="position:absolute;left:0;right:0;top:${padT}px;height:${topH0}px">${h}</div></div><div class="hzbot" style="height:${botH}px">${b}</div></div>`}
 }
