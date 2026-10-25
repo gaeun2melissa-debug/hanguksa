@@ -5,7 +5,7 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStat
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyAPHs56cX-nqgmU9tR3eVGu8cJo5MqalQY",authDomain:"hanguksa-dbb5e.firebaseapp.com",projectId:"hanguksa-dbb5e",storageBucket:"hanguksa-dbb5e.firebasestorage.app",messagingSenderId:"1038931533852",appId:"1:1038931533852:web:4e919a13ebf9e9be8fffd9"});
 const auth=getAuth(app),db=getFirestore(app);
-const KEYS=['hearts','books','kh','snd'],SETS=['hearts','books','kh'],LS=k=>'ksh-'+k;
+const KEYS=['hearts','books','kh','snd','words'],SETS=['hearts','books','kh','words'],LS=k=>'ksh-'+k;
 let uid=null,timer=0;
 const get=k=>{try{return localStorage.getItem(LS(k))}catch(e){return null}},put=(k,v)=>{try{localStorage.setItem(LS(k),v)}catch(e){}};
 function collect(){const o={};KEYS.forEach(k=>{const v=get(k);if(v!=null)o[k]=v});return o}

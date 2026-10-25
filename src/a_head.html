@@ -1006,6 +1006,15 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 
 #hovtip{position:fixed;z-index:120;pointer-events:none;background:var(--ink);color:var(--panel);font-size:12.5px;padding:5px 10px;border-radius:8px;white-space:nowrap;opacity:0;transform:translateY(-2px);transition:opacity .15s,transform .15s;box-shadow:0 4px 14px rgb(0 0 0/.18)}
 #hovtip.on{opacity:.95;transform:none}
+
+.wbk{border:0;background:none;padding:2px;margin-left:6px;cursor:pointer;color:var(--muted);display:inline-grid;place-items:center;vertical-align:middle}
+.wbk svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}
+.wbk[aria-pressed="true"]{color:#6d28d9}.wbk[aria-pressed="true"] svg{fill:currentColor}
+.gbook dt .wbk{margin-left:auto}.gbook dt .gtr+.wbk{margin-left:4px}
+#dcbk{font-weight:800;color:#6d28d9;white-space:nowrap}#dcbk[aria-pressed="true"]{background:#6d28d9;color:#fff;border-radius:8px}
+.dcempty{color:var(--muted);font-size:14px;padding:12px 4px}
+.tlkh{margin:14px 0 6px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--seal) 5%,var(--panel));border:1px solid color-mix(in srgb,var(--seal) 18%,var(--rule));border-left:4px solid var(--seal)}
+.tlkh h3{margin:0 0 8px;font-size:14px;color:var(--seal)}.tlkh h3:last-child{margin:14px 0 0}
 </style>
 
 <div class="app">
@@ -1021,7 +1030,7 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
       <button id="tab-kg" role="tab" aria-selected="false" data-v="kg">왕계표</button>
       <button id="tab-pp" role="tab" aria-selected="false" data-v="pp">인물</button><button id="tab-dc" role="tab" aria-selected="false" data-v="dc">사전</button>
     </nav>
-    <div class="tbtns"><button class="tib" id="heartbtn" type="button" aria-label="하트 모아 보기"><svg viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.6 2.6c0 5.8-7.6 10.4-7.6 10.4z"/></svg></button><button class="tib" id="bookbtn" type="button" aria-label="책갈피 모아 보기"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg></button><button class="tib" id="fsbtn" type="button" aria-label="전체 화면"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button class="tib" id="setbtn" type="button" aria-label="설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z"/></svg></button></div>
+    <div class="tbtns"><button class="tib" id="heartbtn" type="button" aria-label="하트한 사건·인물 보기"><svg viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.6 2.6c0 5.8-7.6 10.4-7.6 10.4z"/></svg></button><button class="tib" id="bookbtn" type="button" aria-label="북마크한 낱말 보기"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg></button><button class="tib" id="fsbtn" type="button" aria-label="전체 화면"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button class="tib" id="setbtn" type="button" aria-label="설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z"/></svg></button></div>
   </header>
 
   <section class="view" id="v-map">

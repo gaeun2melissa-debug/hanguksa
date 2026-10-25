@@ -113,7 +113,7 @@ function openSet(){const p=$('setpop');const mo=Object.entries(MOODS);const FT=s
 let prevT=0;function bgPreview(){bgStart();clearTimeout(prevT);if(!(SND.when==='always'||playing))prevT=setTimeout(()=>{if($('setpop').hidden||!(SND.when==='always'||playing))bgStop()},6000)}
 function closeSet(){$('setpop').hidden=true;$('setdim').hidden=true;clearTimeout(prevT);bgSync()}
 $('setdim').onclick=closeSet;$('setbtn').onclick=openSet;
-$('heartbtn').onclick=()=>{tlHeart='h';showView('tl');renderTLFilter();$('tlread').scrollTop=0};$('bookbtn').onclick=()=>{tlHeart='b';showView('tl');renderTLFilter();$('tlread').scrollTop=0};
+$('heartbtn').onclick=()=>{tlHeart='h';showView('tl');renderTLFilter();$('tlread').scrollTop=0};$('bookbtn').onclick=()=>{dcOnlyBk=true;showView('dc');dcFilter()};
 {const p0=play,p1=pause,pp=popPin;play=function(){unlockAudio();p0.apply(this,arguments);bgSync()};pause=function(){p1.apply(this,arguments);bgSync()};
  popPin=function(o){pp(o);if(playing&&o&&o.pin){const k=sfxFor(o.pin);if(k)sfx(k)}}}
 document.addEventListener('click',ev=>{const h=ev.target.closest('[data-h]');if(h&&h.getAttribute('aria-pressed')==='true')sfx('heart',true)});

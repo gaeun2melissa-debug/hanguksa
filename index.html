@@ -1007,6 +1007,15 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 
 #hovtip{position:fixed;z-index:120;pointer-events:none;background:var(--ink);color:var(--panel);font-size:12.5px;padding:5px 10px;border-radius:8px;white-space:nowrap;opacity:0;transform:translateY(-2px);transition:opacity .15s,transform .15s;box-shadow:0 4px 14px rgb(0 0 0/.18)}
 #hovtip.on{opacity:.95;transform:none}
+
+.wbk{border:0;background:none;padding:2px;margin-left:6px;cursor:pointer;color:var(--muted);display:inline-grid;place-items:center;vertical-align:middle}
+.wbk svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}
+.wbk[aria-pressed="true"]{color:#6d28d9}.wbk[aria-pressed="true"] svg{fill:currentColor}
+.gbook dt .wbk{margin-left:auto}.gbook dt .gtr+.wbk{margin-left:4px}
+#dcbk{font-weight:800;color:#6d28d9;white-space:nowrap}#dcbk[aria-pressed="true"]{background:#6d28d9;color:#fff;border-radius:8px}
+.dcempty{color:var(--muted);font-size:14px;padding:12px 4px}
+.tlkh{margin:14px 0 6px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--seal) 5%,var(--panel));border:1px solid color-mix(in srgb,var(--seal) 18%,var(--rule));border-left:4px solid var(--seal)}
+.tlkh h3{margin:0 0 8px;font-size:14px;color:var(--seal)}.tlkh h3:last-child{margin:14px 0 0}
 </style>
 
 <div class="app">
@@ -1022,7 +1031,7 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
       <button id="tab-kg" role="tab" aria-selected="false" data-v="kg">왕계표</button>
       <button id="tab-pp" role="tab" aria-selected="false" data-v="pp">인물</button><button id="tab-dc" role="tab" aria-selected="false" data-v="dc">사전</button>
     </nav>
-    <div class="tbtns"><button class="tib" id="heartbtn" type="button" aria-label="하트 모아 보기"><svg viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.6 2.6c0 5.8-7.6 10.4-7.6 10.4z"/></svg></button><button class="tib" id="bookbtn" type="button" aria-label="책갈피 모아 보기"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg></button><button class="tib" id="fsbtn" type="button" aria-label="전체 화면"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button class="tib" id="setbtn" type="button" aria-label="설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z"/></svg></button></div>
+    <div class="tbtns"><button class="tib" id="heartbtn" type="button" aria-label="하트한 사건·인물 보기"><svg viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.6 2.6c0 5.8-7.6 10.4-7.6 10.4z"/></svg></button><button class="tib" id="bookbtn" type="button" aria-label="북마크한 낱말 보기"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg></button><button class="tib" id="fsbtn" type="button" aria-label="전체 화면"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button class="tib" id="setbtn" type="button" aria-label="설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z"/></svg></button></div>
   </header>
 
   <section class="view" id="v-map">
@@ -2365,7 +2374,9 @@ EVENTS.forEach(e=>{if(TPFIX[e.t])e.tp=TPFIX[e.t]});
 
 /* ───────── 아이콘 분류: 침입당함 · 막아냄 · 공격함 · 작전 · 사건 ───────── */
 const ICON_SET={def:['매소성 전투','기벌포 전투 · 삼국 통일','노량 해전','옥포 해전','처인성 전투','봉오동 전투','청산리 대첩','황토현 전투','장성 황룡촌 전투'],hit:['중국군 참전','우금치 전투'],atk:['영릉가 전투','쌍성보 전투','대전자령 전투']};
+const RELIC=/유적|동굴|패총|암각화|고인돌|대장경|석굴암|불국사|첨성대|[^골]탑|비 건립|정계비|순수비|금관|토기|동검|불상|신종|고분|무덤|왕릉|능비|직지|여지도|화성 축조|중건|종묘|실록|의궤|활자|측우기|자격루|혼천의|거북선|팔만/;
 function iconOf(e){const t=e.t;for(const k in ICON_SET)if(ICON_SET[k].includes(t))return k;
+  if(!e.tp.includes('war')&&!/건국|멸망/.test(t)&&RELIC.test(t))return 'relic';
   if(/작전|철수|후퇴|회담 시작/.test(t))return 'op';
   if(/사건|참변|사태|학살/.test(t)&&!/전쟁/.test(t))return 'inc';
   if(/침입|침략|양요|호란|왜란|왜변|남침|발발|사변|침공|도굴/.test(t))return 'hit';
@@ -2379,6 +2390,7 @@ const ICON_GL={def:['M0,-5.2L4.3,-3.5V0.1C4.3,2.7,2.4,4.6,0,5.4C-2.4,4.6,-4.3,2.
  atk:['M0,-5.6L2.7,-0.6L0.9,0V5H-0.9V0L-2.7,-0.6Z',1,'#c75a12','공격·진출'],
  op:['M0,-3.4A3.4,3.4 0 1 1 -0.01,-3.4M0,-6V-1.8M0,1.8V6M-6,0H-1.8M1.8,0H6',0,'#4b5b6b','작전'],
  inc:['M0,-4.6V1M0,3.9V4.1',0,null,'사건'],
+ relic:['M-2.6,-5.2H2.6M-1.5,-5.2V-3.6C-4.3,-2.6,-4.7,0.8,-3.2,3.3C-2.1,5,2.1,5,3.2,3.3C4.7,0.8,4.3,-2.6,1.5,-3.6V-5.2M-3.6,0H3.6',0,'#7c3aed','유물·유적'],
  rev:['M0,-5.6C2.8,-3,4,-0.8,3.7,1.6C3.4,4,1.8,5.4,0,5.4C-1.8,5.4,-3.4,4,-3.7,1.6C-3.9,-0.4,-2.6,-1.9,-1.5,-3.1C-1.3,-1.6,-0.7,-0.7,0.1,-0.5C0.6,-2.3,0.5,-4,0,-5.6Z',1,'var(--t-soc)','백성의 봉기'],
  coup:['M1.4,-5.8L-3.6,0.8H-0.3L-1.4,5.8L3.6,-1H0.3Z',1,'#6b21a8','권력 다툼·정변']};
 
@@ -2481,10 +2493,10 @@ function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);if(attrs)
 function h(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store={get(k,d){try{const v=localStorage.getItem('ksh-'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('ksh-'+k,JSON.stringify(v))}catch(e){}}};
-const HEARTS=new Set(store.get('hearts',[])),BOOKS=new Set(store.get('books',[]));let tlHeart=false,ovDirty=false;
+const HEARTS=new Set(store.get('hearts',[])),BOOKS=new Set(store.get('books',[]));if(BOOKS.size){BOOKS.forEach(t=>HEARTS.add(t));BOOKS.clear();store.set('hearts',[...HEARTS]);store.set('books',[])}let tlHeart=false,ovDirty=false;
 const HEART_IC='<svg viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.6 2.6c0 5.8-7.6 10.4-7.6 10.4z"/></svg>';
 const BOOK_IC='<svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg>';
-const hbtn=(e,bk)=>`<button class="hrt${bk?' bk':''}" type="button" ${bk?'data-b':'data-h'}="${e.id}" aria-pressed="${(bk?BOOKS:HEARTS).has(e.t)}" aria-label="${bk?'책갈피':'하트'}">${bk?BOOK_IC:HEART_IC}</button>`;
+const hbtn=(e,bk)=>`<button class="hrt" type="button" data-h="${e.id}" aria-pressed="${HEARTS.has(e.t)}" aria-label="하트">${HEART_IC}</button>`;
 function toggleHeart(id){const e=EVENTS.find(x=>x.id===id);if(!e)return;HEARTS.has(e.t)?HEARTS.delete(e.t):HEARTS.add(e.t);store.set('hearts',[...HEARTS]);const on=HEARTS.has(e.t);
   document.querySelectorAll(`[data-h="${id}"]`).forEach(b=>b.setAttribute('aria-pressed',on));document.querySelectorAll(`[data-ev="${id}"]`).forEach(b=>b.classList.toggle('hearted',on));
   if(tlHeart==='h')renderTLFilter();ovDirty=true;const hc=document.querySelector('.hchip b');if(hc)hc.textContent=HEARTS.size}
@@ -2803,7 +2815,11 @@ function placeInset(){const wrap=svg.getBoundingClientRect();if(!wrap.width)retu
   const score=k=>{const [x,y]=C[k];if(y<0||x<0)return 1e9;let s=0;pts.forEach(([a,b,c,d])=>{if(c>x-4&&a<x+iw+4&&d>y-4&&b<y+ih+4)s++});return s};
   let best=insetCorner,bs=score(insetCorner);['br','bl','tr','tl'].forEach(k=>{const s=score(k);if(s<bs){bs=s;best=k}});insetCorner=best;
   const [x,y]=C[best];inset.style.left=x+'px';inset.style.top=y+'px';inset.style.right='auto';inset.style.bottom='auto'}
-inset.addEventListener('click',()=>{abroad=!abroad;userMoved=true;animVB(abroad?fitVB(outBox()):fitVB(FRAMES[pos.i].view),700);updateInset()});
+/* 해외 작은 지도를 누르면 지구본 돌듯이: 멀리 빠졌다가 날아가서 내려앉기 */
+function flyVB(n,D=1300){const a={...vb};const ux=Math.min(a.x,n.x),uy=Math.min(a.y,n.y),uw=Math.max(a.x+a.w,n.x+n.w)-ux,uh=Math.max(a.y+a.h,n.y+n.h)-uy;const r=a.w/a.h;let mw=Math.max(uw,uh*r)*1.12;const mid={w:mw,h:mw/r,x:ux+uw/2-mw/2,y:uy+uh/2-mw/r/2};
+  if(reduceMotion){setVB(n);return}cancelAnimationFrame(vbRAF);const t0=performance.now();const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;const lerp=(p,q,k)=>({x:p.x+(q.x-p.x)*k,y:p.y+(q.y-p.y)*k,w:p.w+(q.w-p.w)*k,h:p.h+(q.h-p.h)*k});
+  const step=now=>{const t=Math.min(1,(now-t0)/D);const k=ease(t);const c1=lerp(a,mid,Math.sin(Math.PI*k/1)*0+Math.min(1,k*2)),pos2=lerp(a,n,k);const z=Math.sin(Math.PI*k);const v={x:pos2.x+(mid.x+mid.w/2-(pos2.x+pos2.w/2))*0,y:pos2.y,w:pos2.w+(mid.w-pos2.w)*z,h:pos2.h+(mid.h-pos2.h)*z};v.x=pos2.x+pos2.w/2-v.w/2;v.y=pos2.y+pos2.h/2-v.h/2;setVB(v);if(t<1)vbRAF=requestAnimationFrame(step);else{setVB(n);schedLabels&&schedLabels()}};vbRAF=requestAnimationFrame(step)}
+inset.addEventListener('click',()=>{abroad=!abroad;userMoved=true;flyVB(abroad?fitVB(outBox()):fitVB(FRAMES[pos.i].view));updateInset()});
 
 /* ───────── 시간 위치 ───────── */
 const N=FRAMES.length;
@@ -3104,7 +3120,7 @@ const isMajor=e=>e.found||e.fall||e.treaty||/건국|멸망|전쟁|정변|반정|
 const isSiteO=e=>(e.era==='prehist'||e.era==='pre')&&/유적|동굴|패총|암각화|고인돌/.test(e.t);
 const UPT=new Set(['pol','eco','cul']);
 const yrO=e=>esc(e.yl?e.yl.replace('기원전 ','BC '):(e.y<0?'BC '+(-e.y):String(e.y)));
-function cardO(e,w,pos){const hc=BOOKS.has(e.t)?' hearted':'',tr=e.treaty?'<i class="tseal">조</i>':'',st=`width:${w}px;--tc:var(--t-${e.tp[0]});${pos||''}`;
+function cardO(e,w,pos){const hc=HEARTS.has(e.t)?' hearted':'',tr=e.treaty?'<i class="tseal">조</i>':'',st=`width:${w}px;--tc:var(--t-${e.tp[0]});${pos||''}`;
   return `<button class="${UPT.has(e.tp[0])?'ocard dt':'fev'}${hc}" data-ev="${e.id}" style="${st}"><span class="h"><b>${yrO(e)}</b>${tr}${nbT(esc(e.t))}<i class="hm"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg></i></span></button>`}
 function stackO(items){const placed=[];items.sort((a,b)=>a.left-b.left).forEach(it=>{let y=0,mv=true;while(mv){mv=false;for(const p of placed){if(p.left<it.left+it.w+6&&it.left<p.left+p.w+6&&p.y<y+it.h+6&&y<p.y+p.h+6){y=p.y+p.h+6;mv=true}}}it.y=y;placed.push(it)});return placed.reduce((m,p)=>Math.max(m,p.y+p.h),0)}
 let ovW=0,ovDir=store.get('ovdir','v');
@@ -3231,7 +3247,7 @@ function kgShow(n,go){const D0=DYN[n]||REIGNS[0];kgSel=D0.n;
     return `<section class="kgn" id="kgn-${esc(D.n)}" style="--kc:var(--c-${D.c})"><div class="kghd"><h2>${D.n==='남한'?'대한민국':esc(D.n)}</h2><span>${yrTxt(t0)} ~ ${t1>=2026?'현재':yrTxt(t1)}</span></div>${trees?`<div class="kgtrees">구조도 ${trees}</div>`:''}
     <div class="kgl" style="--hb:${HB}px"><div class="kgcols">${cols.map(({r,evs,ach,w,all})=>{const maj=all.some(e=>e.found||e.fall||MAJ.test(e.t));
       const bs=bars.filter(b=>b.s<r.e&&b.e>r.s).map(b=>{const first=b.s>=r.s-1e-6,last=b.e<=r.e+1e-6;return `<i class="kbs${first?' f':''}${last?' l':''}" style="top:${b.li*20}px;--tc:var(--t-${b.c})" title="${esc(b.n)}">${first?esc(b.n):''}</i>`}).join('');
-      return `<div class="kcol${evs.length||ach.length?'':' q'}" style="width:${w}px"><div class="kbars">${bs}</div><div class="kname" data-king="${esc(D.n)}|${D.r.indexOf(r)}"><small>${D.n==='남한'?'':`<em>${ordOf(D,r)}</em>`}${yrTxt(r.s)}${evs.length||ach.length?'~'+(r.e>=2026?'':yrTxt(r.e)):''}</small><b>${esc(r.name.replace('대통령 ',''))}</b></div><div class="ktick">${maj?'<i>×</i>':''}</div>${evs.length||ach.length?`<ul>${ach.map(a=>`<li class="kach">${glx(a)}</li>`).join('')}${evs.map(e=>`<li><button type="button" data-kev="${e.id}" class="${BOOKS.has(e.t)?'hearted':''}" style="--tc:var(--t-${e.tp[0]})">${e.treaty?'<i class="tseal">조</i>':''}${esc(e.t)}</button></li>`).join('')}</ul>`:''}</div>`}).join('')}</div></div></section>`}).join('');
+      return `<div class="kcol${evs.length||ach.length?'':' q'}" style="width:${w}px"><div class="kbars">${bs}</div><div class="kname" data-king="${esc(D.n)}|${D.r.indexOf(r)}"><small>${D.n==='남한'?'':`<em>${ordOf(D,r)}</em>`}${yrTxt(r.s)}${evs.length||ach.length?'~'+(r.e>=2026?'':yrTxt(r.e)):''}</small><b>${esc(r.name.replace('대통령 ',''))}</b></div><div class="ktick">${maj?'<i>×</i>':''}</div>${evs.length||ach.length?`<ul>${ach.map(a=>`<li class="kach">${glx(a)}</li>`).join('')}${evs.map(e=>`<li><button type="button" data-kev="${e.id}" class="${HEARTS.has(e.t)?'hearted':''}" style="--tc:var(--t-${e.tp[0]})">${e.treaty?'<i class="tseal">조</i>':''}${esc(e.t)}</button></li>`).join('')}</ul>`:''}</div>`}).join('')}</div></div></section>`}).join('');
   kgGo(D0,go)}
 function kgGo(D0,go){if(!go)return;const s=document.getElementById('kgn-'+D0.n);if(s){const rd=$('kgread');rd.scrollTo({top:s.offsetTop-rd.querySelector('.rhead').offsetHeight-4,behavior:'smooth'})}}
 $('kgbody').addEventListener('click',ev=>{const b=ev.target.closest('[data-kev]');if(!b)return;const e=EVENTS.find(x=>x.id===+b.dataset.kev);const p=$('trpop');
@@ -3369,7 +3385,7 @@ function openSet(){const p=$('setpop');const mo=Object.entries(MOODS);const FT=s
 let prevT=0;function bgPreview(){bgStart();clearTimeout(prevT);if(!(SND.when==='always'||playing))prevT=setTimeout(()=>{if($('setpop').hidden||!(SND.when==='always'||playing))bgStop()},6000)}
 function closeSet(){$('setpop').hidden=true;$('setdim').hidden=true;clearTimeout(prevT);bgSync()}
 $('setdim').onclick=closeSet;$('setbtn').onclick=openSet;
-$('heartbtn').onclick=()=>{tlHeart='h';showView('tl');renderTLFilter();$('tlread').scrollTop=0};$('bookbtn').onclick=()=>{tlHeart='b';showView('tl');renderTLFilter();$('tlread').scrollTop=0};
+$('heartbtn').onclick=()=>{tlHeart='h';showView('tl');renderTLFilter();$('tlread').scrollTop=0};$('bookbtn').onclick=()=>{dcOnlyBk=true;showView('dc');dcFilter()};
 {const p0=play,p1=pause,pp=popPin;play=function(){unlockAudio();p0.apply(this,arguments);bgSync()};pause=function(){p1.apply(this,arguments);bgSync()};
  popPin=function(o){pp(o);if(playing&&o&&o.pin){const k=sfxFor(o.pin);if(k)sfx(k)}}}
 document.addEventListener('click',ev=>{const h=ev.target.closest('[data-h]');if(h&&h.getAttribute('aria-pressed')==='true')sfx('heart',true)});
@@ -3830,6 +3846,24 @@ function dcShow(){const b=$('dcbody');if(b.dataset.built)return;try{GLOSS;TREE_O
 {const sv=showView;showView=function(v){sv(v);if(v==='dc')dcShow()};if(store.get('view','map')==='dc')setTimeout(dcShow,0)}
 
 {const pc=personColor;personColor=function(P){try{const c=NAT_COL[personNation(P)];if(c)return c}catch(e){}return pc(P)}}
+/* 낱말 북마크 (사전) */
+const WORDS=new Set(store.get('words',[]));let dcOnlyBk=false;
+const wbBtn=k=>`<button type="button" class="wbk" data-wb="${esc(k)}" aria-pressed="${WORDS.has(k)}" aria-label="낱말 북마크">${BOOK_IC}</button>`;
+function toggleWord(k){WORDS.has(k)?WORDS.delete(k):WORDS.add(k);store.set('words',[...WORDS]);document.querySelectorAll(`[data-wb="${CSS.escape(k)}"]`).forEach(b=>b.setAttribute('aria-pressed',WORDS.has(k)));if(dcOnlyBk)dcFilter()}
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-wb]');if(!b)return;ev.preventDefault();ev.stopPropagation();toggleWord(b.dataset.wb)},true);
+function dcFilter(){const b=$('dcbody');if(!b||!b.dataset.built)return;b.classList.toggle('onlybk',dcOnlyBk);let n=0;b.querySelectorAll('.gl2>div').forEach(c=>{const k=c.dataset.k;const show=!dcOnlyBk||WORDS.has(k);c.hidden=!show;if(show)n++});b.querySelectorAll('.gh').forEach(h=>{const dl=h.nextElementSibling;h.hidden=dl&&![...dl.children].some(c=>!c.hidden);if(dl)dl.hidden=h.hidden});
+  const bt=$('dcbk');if(bt)bt.setAttribute('aria-pressed',dcOnlyBk);let em=b.querySelector('.dcempty');if(dcOnlyBk&&!n){if(!em){em=document.createElement('p');em.className='dcempty';b.prepend(em)}em.textContent='아직 북마크한 낱말이 없어요. 낱말 카드의 🔖를 누르면 여기 모여요.';em.hidden=false}else if(em)em.hidden=true}
+{const ds=dcShow;dcShow=function(){const b=$('dcbody');const first=!b.dataset.built;ds();if(!b.dataset.built)return;if(first){b.querySelectorAll('.gl2>div').forEach(c=>{const k=(c.querySelector('dt .gpn')||c.querySelector('dt'))?.childNodes[0]?.textContent?.trim();c.dataset.k=k;if(!c.classList.contains('gp')){const dt=c.querySelector('dt');dt.insertAdjacentHTML('beforeend',wbBtn(k))}});
+   $('dcjump').insertAdjacentHTML('afterbegin',`<button type="button" id="dcbk" aria-pressed="false">🔖 북마크만</button>`);$('dcbk').onclick=()=>{dcOnlyBk=!dcOnlyBk;dcFilter()}}dcFilter()}}
+/* 탭으로 사전에 들어오면 전체 보기 */
+document.querySelectorAll('.tabs [data-v="dc"]').forEach(b=>b.addEventListener('click',()=>{dcOnlyBk=false;setTimeout(dcFilter,0)},true));
+/* 낱말 뜻 창에도 북마크 버튼 */
+{const gp=$('glpop');if(gp)new MutationObserver(()=>{const b=gp.querySelector('b');if(b&&!gp.querySelector('.wbk')){b.insertAdjacentHTML('beforeend',' '+wbBtn(b.textContent.trim()))}}).observe(gp,{childList:true})}
+/* 하트 목록(연표)에 하트한 왕·인물도 같이 */
+{const rt=renderTLFilter;renderTLFilter=function(){rt.apply(this,arguments);const body=$('tlbody');if(!body)return;let box=$('tlkh');if(!tlHeart){if(box)box.remove();return}
+  if(!box){box=document.createElement('section');box.id='tlkh';box.className='tlkh';body.prepend(box)}const ks=[...KHEARTS];
+  box.innerHTML=`<h3>하트한 왕·인물 <small>${ks.length}</small></h3>${ks.length?`<div class="kpp">${ks.map(k=>{const [d,n]=k.split('|');if(d==='p')return `<button data-person="${esc(n)}"><i></i>${esc(n)}</button>`;const D=DYN[d];const i=D?D.r.findIndex(r=>r.name===n):-1;return i<0?'':`<button data-kpk="${esc(d)}|${i}" style="--kc:var(--c-${D.c})"><i></i><span>${d==='남한'?'대한민국':esc(d)}</span>${esc(n.replace('대통령 ',''))}</button>`}).join('')}</div>`:'<p class="dcempty">왕이나 인물 페이지에서 ♡를 누르면 여기 모여요.</p>'}<h3>하트한 사건</h3>`}}
+document.addEventListener('click',ev=>{const k=ev.target.closest('#tlkh [data-kpk]');if(!k)return;ev.preventDefault();ev.stopPropagation();const [d,i]=k.dataset.kpk.split('|');openKing(d,+i)},true);
 /* ───────── 연대표 가로: 필기 노트처럼 (위: 조약·개혁안 / 가운데: 시기·축·사건 이름 / 아래: 왕·주요 사건 풀이) ───────── */
 function drawHZ(k){$('v-ov').classList.add('hzsplit');const sr=$('ovscroll').getBoundingClientRect();const avail=Math.max(300,(sr.top>0?innerHeight-sr.top:$('ovscroll').clientHeight)-14);HZAV=avail;let sc=1,res=layHZ(k,1);for(let it=0;it<9&&res&&res.H>avail;it++){sc*=1.3;const nx=layHZ(k,sc);if(nx.H>=res.H-2)break;res=nx}if(res){$('ovchart').innerHTML=res.html;$('v-ov').classList.add('hzsplit');$('ovsum').innerHTML=''}}
 let HZAV=9999;
@@ -3880,10 +3914,10 @@ function layHZ(k,SC){
     if(yy!==lastY){h+=`<span class="hzyr${maj?' mj':''}" style="left:${xs[i]}px;top:${axY-21}px">${yrTxt(yy)}</span>`;lastY=yy}
     h+=maj?`<span class="hzx" style="left:${xs[i]}px;top:${axY-6}px">×</span>`:`<span class="hztk" style="left:${xs[i]}px;top:${axY-6}px"></span>`});
   // 축 아래: 사건 이름만
-  upN.filter(o=>o.row>=0).forEach(o=>{const y=rowY(o.row);h+=`<i class="hzld up" style="left:${o.x}px;top:${y+19}px;height:${axY-6-(y+19)}px"></i><button class="hzn up${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${BOOKS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${esc(o.e.t)}</span></button>`});
+  upN.filter(o=>o.row>=0).forEach(o=>{const y=rowY(o.row);h+=`<i class="hzld up" style="left:${o.x}px;top:${y+19}px;height:${axY-6-(y+19)}px"></i><button class="hzn up${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${HEARTS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${esc(o.e.t)}</span></button>`});
   const nm=evs.map((e,i)=>({e,x:xs[i],a:xs[i]-twe(e)/2,b:xs[i]+twe(e)/2})).filter(o=>!isUp(o.e)).map(o=>fitSep(o,o.x)).sort((p,q)=>p.a-q.a);const NL=lanes(nm,6);
   const nmTop=axY+20;const NLc=Math.max(2,Math.min(NL,Math.floor((HALF-30)/24)));
-  nm.filter(o=>o.li<NLc).forEach(o=>{const y=nmTop+o.li*24;h+=`<i class="hzld" style="left:${o.x}px;top:${axY+6}px;height:${y-axY-2}px"></i><button class="hzn${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${BOOKS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${o.e.treaty?'<i class="tseal">조</i>':''}${esc(o.e.t)}</span></button>`});
+  nm.filter(o=>o.li<NLc).forEach(o=>{const y=nmTop+o.li*24;h+=`<i class="hzld" style="left:${o.x}px;top:${axY+6}px;height:${y-axY-2}px"></i><button class="hzn${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${HEARTS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${o.e.treaty?'<i class="tseal">조</i>':''}${esc(o.e.t)}</span></button>`});
   const topH0=nmTop+NLc*24+10,aboveH=axY+3,belowH=topH0-axY-3,half=Math.max(aboveH,belowH),padT=half-aboveH,topH=half*2;
   // 아래 칸: 왕 줄 + 주요 사건 풀이
   let b='';const kr=ALL?[]:REIGNS.map(D=>({D,rs:D.r.filter(r=>Math.min(r.e,t1)-Math.max(r.s,t0)>.3)})).filter(x=>x.rs.length);
@@ -3966,7 +4000,7 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStat
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyAPHs56cX-nqgmU9tR3eVGu8cJo5MqalQY",authDomain:"hanguksa-dbb5e.firebaseapp.com",projectId:"hanguksa-dbb5e",storageBucket:"hanguksa-dbb5e.firebasestorage.app",messagingSenderId:"1038931533852",appId:"1:1038931533852:web:4e919a13ebf9e9be8fffd9"});
 const auth=getAuth(app),db=getFirestore(app);
-const KEYS=['hearts','books','kh','snd'],SETS=['hearts','books','kh'],LS=k=>'ksh-'+k;
+const KEYS=['hearts','books','kh','snd','words'],SETS=['hearts','books','kh','words'],LS=k=>'ksh-'+k;
 let uid=null,timer=0;
 const get=k=>{try{return localStorage.getItem(LS(k))}catch(e){return null}},put=(k,v)=>{try{localStorage.setItem(LS(k),v)}catch(e){}};
 function collect(){const o={};KEYS.forEach(k=>{const v=get(k);if(v!=null)o[k]=v});return o}

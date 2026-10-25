@@ -241,3 +241,21 @@ function dcShow(){const b=$('dcbody');if(b.dataset.built)return;try{GLOSS;TREE_O
 {const sv=showView;showView=function(v){sv(v);if(v==='dc')dcShow()};if(store.get('view','map')==='dc')setTimeout(dcShow,0)}
 
 {const pc=personColor;personColor=function(P){try{const c=NAT_COL[personNation(P)];if(c)return c}catch(e){}return pc(P)}}
+/* 낱말 북마크 (사전) */
+const WORDS=new Set(store.get('words',[]));let dcOnlyBk=false;
+const wbBtn=k=>`<button type="button" class="wbk" data-wb="${esc(k)}" aria-pressed="${WORDS.has(k)}" aria-label="낱말 북마크">${BOOK_IC}</button>`;
+function toggleWord(k){WORDS.has(k)?WORDS.delete(k):WORDS.add(k);store.set('words',[...WORDS]);document.querySelectorAll(`[data-wb="${CSS.escape(k)}"]`).forEach(b=>b.setAttribute('aria-pressed',WORDS.has(k)));if(dcOnlyBk)dcFilter()}
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-wb]');if(!b)return;ev.preventDefault();ev.stopPropagation();toggleWord(b.dataset.wb)},true);
+function dcFilter(){const b=$('dcbody');if(!b||!b.dataset.built)return;b.classList.toggle('onlybk',dcOnlyBk);let n=0;b.querySelectorAll('.gl2>div').forEach(c=>{const k=c.dataset.k;const show=!dcOnlyBk||WORDS.has(k);c.hidden=!show;if(show)n++});b.querySelectorAll('.gh').forEach(h=>{const dl=h.nextElementSibling;h.hidden=dl&&![...dl.children].some(c=>!c.hidden);if(dl)dl.hidden=h.hidden});
+  const bt=$('dcbk');if(bt)bt.setAttribute('aria-pressed',dcOnlyBk);let em=b.querySelector('.dcempty');if(dcOnlyBk&&!n){if(!em){em=document.createElement('p');em.className='dcempty';b.prepend(em)}em.textContent='아직 북마크한 낱말이 없어요. 낱말 카드의 🔖를 누르면 여기 모여요.';em.hidden=false}else if(em)em.hidden=true}
+{const ds=dcShow;dcShow=function(){const b=$('dcbody');const first=!b.dataset.built;ds();if(!b.dataset.built)return;if(first){b.querySelectorAll('.gl2>div').forEach(c=>{const k=(c.querySelector('dt .gpn')||c.querySelector('dt'))?.childNodes[0]?.textContent?.trim();c.dataset.k=k;if(!c.classList.contains('gp')){const dt=c.querySelector('dt');dt.insertAdjacentHTML('beforeend',wbBtn(k))}});
+   $('dcjump').insertAdjacentHTML('afterbegin',`<button type="button" id="dcbk" aria-pressed="false">🔖 북마크만</button>`);$('dcbk').onclick=()=>{dcOnlyBk=!dcOnlyBk;dcFilter()}}dcFilter()}}
+/* 탭으로 사전에 들어오면 전체 보기 */
+document.querySelectorAll('.tabs [data-v="dc"]').forEach(b=>b.addEventListener('click',()=>{dcOnlyBk=false;setTimeout(dcFilter,0)},true));
+/* 낱말 뜻 창에도 북마크 버튼 */
+{const gp=$('glpop');if(gp)new MutationObserver(()=>{const b=gp.querySelector('b');if(b&&!gp.querySelector('.wbk')){b.insertAdjacentHTML('beforeend',' '+wbBtn(b.textContent.trim()))}}).observe(gp,{childList:true})}
+/* 하트 목록(연표)에 하트한 왕·인물도 같이 */
+{const rt=renderTLFilter;renderTLFilter=function(){rt.apply(this,arguments);const body=$('tlbody');if(!body)return;let box=$('tlkh');if(!tlHeart){if(box)box.remove();return}
+  if(!box){box=document.createElement('section');box.id='tlkh';box.className='tlkh';body.prepend(box)}const ks=[...KHEARTS];
+  box.innerHTML=`<h3>하트한 왕·인물 <small>${ks.length}</small></h3>${ks.length?`<div class="kpp">${ks.map(k=>{const [d,n]=k.split('|');if(d==='p')return `<button data-person="${esc(n)}"><i></i>${esc(n)}</button>`;const D=DYN[d];const i=D?D.r.findIndex(r=>r.name===n):-1;return i<0?'':`<button data-kpk="${esc(d)}|${i}" style="--kc:var(--c-${D.c})"><i></i><span>${d==='남한'?'대한민국':esc(d)}</span>${esc(n.replace('대통령 ',''))}</button>`}).join('')}</div>`:'<p class="dcempty">왕이나 인물 페이지에서 ♡를 누르면 여기 모여요.</p>'}<h3>하트한 사건</h3>`}}
+document.addEventListener('click',ev=>{const k=ev.target.closest('#tlkh [data-kpk]');if(!k)return;ev.preventDefault();ev.stopPropagation();const [d,i]=k.dataset.kpk.split('|');openKing(d,+i)},true);

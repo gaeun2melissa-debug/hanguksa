@@ -48,10 +48,10 @@ function layHZ(k,SC){
     if(yy!==lastY){h+=`<span class="hzyr${maj?' mj':''}" style="left:${xs[i]}px;top:${axY-21}px">${yrTxt(yy)}</span>`;lastY=yy}
     h+=maj?`<span class="hzx" style="left:${xs[i]}px;top:${axY-6}px">×</span>`:`<span class="hztk" style="left:${xs[i]}px;top:${axY-6}px"></span>`});
   // 축 아래: 사건 이름만
-  upN.filter(o=>o.row>=0).forEach(o=>{const y=rowY(o.row);h+=`<i class="hzld up" style="left:${o.x}px;top:${y+19}px;height:${axY-6-(y+19)}px"></i><button class="hzn up${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${BOOKS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${esc(o.e.t)}</span></button>`});
+  upN.filter(o=>o.row>=0).forEach(o=>{const y=rowY(o.row);h+=`<i class="hzld up" style="left:${o.x}px;top:${y+19}px;height:${axY-6-(y+19)}px"></i><button class="hzn up${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${HEARTS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${esc(o.e.t)}</span></button>`});
   const nm=evs.map((e,i)=>({e,x:xs[i],a:xs[i]-twe(e)/2,b:xs[i]+twe(e)/2})).filter(o=>!isUp(o.e)).map(o=>fitSep(o,o.x)).sort((p,q)=>p.a-q.a);const NL=lanes(nm,6);
   const nmTop=axY+20;const NLc=Math.max(2,Math.min(NL,Math.floor((HALF-30)/24)));
-  nm.filter(o=>o.li<NLc).forEach(o=>{const y=nmTop+o.li*24;h+=`<i class="hzld" style="left:${o.x}px;top:${axY+6}px;height:${y-axY-2}px"></i><button class="hzn${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${BOOKS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${o.e.treaty?'<i class="tseal">조</i>':''}${esc(o.e.t)}</span></button>`});
+  nm.filter(o=>o.li<NLc).forEach(o=>{const y=nmTop+o.li*24;h+=`<i class="hzld" style="left:${o.x}px;top:${axY+6}px;height:${y-axY-2}px"></i><button class="hzn${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${HEARTS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${o.e.treaty?'<i class="tseal">조</i>':''}${esc(o.e.t)}</span></button>`});
   const topH0=nmTop+NLc*24+10,aboveH=axY+3,belowH=topH0-axY-3,half=Math.max(aboveH,belowH),padT=half-aboveH,topH=half*2;
   // 아래 칸: 왕 줄 + 주요 사건 풀이
   let b='';const kr=ALL?[]:REIGNS.map(D=>({D,rs:D.r.filter(r=>Math.min(r.e,t1)-Math.max(r.s,t0)>.3)})).filter(x=>x.rs.length);

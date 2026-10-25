@@ -17,10 +17,10 @@ function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);if(attrs)
 function h(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store={get(k,d){try{const v=localStorage.getItem('ksh-'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('ksh-'+k,JSON.stringify(v))}catch(e){}}};
-const HEARTS=new Set(store.get('hearts',[])),BOOKS=new Set(store.get('books',[]));let tlHeart=false,ovDirty=false;
+const HEARTS=new Set(store.get('hearts',[])),BOOKS=new Set(store.get('books',[]));if(BOOKS.size){BOOKS.forEach(t=>HEARTS.add(t));BOOKS.clear();store.set('hearts',[...HEARTS]);store.set('books',[])}let tlHeart=false,ovDirty=false;
 const HEART_IC='<svg viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.6 2.6c0 5.8-7.6 10.4-7.6 10.4z"/></svg>';
 const BOOK_IC='<svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg>';
-const hbtn=(e,bk)=>`<button class="hrt${bk?' bk':''}" type="button" ${bk?'data-b':'data-h'}="${e.id}" aria-pressed="${(bk?BOOKS:HEARTS).has(e.t)}" aria-label="${bk?'책갈피':'하트'}">${bk?BOOK_IC:HEART_IC}</button>`;
+const hbtn=(e,bk)=>`<button class="hrt" type="button" data-h="${e.id}" aria-pressed="${HEARTS.has(e.t)}" aria-label="하트">${HEART_IC}</button>`;
 function toggleHeart(id){const e=EVENTS.find(x=>x.id===id);if(!e)return;HEARTS.has(e.t)?HEARTS.delete(e.t):HEARTS.add(e.t);store.set('hearts',[...HEARTS]);const on=HEARTS.has(e.t);
   document.querySelectorAll(`[data-h="${id}"]`).forEach(b=>b.setAttribute('aria-pressed',on));document.querySelectorAll(`[data-ev="${id}"]`).forEach(b=>b.classList.toggle('hearted',on));
   if(tlHeart==='h')renderTLFilter();ovDirty=true;const hc=document.querySelector('.hchip b');if(hc)hc.textContent=HEARTS.size}
@@ -339,7 +339,11 @@ function placeInset(){const wrap=svg.getBoundingClientRect();if(!wrap.width)retu
   const score=k=>{const [x,y]=C[k];if(y<0||x<0)return 1e9;let s=0;pts.forEach(([a,b,c,d])=>{if(c>x-4&&a<x+iw+4&&d>y-4&&b<y+ih+4)s++});return s};
   let best=insetCorner,bs=score(insetCorner);['br','bl','tr','tl'].forEach(k=>{const s=score(k);if(s<bs){bs=s;best=k}});insetCorner=best;
   const [x,y]=C[best];inset.style.left=x+'px';inset.style.top=y+'px';inset.style.right='auto';inset.style.bottom='auto'}
-inset.addEventListener('click',()=>{abroad=!abroad;userMoved=true;animVB(abroad?fitVB(outBox()):fitVB(FRAMES[pos.i].view),700);updateInset()});
+/* 해외 작은 지도를 누르면 지구본 돌듯이: 멀리 빠졌다가 날아가서 내려앉기 */
+function flyVB(n,D=1300){const a={...vb};const ux=Math.min(a.x,n.x),uy=Math.min(a.y,n.y),uw=Math.max(a.x+a.w,n.x+n.w)-ux,uh=Math.max(a.y+a.h,n.y+n.h)-uy;const r=a.w/a.h;let mw=Math.max(uw,uh*r)*1.12;const mid={w:mw,h:mw/r,x:ux+uw/2-mw/2,y:uy+uh/2-mw/r/2};
+  if(reduceMotion){setVB(n);return}cancelAnimationFrame(vbRAF);const t0=performance.now();const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;const lerp=(p,q,k)=>({x:p.x+(q.x-p.x)*k,y:p.y+(q.y-p.y)*k,w:p.w+(q.w-p.w)*k,h:p.h+(q.h-p.h)*k});
+  const step=now=>{const t=Math.min(1,(now-t0)/D);const k=ease(t);const c1=lerp(a,mid,Math.sin(Math.PI*k/1)*0+Math.min(1,k*2)),pos2=lerp(a,n,k);const z=Math.sin(Math.PI*k);const v={x:pos2.x+(mid.x+mid.w/2-(pos2.x+pos2.w/2))*0,y:pos2.y,w:pos2.w+(mid.w-pos2.w)*z,h:pos2.h+(mid.h-pos2.h)*z};v.x=pos2.x+pos2.w/2-v.w/2;v.y=pos2.y+pos2.h/2-v.h/2;setVB(v);if(t<1)vbRAF=requestAnimationFrame(step);else{setVB(n);schedLabels&&schedLabels()}};vbRAF=requestAnimationFrame(step)}
+inset.addEventListener('click',()=>{abroad=!abroad;userMoved=true;flyVB(abroad?fitVB(outBox()):fitVB(FRAMES[pos.i].view));updateInset()});
 
 /* ───────── 시간 위치 ───────── */
 const N=FRAMES.length;
