@@ -164,7 +164,7 @@ EVENTS.forEach(e=>{if(!e.ar)return;const parts=[];
     const p=el('path',{class:'af',d:'M'+sm.map(xy).join('L'),pathLength:1,style:`stroke:${acol(c)}`},g);el('path',{class:'aflow',d:'M'+sm.map(xy).join('L'),pathLength:1},g);
     const a=sm[sm.length-2],b=sm[sm.length-1];const ang=Math.atan2(Y(b[1])-Y(a[1]),X(b[0])-X(a[0]))*180/Math.PI;
     const hg=el('g',{class:'ahd hide'+(inv?' inv':'')},headG);{const d=inv?'M-11,-9L1.5,0L-11,9':'M-8,-6.5L1,0L-8,6.5';el('path',{class:'ahb',d},hg);el('path',{class:'ahl',d,style:`stroke:${acol(c)}`},hg)}
-    const o=ovItem(hg,X(b[0]),Y(b[1]),ang);const xs=sm.map(q=>X(q[0])),ys=sm.map(q=>Y(q[1]));parts.push({g,hg,o,bb:[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)]})});
+    const o=ovItem(hg,X(b[0]),Y(b[1]),ang);const xs=sm.map(q=>X(q[0])),ys=sm.map(q=>Y(q[1]));parts.push({g,hg,o,c,dash:!!dash,inv,bb:[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)]})});
   arrOf.set(e.id,parts)});
 function setArrows(e,state){const ps=arrOf.get(e.id);if(!ps)return;ps.forEach(p=>{
   p.g.classList.toggle('hide',state==='hide');p.hg.classList.toggle('hide',state==='hide');
@@ -335,7 +335,7 @@ function placeInset(){const wrap=svg.getBoundingClientRect();if(!wrap.width)retu
   const dock=$('dock')?$('dock').getBoundingClientRect():{top:wrap.bottom};const card=$('fcard')?$('fcard').getBoundingClientRect():{bottom:wrap.top+90,right:wrap.left+280};
   const bottomY=Math.min(wrap.height,dock.top-wrap.top)-ih-52,topY=Math.max(12,card.bottom-wrap.top+10);
   const hb=document.querySelector('header.top').getBoundingClientRect().bottom-wrap.top;const C={br:[wrap.width-iw-12,bottomY],bl:[12,bottomY],tr:[wrap.width-iw-60,Math.max(12,hb+10)],tl:[12,Math.max(topY,hb+10)]};
-  const pts=[];document.querySelectorAll('#pins .pin:not(.hide):not(.wait):not(.stale):not(.buried):not(.gone), #ovl text:not(.hide)').forEach(g=>{const r=g.getBoundingClientRect();if(r.width){const lab=g.matches('.pin')?110:0;pts.push([r.left-wrap.left-(lab?40:0),r.top-wrap.top,r.right-wrap.left+lab,r.bottom-wrap.top])}});
+  const pts=[];document.querySelectorAll('#pins .pin:not(.hide):not(.wait):not(.stale):not(.buried):not(.gone), #ovl text:not(.hide), #arrleg:not([hidden])').forEach(g=>{const r=g.getBoundingClientRect();if(r.width){const lab=g.matches('.pin')?110:0;pts.push([r.left-wrap.left-(lab?40:0),r.top-wrap.top,r.right-wrap.left+lab,r.bottom-wrap.top])}});
   const score=k=>{const [x,y]=C[k];if(y<0||x<0)return 1e9;let s=0;pts.forEach(([a,b,c,d])=>{if(c>x-4&&a<x+iw+4&&d>y-4&&b<y+ih+4)s++});return s};
   let best=insetCorner,bs=score(insetCorner);['br','bl','tr','tl'].forEach(k=>{const s=score(k);if(s<bs){bs=s;best=k}});insetCorner=best;
   const [x,y]=C[best];inset.style.left=x+'px';inset.style.top=y+'px';inset.style.right='auto';inset.style.bottom='auto'}
