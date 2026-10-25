@@ -1003,13 +1003,16 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 .hzd.hzg{border-left:3px solid #6d28d9;padding-left:8px}
 .hzd.hzg b.gw{display:block;font-size:13px;color:#6d28d9;text-decoration:none!important;cursor:pointer}
 .hzd.hzg em{font-size:11px}
+
+#hovtip{position:fixed;z-index:120;pointer-events:none;background:var(--ink);color:var(--panel);font-size:12.5px;padding:5px 10px;border-radius:8px;white-space:nowrap;opacity:0;transform:translateY(-2px);transition:opacity .15s,transform .15s;box-shadow:0 4px 14px rgb(0 0 0/.18)}
+#hovtip.on{opacity:.95;transform:none}
 </style>
 
 <div class="app">
   <header class="top">
     <h1><span class="seal" aria-hidden="true">史</span><span>한국사 <span class="full">지도</span></span></h1>
     <button class="srbtn" id="srbtn" type="button" aria-label="검색"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><span>검색</span></button>
-    <div class="hnav" id="hnav"><button id="hback" type="button" aria-label="이전"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button id="hfwd" type="button" aria-label="다시 앞으로"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div>
+    <div class="hnav" id="hnav"><button id="hback" type="button" aria-label="뒤로 가기"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button id="hfwd" type="button" aria-label="다시 앞으로"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div>
     <nav class="tabs" role="tablist" aria-label="화면">
       <button id="tab-map" role="tab" aria-selected="true" data-v="map">지도</button>
       <button id="tab-tl" role="tab" aria-selected="false" data-v="tl">연표</button>
@@ -1018,7 +1021,7 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
       <button id="tab-kg" role="tab" aria-selected="false" data-v="kg">왕계표</button>
       <button id="tab-pp" role="tab" aria-selected="false" data-v="pp">인물</button><button id="tab-dc" role="tab" aria-selected="false" data-v="dc">사전</button>
     </nav>
-    <div class="tbtns"><button class="tib" id="heartbtn" type="button" aria-label="하트한 사건 보기"><svg viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.6 2.6c0 5.8-7.6 10.4-7.6 10.4z"/></svg></button><button class="tib" id="bookbtn" type="button" aria-label="책갈피한 사건 보기"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg></button><button class="tib" id="fsbtn" type="button" aria-label="전체 화면"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button class="tib" id="setbtn" type="button" aria-label="소리 설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z"/></svg></button></div>
+    <div class="tbtns"><button class="tib" id="heartbtn" type="button" aria-label="하트 모아 보기"><svg viewBox="0 0 24 24"><path d="M12 20.3s-7.6-4.6-7.6-10.4A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.6 2.6c0 5.8-7.6 10.4-7.6 10.4z"/></svg></button><button class="tib" id="bookbtn" type="button" aria-label="책갈피 모아 보기"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg></button><button class="tib" id="fsbtn" type="button" aria-label="전체 화면"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button class="tib" id="setbtn" type="button" aria-label="설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.4h-4l-.4 2.5A7.5 7.5 0 0 0 7 6.4l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z"/></svg></button></div>
   </header>
 
   <section class="view" id="v-map">
@@ -3947,4 +3950,11 @@ function paintSections(root){if(!root)return;root.querySelectorAll('.kpin>sectio
 /* 검색 결과: 묶음마다 색 상자 */
 const SR_COL={'인물':'#047857','왕':'#7c3aed','구조도':'#c2410c','낱말':'#6d28d9','사건':'#1d4ed8','장소':'#0e7490'};
 {const sr=srRun;srRun=function(q){sr(q);const box=$('srres');if(!box.querySelector('h4'))return;const out=document.createElement('div');let g=null;[...box.childNodes].forEach(n=>{if(n.nodeType===1&&n.tagName==='H4'){g=document.createElement('div');g.className='srgrp';const k=Object.keys(SR_COL).find(k=>n.textContent.startsWith(k));g.style.setProperty('--sc',SR_COL[k]||'#475569');out.appendChild(g)}(g||out).appendChild(n)});box.innerHTML='';box.appendChild(out)}}
+/* 마우스를 올리면 버튼 이름 말풍선 (아이콘 버튼·로그인 등) */
+{const tip=document.createElement('div');tip.id='hovtip';document.body.appendChild(tip);let cur=null,tT=0;
+ const nameOf=el=>{if(el.title){el.dataset.tt=el.title;el.removeAttribute('title')}return el.dataset.tt||el.getAttribute('aria-label')||''};
+ const isIconish=el=>{const t=(el.textContent||'').replace(/\s+/g,'');return !t||t.length<=3||el.dataset.tt};
+ document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const el=e.target.closest('button[aria-label],button[title],button[data-tt],[role=button][aria-label]');if(!el||el===cur)return;if(!isIconish(el)&&!el.matches('.loginb')){return}const n=nameOf(el);if(!n)return;cur=el;clearTimeout(tT);tT=setTimeout(()=>{if(cur!==el)return;tip.textContent=n;tip.classList.add('on');const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;let x=r.left+r.width/2-w/2,y=r.bottom+8;if(y+h>innerHeight-6)y=r.top-h-8;x=Math.max(6,Math.min(innerWidth-w-6,x));tip.style.left=x+'px';tip.style.top=y+'px'},250)});
+ document.addEventListener('pointerout',e=>{if(!cur)return;if(e.relatedTarget&&cur.contains(e.relatedTarget))return;cur=null;clearTimeout(tT);tip.classList.remove('on')});
+ document.addEventListener('pointerdown',()=>{cur=null;clearTimeout(tT);tip.classList.remove('on')},true)}
 </script>
