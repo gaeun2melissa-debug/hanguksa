@@ -22,11 +22,11 @@ function layHZ(k,SC){
   let h='';
   // 위: 조약 · 개혁안
   const tops=[...evs.filter(e=>e.treaty).map(e=>({kind:'t',e,t:e.T,title:e.t,body:e.x})),...REFORMS.filter(r=>r[0]>=t0&&r[0]<t1).map(r=>({kind:'r',t:r[0],title:r[1],by:r[2],body:r[3]}))].sort((a,b)=>a.t-b.t);
-  const rg=(ALL?ERAS.map((E2,j)=>{const ff=FRAMES.filter(x=>x.era===E2.k);return {s:ff[0].t,e:ff[ff.length-1].t2,n:E2.n,c:(j%5)+1}}):((()=>{const r=REGIMES.filter(r=>r.e>t0&&r.s<t1);return r.length?r:fs.map((F,j)=>({s:F.t,e:F.t2,n:F.title.replace(/^\d세기 · /,''),c:(j%5)+1}))})())).map(r=>({n:r.n,c:r.c,a:xT(Math.max(r.s,t0)),b:xT(Math.min(r.e,t1))})).filter((r,i,A)=>A.length<2||r.b-r.a>=60);if(rg.length)rg[0].a=Math.min(rg[0].a,0);
+  const rg=(ALL?ERAS.map((E2,j)=>{const ff=FRAMES.filter(x=>x.era===E2.k);return {s:ff[0].t,e:ff[ff.length-1].t2,n:E2.n,c:(j%5)+1}}):((()=>{const r=REGIMES.filter(r=>r.e>t0&&r.s<t1);return r.length?r:fs.map((F,j)=>({s:F.t,e:F.t2,n:F.title.replace(/^\d세기 · /,''),c:(j%5)+1}))})())).map(r=>({n:r.n,c:r.c,ts:r.s,te:r.e,a:xT(Math.max(r.s,t0)),b:xT(Math.min(r.e,t1))})).filter((r,i,A)=>A.length<2||r.b-r.a>=60);if(rg.length)rg[0].a=Math.min(rg[0].a,0);
   const SEPS=rg.slice(1).map(r=>r.a).concat(rg.length?[rg[rg.length-1].b]:[]);
   const fitSep=(o,anchor)=>{const w=o.b-o.a;for(const s of SEPS){if(o.a<s-3&&o.b>s-3){if(anchor<s){o.b=s-5;o.a=o.b-w;o.ra=1}else{o.a=s+5;o.b=o.a+w}}}if(o.a<6){o.a=6;o.b=6+w;o.ra=0}if(o.b>W-6){o.b=W-6;o.a=o.b-w;o.ra=1}return o};
   tops.forEach(o=>{o.a=xT(o.t)-115;o.b=o.a+230;fitSep(o,xT(o.t))});tops.sort((p,q)=>p.a-q.a);const TL=lanes(tops,14);
-  const og=ONGOING.filter(o=>o[1]>t0&&o[0]<t1).map(o=>({n:o[2],c:o[3],a:xT(Math.max(o[0],t0)),b:xT(Math.min(o[1],t1))})).filter(o=>o.b-o.a>=30);const OL=lanes(og,4);
+  const og=ONGOING.filter(o=>o[1]>t0&&o[0]<t1).map(o=>({n:o[2],c:o[3],ta:o[0],tb:o[1],a:xT(Math.max(o[0],t0)),b:xT(Math.min(o[1],t1))})).filter(o=>o.b-o.a>=30);const ogDup=o=>{const k=x=>String(x).split(/[·(]/)[0].replace(/\s+/g,'');const m=n=>k(n).includes(k(o.n))||k(o.n).includes(k(n));return rg.some(r=>r.b>o.a&&r.a<o.b&&m(r.n))||(typeof REGIMES!=='undefined'&&REGIMES.some(r=>(r.e??r[1])>o.ta&&(r.s??r[0])<o.tb&&m(r.n??r[2])))||FRAMES.some(f=>(f.t2||f.t+1)>o.ta&&f.t<o.tb&&m(f.title))};og.splice(0,og.length,...og.filter(o=>!ogDup(o)));const OL=lanes(og,4);
   const isUp=e=>UPT.has(e.tp[0])&&!e.treaty;
   const upN=evs.map((e,i)=>({e,x:xs[i],a:xs[i]-twe(e)/2,b:xs[i]+twe(e)/2})).filter(o=>isUp(o.e)).map(o=>fitSep(o,o.x)).sort((p,q)=>p.a-q.a);const UL0=lanes(upN,6);
   const HALF=Math.max(150,HZAV*.31),FIX=(OL?OL*22+4:0)+30+22+16;let room=HALF-FIX;const ULc=Math.min(UL0,Math.max(1,Math.min(3,Math.floor(room*.45/25))));room-=ULc*25+10;const TB=74,TLc=0,TOPH=TLc*TB;
@@ -40,8 +40,8 @@ function layHZ(k,SC){
   const used=Math.max(OL,...upN.map(o=>o.row+1),0);
   let y0=TOPH+38+used*RH+(used?10:0);
   const rowY=k=>y0-10-(k+1)*RH+3;const gcAt=x=>{const r=rg.find(r=>x>=r.a&&x<r.b);return r?`var(--g${r.c})`:'transparent'};
-  og.forEach(o=>{h+=`<div class="hzog" style="left:${o.a}px;top:${rowY(o.li)}px;width:${Math.max(8,o.b-o.a)}px;--tc:var(--t-${o.c})"><span>${esc(o.n)}</span></div>`});
-  let rgH='',stH='';rg.forEach((r,ri)=>{const rb=ri===rg.length-1?Math.max(r.b,W):r.b;stH+=`<div class="hzst" style="left:${ri?r.a:Math.min(r.a,0)}px;width:${Math.max(0,rb-(ri?r.a:Math.min(r.a,0)))}px;--gc:var(--g${r.c})"></div>`;rgH+=`<div class="hzrg" style="left:${r.a}px;top:4px;width:${Math.max(8,rb-r.a-6)}px;--gc:var(--g${r.c})"><span>${esc(r.n)}</span></div><i class="hzsep" style="left:${r.a}px"></i>`});
+  og.forEach(o=>{h+=`<div class="hzog" data-rg="${o.ta}|${o.tb}|${esc(o.n)}" style="left:${o.a}px;top:${rowY(o.li)}px;width:${Math.max(8,o.b-o.a)}px;--tc:var(--t-${o.c})"><span>${esc(o.n)}</span></div>`});
+  let rgH='',stH='';rg.forEach((r,ri)=>{const rb=ri===rg.length-1?Math.max(r.b,W):r.b;stH+=`<div class="hzst" style="left:${ri?r.a:Math.min(r.a,0)}px;width:${Math.max(0,rb-(ri?r.a:Math.min(r.a,0)))}px;--gc:var(--g${r.c})"></div>`;rgH+=`<div class="hzrg" data-rg="${r.ts}|${r.te}|${esc(r.n)}" style="left:${r.a}px;top:4px;width:${Math.max(8,rb-r.a-6)}px;--gc:var(--g${r.c})"><span>${esc(r.n)}</span></div><i class="hzsep" style="left:${r.a}px"></i>`});
   const axY=y0+22;
   // 축 · 연도 · 표시
   h+=`<div class="hzax" style="top:${axY}px;width:${W}px"></div>`;

@@ -2,7 +2,7 @@
 let ovBuilt=false,ovSel=null;const ovZ=1,ovDet=true;
 const LABW=78;
 function ovChips(){{const ovh=document.querySelector('.ovh');ovh.insertAdjacentHTML('beforeend',`<div class="seg ovdir" role="group" aria-label="읽는 방향"><button type="button" data-d="v">세로</button><button type="button" data-d="h">가로</button></div>`);const sync=()=>ovh.querySelectorAll('.ovdir button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===ovDir));sync();ovh.querySelectorAll('.ovdir button').forEach(b=>b.onclick=()=>{ovDir=b.dataset.d;store.set('ovdir',ovDir);sync();if(ovSel)drawEra(ovSel);$('ovscroll').scrollLeft=0})}
-  const c=$('ovchips');c.innerHTML=`<button class="chip" data-e="all">전체 흐름</button>`+ERAS.map(E=>`<button class="chip" data-e="${E.k}">${E.n}</button>`).join('');
+  const c=$('ovchips');c.innerHTML=ERAS.map(E=>`<button class="chip" data-e="${E.k}">${E.n}</button>`).join('');
   c.querySelectorAll('.chip').forEach(b=>b.onclick=()=>ovShow(b.dataset.e));
   $('ovchart').addEventListener('click',ev=>{const c=ev.target.closest('[data-ev]');if(c){openOvPop(EVENTS.find(x=>x.id===+c.dataset.ev));return}const gp=ev.target.closest('[data-grp]');if(gp){openGrpPop(+gp.dataset.grp);return}
     const er=ev.target.closest('[data-era]');if(er){ovShow(er.dataset.era);return}
