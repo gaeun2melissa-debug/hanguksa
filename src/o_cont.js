@@ -8,6 +8,7 @@ function buildCont(){const V=ovDir==='v',sc=$('ovscroll'),parts=[];ovBuilding=tr
   $('v-ov').classList.add('hzsplit');
   $('ovchart').innerHTML=`<div class="hzall">${parts.join('')}</div>`;
   $('ovsum').innerHTML='';$('ovside').innerHTML='';
+  hzLift();
   if(V)vSlice();else hzAlign();
   ovCont={dir:ovDir,w:sc.clientWidth,dirty:false};if(!V)hzSync()}
 /* 세로: 가로 연대표를 화면 폭만큼 잘라 줄줄이 쌓기 (글자 안 잘리는 자리에서 자름) */
@@ -108,3 +109,8 @@ function arrName(c,e){const y=e.y;const k=n=>n;
 
 /* 연대표 방향: 화면이 가로면 가로, 세로로 세우면 세로 (자동) */
 {const fit=()=>{const want=(innerHeight>innerWidth*1.05)?'v':'h';if(want===ovDir)return;ovDir=want;ovCont=null;if(!$('v-ov').hidden&&ovSel)ovShow(ovSel)};let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(fit,250)});addEventListener('orientationchange',()=>setTimeout(fit,300))}
+
+/* 선사 특징: 위 칸의 시대 이름(구석기·신석기) 바로 밑으로 올리기 */
+function hzLift(){document.querySelectorAll('#ovchart .hzwrap').forEach(w=>{const top=w.querySelector('.hztop');const inn=top&&top.querySelector(':scope>div[style*="left:0;right:0"]');if(!inn)return;const r0=inn.getBoundingClientRect();
+  w.querySelectorAll('.hzbot .hznt').forEach(n=>{const b=n.querySelector('button[data-ev]');const lb=b&&top.querySelector(`.hzn[data-ev="${b.dataset.ev}"]`);if(!lb)return;const r=lb.getBoundingClientRect();
+    b.remove();n.classList.add('lift');n.style.left=(r.left-r0.left)+'px';n.style.top=(r.bottom-r0.top+4)+'px';inn.appendChild(n);const need=inn.offsetTop+n.offsetTop+n.offsetHeight+12;if(need>top.offsetHeight)top.style.height=need+'px'})})}
