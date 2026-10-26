@@ -3598,6 +3598,12 @@ const TREES={
   N_('을사의병 (1905)','을사늑약에 반발. 평민 의병장 등장','민종식, 최익현, 신돌석'),
   N_('정미의병 (1907)','고종 강제 퇴위·군대 해산에 반발. 해산 군인 합류로 전투력 강화, 13도 창의군의 서울 진공 작전','이인영, 허위'),
   N_('남한 대토벌 (1909) 이후','일제의 대토벌로 국내 활동이 어려워져 만주·연해주로 옮겨 독립군이 됨','홍범도, 이범윤')]},
+ gyemong:{title:'개항기 · 애국 계몽 단체',sub:'1896 ~ 1910, 근대 의식과 실력 양성으로 국권을 지키자',chain:[
+  N_('독립 협회 (1896)','서재필, 『독립신문』·독립문. 만민 공동회·관민 공동회 → 헌의 6조. 황국 협회의 방해로 해산(1898)','서재필, 이상재, 윤치호'),
+  N_('보안회 (1904)','일본의 황무지 개간권 요구를 막아 냄','송수만'),
+  N_('헌정 연구회 (1905)','입헌 군주제 주장, 일진회에 맞섬','윤효정'),
+  N_('대한 자강회 (1906)','교육·산업 진흥, 고종 강제 퇴위 반대 운동 → 해산','장지연, 윤치호'),
+  N_('신민회 (1907)','비밀 결사, 공화정 목표. 대성 학교·오산 학교, 자기 회사·태극 서관, 남만주 삼원보 기지 건설 → 105인 사건(1911)으로 해체','안창호, 양기탁, 이승훈')]},
  org1910:{title:'1910년대 독립운동 단체',sub:'무단 통치 속 국내 비밀 결사와 국외 독립운동 기지',root:
   N_('1910년대 독립운동','국내는 비밀 결사, 국외는 독립운동 기지 건설','',[
    N_('국내 비밀 결사','','',[
@@ -3675,7 +3681,7 @@ const TREES={
    N_('우익','신탁 통치 반대','',[N_('이승만','정읍 발언(1946)으로 남한 단독 정부 수립 주장','이승만',[]),N_('김구','한국 독립당, 단독 정부 반대 → 남북 협상(1948)','김구',[])])])}
 };
 /* 구조도는 시대 순서로 */
-{const ORD=['goryeo','musin','bungdang','bukbeol','silhak','wijeong','donghak','gaehwa','uibyeong','org1910','armed1920','uiyeol','dongnip','minjok1920','society1920','china1930','haebang'];const cp={...TREES};Object.keys(TREES).forEach(k=>delete TREES[k]);[...ORD.filter(k=>cp[k]),...Object.keys(cp).filter(k=>!ORD.includes(k))].forEach(k=>TREES[k]=cp[k])}
+{const ORD=['goryeo','musin','bungdang','bukbeol','silhak','wijeong','donghak','gaehwa','uibyeong','gyemong','org1910','armed1920','uiyeol','dongnip','minjok1920','society1920','china1930','haebang'];const cp={...TREES};Object.keys(TREES).forEach(k=>delete TREES[k]);[...ORD.filter(k=>cp[k]),...Object.keys(cp).filter(k=>!ORD.includes(k))].forEach(k=>TREES[k]=cp[k])}
 function treeNode(n){const kids=n.c&&n.c.length;
   const lab=`<div class="hn">${n.t?`<i class="ht">${esc(n.t)}</i>`:''}<b>${esc(n.n)}</b>${n.p?`<em>${esc(n.p)}</em>`:''}${n.d?`<small>${glx(n.d)}</small>`:''}${n.a?(()=>{const [h,...r]=n.a[1].split(/\s*→\s*/);const sub=r.join(' → ').split(/\s*\/\s*/).filter(Boolean);return `<span class="ha" style="--ac:${n.a[2]}"><i>${esc(n.a[0])}</i><span class="hab"><span>${esc(h)}${sub.length?' →':''}</span>${sub.length?`<span class="hasw">${sub.map(x=>`<span class="has">${esc(x)}</span>`).join('')}</span>`:''}</span></span>`})():''}</div>`;
   return `<div class="hrow">${lab}${kids?`<span class="hlink"></span><div class="hkids${n.c.length===1?' one':''}${n.c.every(c=>c.c&&c.c.length)?' grp':''}">${n.c.map(c=>`<div class="hkid">${treeNode(c)}</div>`).join('')}</div>`:''}</div>`}
