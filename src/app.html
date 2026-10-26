@@ -4524,18 +4524,25 @@ FRAMES.forEach((f,i)=>{if(!f.view||f.view===VS)return;const pts=EVENTS.filter(e=
 {const sa=safeArea;safeArea=function(){const a=sa.apply(this,arguments);const s=svg.getBoundingClientRect(),tp=document.querySelector('.top');if(tp){const ov=tp.getBoundingClientRect().bottom-s.top+14;if(ov>a.t){a.h=Math.max(80,a.h-(ov-a.t));a.t=ov}}return a}}
 /* 재생 중 경로가 있는 사건(동학·임진왜란·갑신정변 등)은 경로만큼 확대해 자세히 보여 주고 다시 돌아감 */
 let rzT=0;
-/* 확대는 한 장면에 작은 경로가 여럿 몰린 경우(임진왜란·동학 농민 운동·6·25 등)만, 장면당 한 번.
-   확대가 끝나면 잠깐 멈춰서 볼 준비할 시간을 주고, 장면이 끝날 때까지 확대 유지 */
-let rzDone=-1;const RZ_HOLD=1600;
-function rzBox(fi){const deg=X(1)-X(0);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,n=0;
-  (byFrame[fi]||[]).forEach(e=>{const ps=arrOf.get(e.id);if(!ps)return;let w=0;ps.forEach(p=>w=Math.max(w,p.bb[2]-p.bb[0],p.bb[3]-p.bb[1]));if(w>deg*1.6)return;n++;
-    ps.forEach(p=>{x0=Math.min(x0,p.bb[0]);y0=Math.min(y0,p.bb[1]);x1=Math.max(x1,p.bb[2]);y1=Math.max(y1,p.bb[3])});
-    if(e.ll){x0=Math.min(x0,X(e.ll[0]));x1=Math.max(x1,X(e.ll[0]));y0=Math.min(y0,Y(e.ll[1]));y1=Math.max(y1,Y(e.ll[1]))}});
-  if(n<3)return null;const minW=deg*2.4;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
-  const FV=fitVB(FRAMES[fi].view);if(w*h>FV.w*FV.h*.45)return null;const pw=w*.16,ph=h*.2;return {x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}}
-function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved||rzDone===pos.i||!arrOf.has(e.id))return;rzDone=pos.i;const bx=rzBox(pos.i);if(!bx)return;
-  const fb=fitBox(bx),FV=fitVB(FRAMES[pos.i].view);if(fb.w*fb.h>FV.w*FV.h*.5)return;animVB(fb,900);holdUntil=Math.max(holdUntil,performance.now()+900+RZ_HOLD)}
-{const sp=setPos;setPos=function(i){if(i!==pos.i)rzDone=-1;return sp.apply(this,arguments)}}
+/* 재생 확대: 같은 장면에서 가까운 곳에 사건이 연달아 3개 이상 몰릴 때(임진왜란 남해안, 동학 농민 운동 등)와
+   갑신정변처럼 꼭 짚을 사건만 확대. 확대 뒤엔 잠깐 멈춰 볼 시간을 주고, 그 묶음이 끝나면 다시 전체로 */
+const RZ_FORCE=/갑신정변/,RZ_HOLD=1600,RZ_R=1.4;let rzCur=null,rzSeen=new Set();
+function rzPts(e){const deg=X(1)-X(0),r=[];if(e.ll&&e.tp[0]!=='wld'&&e.ll[0]>117&&e.ll[0]<133&&e.ll[1]>32&&e.ll[1]<44.5)r.push([X(e.ll[0]),Y(e.ll[1])]);
+  const ps=arrOf.get(e.id);if(ps){let w=0;ps.forEach(p=>w=Math.max(w,p.bb[2]-p.bb[0],p.bb[3]-p.bb[1]));if(w<=deg*1.6)ps.forEach(p=>{r.push([p.bb[0],p.bb[1]],[p.bb[2],p.bb[3]])})}return r}
+function rzCluster(e){const deg=X(1)-X(0),L=byFrame[pos.i]||[],k=L.indexOf(e),a=rzPts(e);if(k<0||!a.length)return null;
+  const hasR=x=>rzPts(x).length>(x.ll?1:0);const cx=a[0][0],cy=a[0][1];let pts=a.slice(),n=1,nr=hasR(e)?1:0,mem=[e.id],gap=[];
+  for(let j=k+1;j<L.length;j++){const q=rzPts(L[j]);if(!q.length){gap.push(L[j].id);continue}mem.push(...gap,L[j].id);gap=[];if(q.some(([x,y])=>Math.hypot(x-cx,y-cy)>deg*RZ_R))break;pts=pts.concat(q);n++;if(hasR(L[j]))nr++}
+  const force=RZ_FORCE.test(e.t);if((n<3||nr<2)&&!force)return null;
+  let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));
+  const minW=deg*(force?1.5:2.2);let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
+  const pw=w*.18,ph=h*.22,fb=fitBox({x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}),FV=fitVB(FRAMES[pos.i].view);if(fb.w*fb.h>FV.w*FV.h*.5)return null;fb.mem=new Set(mem);return fb}
+const rzIn=(e,b)=>rzPts(e).every(([x,y])=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);
+function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved)return;
+  if(rzCur&&rzCur.mem.has(e.id))return;
+  const c=rzSeen.has(e.id)?null:rzCluster(e);const now=performance.now();
+  if(c){c.mem.forEach(id=>rzSeen.add(id));rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,now+900+RZ_HOLD+(RZ_FORCE.test(e.t)?1400:0));return}
+  if(rzCur){rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900);holdUntil=Math.max(holdUntil,now+900+500)}}
+{const sp=setPos;setPos=function(i){if(i!==pos.i){rzCur=null;rzSeen.clear()}return sp.apply(this,arguments)}}
 {const tk=ticker;ticker=function(e){const r=tk.apply(this,arguments);try{routeZoom(e)}catch(_){}return r}}
 /* ───────── 해외 작은 지도: 멀리 떨어진 곳이 여럿이면 최대 3개, 화면에 보여도 우리나라 밖이면 표시 ───────── */
 {const KOR=e=>e.ll[0]>=124&&e.ll[0]<=131.3&&e.ll[1]>=33&&e.ll[1]<=43.4;
