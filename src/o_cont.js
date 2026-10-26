@@ -169,3 +169,28 @@ function trPack(){const tb=$('trbody');if(!tb||!tb.offsetParent)return;const cs=
 function keepParens(root){if(!root)return;const RE=/[^\s,()]*\([^()]{1,40}\)[^\s,()]*/g;root.querySelectorAll('.hn small,.hn em,.trflow li').forEach(el=>{const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest('.plw,.kpar')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});const ns=[];while(w.nextNode())ns.push(w.currentNode);
   ns.forEach(tn=>{const t=tn.nodeValue;RE.lastIndex=0;if(!RE.test(t))return;RE.lastIndex=0;const f=document.createDocumentFragment();let i=0,m;while((m=RE.exec(t))){if(m.index>i)f.append(t.slice(i,m.index));const sp=document.createElement('span');sp.className='kpar';sp.textContent=m[0];f.append(sp);i=m.index+m[0].length}if(i<t.length)f.append(t.slice(i));tn.replaceWith(f)})})}
 {const t1=trShow;trShow=function(){const r=t1.apply(this,arguments);try{keepParens($('trbody'))}catch(e){}requestAnimationFrame(trPack);return r};let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(trPack,300)})}
+/* ───────── 조약 주요 내용 (누르면 펼침) ───────── */
+const TREATY_TXT={
+ '미일 화친 조약':['시모다·하코다테 2개 항구 개항','미국 배에 연료·식량 공급','미국에 일방적 최혜국 대우'],
+ '강화도 조약':['제1관 조선은 자주국 → 청의 종주권 부정 의도','제4·5관 부산 외 2곳 개항 (원산 1880, 인천 1883)','제7관 일본의 조선 해안 측량권','제10관 개항장 일본인 범죄는 일본 영사가 재판 (영사 재판권·치외 법권)'],
+ '조일 수호 조규 부록':['개항장에서 일본 화폐 사용','일본인 거류지 설정, 간행이정 10리','(무역 규칙) 양곡 무제한 유출','(무역 규칙) 무관세, 일본 선박 항세 면제'],
+ '조미 수호 통상 조약':['서양과 맺은 최초의 조약 (청 이홍장 알선)','거중 조정','최혜국 대우 (최초)','치외 법권, 협정 관세 (관세 부과 첫 인정)','→ 보빙사 파견'],
+ '제물포 조약':['배상금 지불','일본 공사관에 경비병 주둔','사죄 사절 파견 (박영효, 태극기 사용)'],
+ '조청 상민 수륙 무역 장정':['조선은 청의 속방','청 상인의 한성 양화진 개설·내지 통상','청의 치외 법권, 상무위원 파견','→ 청·일 상인의 경쟁 심화'],
+ '한성 조약':['일본에 사과','배상금 지불','일본 공사관 신축 비용 부담'],
+ '톈진 조약':['청·일 양국 군대 동시 철수','파병 시 서로 미리 알림 (행문지조)','→ 청일 전쟁 때 일본 파병의 구실'],
+ '시모노세키 조약':['청은 조선이 완전한 자주 독립국임을 인정','랴오둥 반도·타이완·펑후 제도를 일본에 할양','배상금 지불','→ 삼국 간섭(러·프·독)으로 랴오둥 반도 반환'],
+ '제1차 한일 협약':['일본이 추천한 고문을 둠 (고문 정치)','재정 고문 메가타 → 화폐 정리 사업','외교 고문 스티븐스'],
+ '포츠머스 조약':['(포츠머스) 러시아가 일본의 한국 지도·보호·감리권 인정','(포츠머스) 사할린 남부를 일본에 넘김','(가쓰라·태프트 밀약) 미국의 필리핀, 일본의 한국 지배를 서로 인정','(제2차 영일 동맹) 영국도 일본의 한국 지배 인정'],
+ '을사늑약':['대한 제국의 외교권 박탈','통감부 설치 (초대 통감 이토 히로부미)','고종의 서명·비준 없음 → 무효 주장, 헤이그 특사(1907)','→ 민영환 자결, 「시일야방성대곡」, 을사의병'],
+ '샌프란시스코 강화 조약':['일본의 주권 회복','일본이 한국 독립 인정, 제주도·거문도·울릉도 포기','독도는 명시되지 않음','한국은 서명국에서 제외'],
+ '정전 협정':['군사 분계선(휴전선)과 비무장 지대(DMZ) 설정','포로 자유 송환','군사 정전 위원회·중립국 감독 위원회 설치','한국 정부는 서명하지 않음 (이승만 반대)'],
+ '한미 상호 방위 조약':['외부 무력 공격 시 공동 대처','미군의 한국 주둔 근거']};
+function treatyTxt(e){if(!e||!e.t)return null;const k=Object.keys(TREATY_TXT).find(k=>e.t.includes(k));return k?TREATY_TXT[k]:null}
+const treatyHTML=e=>{const t=treatyTxt(e);return t?`<div class="tcl"><h4>조약 주요 내용</h4>${t.map(x=>`<div class="tci">${esc(x)}</div>`).join('')}</div>`:''};
+{const ed=evDetailHTML;evDetailHTML=function(e){const h=ed.apply(this,arguments);const t=treatyHTML(e);if(!t)return h;const i=h.indexOf('<p');return i>=0?h.replace(/(<p[^>]*>[\s\S]*?<\/p>)/,'$1'+t):h+t}}
+document.addEventListener('click',ev=>{const tb=ev.target.closest('.tclb');if(tb){ev.stopPropagation();ev.preventDefault();const e=EVENTS.find(x=>String(x.id)===tb.dataset.tcl);const nx=tb.nextElementSibling;if(nx&&nx.classList.contains('tcl')){nx.remove();tb.classList.remove('on');return}tb.insertAdjacentHTML('afterend',treatyHTML(e));tb.classList.add('on');return}
+ const li=ev.target.closest('.lawl li[data-tl]');if(!li||ev.target.closest('button,.gw,.pl'))return;ev.stopPropagation();ev.preventDefault();const e=EVENTS.find(x=>String(x.id)===li.dataset.tl);if(!e)return;let box=li.querySelector('.tcl');if(box){box.remove();li.classList.remove('open');return}const t=treatyHTML(e);if(!t)return;li.querySelector('div').insertAdjacentHTML('beforeend',t);li.classList.add('open')},true);
+{const rh=rowHTML;rowHTML=function(e){const h=rh.apply(this,arguments);if(!treatyTxt(e))return h;return h.replace(/(<p>[\s\S]*?<\/p>)/,`$1<button type="button" class="tclb" data-tcl="${e.id}">조약 내용</button>`)}}
+function addTclb(root){(root||document).querySelectorAll('li[data-id]:not([data-tc])').forEach(li=>{li.dataset.tc=1;const e=EVENTS.find(x=>String(x.id)===li.dataset.id);if(!treatyTxt(e))return;const p=li.querySelector('p');if(p&&!li.querySelector('.tclb'))p.insertAdjacentHTML('afterend',`<button type="button" class="tclb" data-tcl="${e.id}">조약 내용</button>`)})}
+addTclb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObserver(()=>addTclb(el)).observe(el,{childList:true,subtree:true})});
