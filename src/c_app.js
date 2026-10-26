@@ -417,6 +417,7 @@ function updateTime(changed){
     const due=!playing||e.T<=t+1e-9;
     if(e.found){if(!playing)g.classList.toggle('gone',e.id!==selId);else if(!due)g.classList.remove('gone')}
     if(playing&&due&&g.classList.contains('wait')&&!changed){g.classList.remove('wait');popPin(o)}
+    else if(playing&&due&&changed&&Math.abs(e.T-F.t)<0.6){g.classList.remove('wait');clearTimeout(o.pz);o.pz=setTimeout(()=>{if(pos.i===e.f)popPin(o)},450)}
     else g.classList.toggle('wait',!due);
   }
   for(const e of EVENTS){if(!arrOf.has(e.id))continue;

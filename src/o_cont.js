@@ -441,7 +441,7 @@ function spreadFill(c,fill,ll){const p=c.el;if(c.sp){c.sp.end()}if(!fill)fill=ge
   const cid='sp'+Math.random().toString(36).slice(2,8),cp=el('clipPath',{id:cid},$('defs')),ci=el('circle',{cx:X(ll[0]),cy:Y(ll[1]),r:0},cp);
   const cl=p.cloneNode(false);cl.removeAttribute('id');cl.style.transition='none';cl.style.fill=fill;cl.style.pointerEvents='none';cl.setAttribute('clip-path',`url(#${cid})`);p.after(cl);
   const bb=p.getBBox(),cx=X(ll[0]),cy=Y(ll[1]);const R=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))+10;
-  cl.style.opacity='1';const t0=performance.now(),D=2000;let raf=0;const end=()=>{cancelAnimationFrame(raf);p.style.transition='none';p.style.fill=fill;p.style.opacity='';cl.remove();cp.remove();c.sp=null};c.sp={end};
+  cl.style.opacity='1';const t0=performance.now(),D=1300;let raf=0;const end=()=>{cancelAnimationFrame(raf);p.style.transition='none';p.style.fill=fill;p.style.opacity='';cl.remove();cp.remove();c.sp=null};c.sp={end};
   const step=now=>{const u=Math.min(1,(now-t0)/D),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(R*k).toFixed(1));if(u<1)raf=requestAnimationFrame(step);else end()};raf=requestAnimationFrame(step)}
 function applyStates(fresh){try{const t=curT();for(const [id,S] of Object.entries(STATE_STEPS)){const c=shapes.get(id);if(!c)continue;
     if(fresh||c.base==null){c.base=c.el.style.fill||getComputedStyle(c.el).fill;c.lbase=c.lab.t.style.fill;c.stk=null}
@@ -478,3 +478,35 @@ document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')retu
   const t=ev.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
   const vm=$('v-map');if(!vm||vm.hidden)return;const sp=$('setpop');if(sp&&!sp.hidden)return;
   ev.preventDefault();ev.stopPropagation();try{if(document.activeElement&&document.activeElement.tagName==='BUTTON')document.activeElement.blur()}catch(_){}playing?pause():play()},true);
+/* 지도 가장자리(중국 쪽) 직선 숨기기: 주변 땅 해안선은 자료 경계에서 잘라냄 */
+{const c2=$('cl2');if(c2){try{const bb=c2.getBBox(),m=2.5;const cp=el('clipPath',{id:'cl2clip',clipPathUnits:'userSpaceOnUse'},$('defs'));el('rect',{x:bb.x+m,y:bb.y+m,width:bb.width-2*m,height:bb.height-2*m},cp);c2.setAttribute('clip-path','url(#cl2clip)')}catch(_){}}}
+/* 배경 음악을 효과음과 같은 오디오 통로로: 모바일에서 효과음 뒤에 음악이 멈추거나 안 들리는 문제 방지 */
+{let BGG=null;const ensureG=()=>{if(BGG||!BGA)return BGG;const a=ac();if(!a)return null;try{const src=a.createMediaElementSource(BGA);BGG=a.createGain();BGG.gain.value=0;src.connect(BGG);BGG.connect(a.destination);BGA.volume=1;window.__bgg=BGG}catch(_){BGG=null}return BGG};
+ const ramp=(v,ms)=>{const t=AC.currentTime;BGG.gain.cancelScheduledValues(t);BGG.gain.setValueAtTime(BGG.gain.value,t);BGG.gain.linearRampToValueAtTime(v,t+ms/1000)};
+ const ft=fadeTo;fadeTo=function(a,v,ms,done){if(a===BGA&&BGG){clearInterval(fadeT);clearTimeout(fadeTo.t);ramp(v,ms);if(done)fadeTo.t=setTimeout(done,ms);return}return ft.apply(this,arguments)};
+ fileStart=function(){if(!BGA){BGA=new Audio('bgm.mp3');BGA.loop=true;BGA.preload='auto';try{BGA.crossOrigin='anonymous'}catch(_){}}const g=location.protocol.startsWith('http')?ensureG():null;if(g){BGA.volume=1;clearTimeout(fadeTo.t);ramp(0,10)}else BGA.volume=0;const pr=BGA.play();if(pr&&pr.catch)pr.catch(()=>{});fadeTo(BGA,fileVol(),1200)};
+ const dk=duck;duck=function(){if(bgOn==='file'&&BGA&&BGG){clearTimeout(duck.t);ramp(fileVol()*.55,80);duck.t=setTimeout(()=>{if(bgOn==='file')ramp(fileVol(),700)},900);return}return dk.apply(this,arguments)}}
+/* 재생 중 방향키: ←/→ 이전·다음 사건으로, ↑/↓ 이전·다음 장면으로 (멈춰 있을 땐 원래처럼 지도 끌기) */
+{const fOfT=(i,T)=>{let a=0,b=1;for(let k=0;k<30;k++){const m=(a+b)/2;if(tOfF(i,m)<T)a=m;else b=m}return a};
+ const KEV=EVENTS.filter(e=>e.f!=null).slice().sort((a,b)=>a.T-b.T||a.id-b.id);
+ const seekT=(T)=>{let i=0;for(let j=0;j<FRAMES.length;j++)if(FRAMES[j].t<=T+1e-9)i=j;const f=Math.max(0,Math.min(.9999,fOfT(i,T)));const ch=i!==pos.i;userMoved=false;setPos(i,f,{fit:ch});if(typeof lastT!=='undefined')lastT=curT();holdUntil=performance.now()+250};
+ window.addEventListener('keydown',ev=>{const k=ev.key;if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(k))return;const vm=$('v-map');if(!vm||vm.hidden||!playing)return;
+  const t=ev.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;ev.preventDefault();ev.stopImmediatePropagation();
+  const now=curT();
+  if(k==='ArrowRight'){const e=KEV.find(x=>x.T>now+1e-6);if(e)seekT(e.T-1e-4)}
+  else if(k==='ArrowLeft'){const past=KEV.filter(x=>x.T<now-1e-6);const e=past.length>1?past[past.length-2]:past[0];if(e)seekT(e.T-1e-4);else seekT(FRAMES[pos.i].t)}
+  else if(k==='ArrowDown'){if(pos.i<FRAMES.length-1)seekT(FRAMES[pos.i+1].t)}
+  else if(k==='ArrowUp'){const tgt=pos.f>.08||pos.i===0?pos.i:pos.i-1;seekT(FRAMES[tgt].t)}},true);
+ window.addEventListener('keyup',ev=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(ev.key)&&playing&&$('v-map')&&!$('v-map').hidden)ev.stopImmediatePropagation()},true)}
+/* 화면을 나가면(다른 앱·탭으로 가거나 지도 탭을 떠나면) 재생 자동 멈춤 */
+{const stop=()=>{try{if(playing)pause()}catch(_){}};document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});window.addEventListener('pagehide',stop);
+ const vm=$('v-map');if(vm)new MutationObserver(()=>{if(vm.hidden)stop()}).observe(vm,{attributes:true,attributeFilter:['hidden']})}
+/* 로고(한국사 지도) 누르면: 새로고침하듯 지도 화면으로 */
+{const h=document.querySelector('header.top h1');if(h){h.style.cursor='pointer';h.setAttribute('role','button');h.title='지도 화면으로';
+ h.addEventListener('click',()=>{try{if(playing)pause()}catch(_){}
+  document.querySelectorAll('.pppop,#pppop,#glpop,.glpop,#setpop').forEach(n=>{if(n.id==='setpop'){if(!n.hidden&&typeof closeSet==='function')closeSet()}else n.hidden=true});
+  try{closeBubble(true)}catch(_){}try{selId=null;refreshSel()}catch(_){}abroad=false;userMoved=false;
+  const app=document.querySelector('.app');app.classList.add('reloading');showView('map');
+  try{flyVB(fitVB(FRAMES[pos.i].view))}catch(_){animVB(fitVB(FRAMES[pos.i].view),600)}
+  document.querySelectorAll('#pbody,.pbody').forEach(n=>{try{n.scrollTo({top:0})}catch(_){}});try{if(typeof markListTime==='function')markListTime(true)}catch(_){}
+  setTimeout(()=>app.classList.remove('reloading'),380)})}}

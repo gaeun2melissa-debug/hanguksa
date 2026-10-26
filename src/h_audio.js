@@ -104,7 +104,7 @@ function openSet(){const p=$('setpop');const mo=Object.entries(MOODS);const FT=s
   p.hidden=false;$('setdim').hidden=false;
   p.querySelector('[data-x]').onclick=closeSet;
   p.querySelectorAll('[data-g2="font"] button').forEach(b=>b.onclick=()=>{store.set('font',b.dataset.v);applyFont(b.dataset.v);p.querySelectorAll('[data-g2="font"] button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
-  p.querySelectorAll('input[data-k]').forEach(i=>i.oninput=()=>{const k=i.dataset.k;SND[k]=i.type==='checkbox'?i.checked:+i.value;saveSnd();if(k==='vol'){if(ac())MASTER.gain.setTargetAtTime(SND.vol,AC.currentTime,.05);if(BGA&&bgOn==='file'){clearInterval(fadeT);BGA.volume=fileVol()}}else{ac();bgSync()}});
+  p.querySelectorAll('input[data-k]').forEach(i=>i.oninput=()=>{const k=i.dataset.k;SND[k]=i.type==='checkbox'?i.checked:+i.value;saveSnd();if(k==='vol'){if(ac())MASTER.gain.setTargetAtTime(SND.vol,AC.currentTime,.05);if(BGA&&bgOn==='file'){clearInterval(fadeT);if(window.__bgg)fadeTo(BGA,fileVol(),60);else BGA.volume=fileVol()}}else{ac();bgSync()}});
   p.querySelectorAll('input[data-f]').forEach(i=>i.onchange=()=>{SND.fx[i.dataset.f]=i.checked;saveSnd()});
   p.querySelectorAll('[data-fx]').forEach(b=>b.onclick=ev=>{ev.preventDefault();ev.stopPropagation();if(!ac())return;SFX[b.dataset.fx]();duck()});
   p.querySelectorAll('[data-g]').forEach(g=>g.querySelectorAll('button').forEach(b=>b.onclick=()=>{SND[g.dataset.g]=b.dataset.v;saveSnd();g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
