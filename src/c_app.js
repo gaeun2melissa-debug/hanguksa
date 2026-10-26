@@ -248,8 +248,14 @@ function placeLabels(){
     p.sp.forEach(([x,y])=>aPts.push(toS(x,y)))}
   const arrHitN=b=>{let n=0;for(const [x,y] of aPts)if(x>b[0]-3&&x<b[2]+3&&y>b[1]-3&&y<b[3]+3)n++;return n};
   const slabs=OV.filter(o=>o.slab).sort((a,b)=>(b.area||0)-(a.area||0));
-  for(const o of slabs){const [sx,sy]=toS(o.x,o.y);const tsp=[...o.t.children].filter(c=>c.tagName==='tspan');const n=tsp.length?Math.max(...tsp.map(c=>c.textContent.length)):o.t.textContent.length,nl=tsp.length||1;const setX=x=>{o.t.setAttribute('x',x);tsp.forEach(c=>c.setAttribute('x',x))};const size=(o.area||300)/k;
+  for(const o of slabs){let [sx,sy]=toS(o.x,o.y);const tsp=[...o.t.children].filter(c=>c.tagName==='tspan');const n=tsp.length?Math.max(...tsp.map(c=>c.textContent.length)):o.t.textContent.length,nl=tsp.length||1;const setX=x=>{o.t.setAttribute('x',x);tsp.forEach(c=>c.setAttribute('x',x))};const size=(o.area||300)/k;
     let fs=Math.max(11,Math.min(19,size/7));
+    let ox=0,oy=0;{const W=svg.clientWidth,H=svg.clientHeight,m=40;if(o.terr&&o.terr.isPointInFill&&(sx<m||sy<m||sx>W-m||sy>H-m)){
+      const ck2=[Math.round(vb.x/8),Math.round(vb.y/8),Math.round(vb.w/8),Math.round(o.x),Math.round(o.y)].join('|');
+      if(!o.vc||o.vc.k!==ck2){let best=null,bd=1e18;const LKk=$('landk'),LCc=$('landc');
+        for(let i=1;i<10;i++)for(let j=1;j<7;j++){const px=W*i/10,py=H*j/7,q=new DOMPoint(vb.x+px*k,vb.y+py*k);let ok=false;try{ok=o.terr.isPointInFill(q)}catch(_){}if(!ok)continue;const dd=(px-sx)**2+(py-sy)**2;if(dd<bd){let land=false;try{land=LKk.isPointInFill(q)||LCc.isPointInFill(q)}catch(_){}if(land){bd=dd;best=[px,py]}}}
+        o.vc={k:ck2,v:best}}
+      if(o.vc.v){ox=o.vc.v[0]-sx;oy=o.vc.v[1]-sy;sx+=ox;sy+=oy}}}
     if(size>=n*11*.98*1.15){ // 영토 안에: 자리가 없으면 글씨를 줄이거나 조금 비켜서라도 안에 둔다
       while(fs>11&&size<n*fs*.98*1.15)fs-=1;
       const LK=$('landk'),LC=$('landc');const outN=bx=>{const P=o.terr;if(!P||!P.isPointInFill)return 0;let c=0;for(let i=0;i<=3;i++)for(let j=0;j<=2;j++){const x=vb.x+(bx[0]+(bx[2]-bx[0])*i/3)*k,y=vb.y+(bx[1]+(bx[3]-bx[1])*j/2)*k;try{const q=new DOMPoint(x,y);if(!P.isPointInFill(q)||!(LK.isPointInFill(q)||LC.isPointInFill(q)))c++}catch(_){}}return c};
@@ -261,7 +267,7 @@ function placeLabels(){
         for(const [d,e,c0] of CAND){if(c0+fp>=bs)break;const b=[sx+e*ww-ww,sy+d*f-h2,sx+e*ww+ww,sy+d*f+h2];let sc=c0+fp+(hit(b)?100:0);if(sc>=bs)continue;sc+=arrHitN(b)*10;if(sc>=bs)continue;sc+=outN(b)*60;if(sc<bs){bs=sc;dy=d*f;dx=e*ww;w=ww;hh=h2;bfs=f}}}
       if(bs)o.lc={k:ck,v:[dy,dx,w,hh,bfs]};fs=bfs;
       boxes.push([sx+dx-w,sy+dy-hh,sx+dx+w,sy+dy+hh]);
-      o.t.style.fontSize=fs+'px';setX(dx.toFixed(1));o.t.setAttribute('y',dy.toFixed(1));o.t.setAttribute('text-anchor','middle');o.g.classList.remove('out');continue}
+      o.t.style.fontSize=fs+'px';setX((dx+ox).toFixed(1));o.t.setAttribute('y',(dy+oy).toFixed(1));o.t.setAttribute('text-anchor','middle');o.g.classList.remove('out');continue}
     // 영토가 작으면 밖으로 빼고 선으로 잇기
     fs=13;const w=n*fs*.98+4,hh=9*nl;let pick=null;
     for(const [dx,dy] of [[48,26],[48,-26],[-48,26],[-48,-26],[0,44],[0,-44],[70,0],[-70,0]]){const x0=dx>0?sx+dx:dx<0?sx+dx-w:sx-w/2;const b=[x0,sy+dy-hh,x0+w,sy+dy+hh];if(!hit(b)){pick=[dx,dy,b];break}}

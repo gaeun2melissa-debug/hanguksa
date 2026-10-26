@@ -293,14 +293,14 @@ function rzCluster(e){const deg=X(1)-X(0),L=byFrame[pos.i]||[],k=L.indexOf(e),a=
   for(let j=k+1;j<L.length;j++){const q=rzPts(L[j]);if(!q.length){gap.push(L[j].id);continue}if(q.some(([x,y])=>Math.hypot(x-cx,y-cy)>deg*RZ_R))break;mem.push(...gap,L[j].id);gap=[];pts=pts.concat(q);n++;if(hasR(L[j]))nr++}
   const force=RZ_FORCE.test(e.t);if((n<3||nr<2)&&!force)return null;
   let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));
-  const minW=deg*(force?2.2:2.6);let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
+  const minW=deg*(force?3:3.4);let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
   const pw=w*.18,ph=h*.22,fb=fitBox({x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}),FV=fitVB(FRAMES[pos.i].view);if(fb.w*fb.h>FV.w*FV.h*.5)return null;fb.mem=new Set(mem);fb.last=mem[mem.length-1];return fb}
 const rzIn=(e,b)=>rzPts(e).every(([x,y])=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);
 function rzOut(){const now=performance.now(),fi=pos.i;holdUntil=Math.max(holdUntil,now+2200+900+600);clearTimeout(rzOut.t);
   rzOut.t=setTimeout(()=>{if(pos.i!==fi||userMoved)return;rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900)},2200)}
 const RZ_SEQ=[[/^공산 전투/,/^고창 전투/,/^일리천 전투/]];
 function rzSeq(e){for(const sq of RZ_SEQ){if(!sq[0].test(e.t))continue;const evs=sq.map(r=>EVENTS.find(x=>r.test(x.t))).filter(Boolean);const pts=[].concat(...evs.map(rzPts));if(!pts.length)return null;
-  const deg=X(1)-X(0);let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));const minW=deg*2.8;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
+  const deg=X(1)-X(0);let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));const minW=deg*3.6;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
   const fb=fitBox({x:x0-w*.2,y:y0-h*.25,w:w*1.4,h:h*1.5});fb.mem=new Set(evs.map(x=>x.id));fb.last=evs[evs.length-1].id;fb.seq=true;return fb}return null}
 function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved)return;
   if(rzCur&&rzCur.seq){if(e.id===rzCur.last)rzOut();else if(!rzCur.shown&&rzCur.mem.has(e.id)){rzCur.shown=1;holdUntil=Math.max(holdUntil,performance.now()+RZ_HOLD)}return}
@@ -425,7 +425,7 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
 (function rzPre(){requestAnimationFrame(rzPre);try{if(!playing||userMoved||performance.now()<holdUntil)return;
   const t=curT(),ta=tOfF(pos.i,Math.min(1,pos.f+450/frameDur(pos.i)));const L=byFrame[pos.i]||[];if(rzCur&&rzCur.seq)return;let ev=null,c=null;const x=L.find(x=>x.T>t+1e-9);if(x&&!(rzCur&&rzCur.mem.has(x.id))&&!rzSeen.has(x.id)&&(x.ll||arrOf.has(x.id))){c=rzSeq(x)||rzCluster(x);ev=x}
   if(!c)return;if(!c.seq)c.mem.forEach(id=>rzSeen.add(id));
-  rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,performance.now()+900+700)}catch(_){}})();
+  rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,performance.now()+900+1000)}catch(_){}})();
 /* 나라 이름이 장면 중간에 바뀌는 경우 (후고구려 → 마진 → 태봉 → 고려) */
 const NAME_T={'후고구려':[[904,'마진'],[911,'태봉'],[918,'고려']]};
 function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const tx=o.t;if(o.base==null||!(o.base in NAME_T)){const cur=tx.textContent;if(cur in NAME_T)o.base=cur;else return}
@@ -433,3 +433,10 @@ function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const 
 {const ls=labStyle;labStyle=function(L,s){L.o.base=null;const r=ls.apply(this,arguments);applyNameT();return r}}
 {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyNameT();return r}}
 applyNameT();
+/* 장면 중간에 세워진 나라는 세운 해부터 땅이 생김 (후고구려 901) */
+const STATE_FROM={taebong:901}; /* 세우기 전엔 신라 땅 색으로 */
+function applyStateFrom(){try{const t=curT();for(const [id,y] of Object.entries(STATE_FROM)){const c=shapes.get(id);if(!c)continue;const on=t>=y-1e-6;
+  if(c.el.dataset.sf!==String(on)){c.el.dataset.sf=on;const sl=shapes.get('silla');c.el.style.transition='fill .8s';c.el.style.fill=on||!sl?'':getComputedStyle(sl.el).fill;c.lab.g.style.visibility=on?'':'hidden'}}}catch(_){}}
+{const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStateFrom();return r}}
+{const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);for(const id in STATE_FROM){const c=shapes.get(id);if(c)delete c.el.dataset.sf}applyStateFrom();return r}}
+applyStateFrom();
