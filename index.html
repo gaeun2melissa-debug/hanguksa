@@ -4715,7 +4715,7 @@ function spreadFill(c,fill,ll){const p=c.el;if(c.sp){c.sp.end()}if(!fill)fill=ge
   const cid='sp'+Math.random().toString(36).slice(2,8),cp=el('clipPath',{id:cid},$('defs')),ci=el('circle',{cx:X(ll[0]),cy:Y(ll[1]),r:0},cp);
   const cl=p.cloneNode(false);cl.removeAttribute('id');cl.style.transition='none';cl.style.fill=fill;cl.style.pointerEvents='none';cl.setAttribute('clip-path',`url(#${cid})`);p.after(cl);
   const bb=p.getBBox(),cx=X(ll[0]),cy=Y(ll[1]);const R=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))+10;
-  cl.style.opacity='1';const t0=performance.now(),D=1300;let raf=0;const end=()=>{cancelAnimationFrame(raf);p.style.transition='none';p.style.fill=fill;p.style.opacity='';cl.remove();cp.remove();c.sp=null};c.sp={end};
+  cl.style.opacity='1';const t0=performance.now(),D=2000;let raf=0;const end=()=>{cancelAnimationFrame(raf);p.style.transition='none';p.style.fill=fill;p.style.opacity='';cl.remove();cp.remove();c.sp=null};c.sp={end};
   const step=now=>{const u=Math.min(1,(now-t0)/D),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(R*k).toFixed(1));if(u<1)raf=requestAnimationFrame(step);else end()};raf=requestAnimationFrame(step)}
 function applyStates(fresh){try{const t=curT();for(const [id,S] of Object.entries(STATE_STEPS)){const c=shapes.get(id);if(!c)continue;
     if(fresh||c.base==null){c.base=c.el.style.fill||getComputedStyle(c.el).fill;c.lbase=c.lab.t.style.fill;c.stk=null}
@@ -4760,18 +4760,28 @@ document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')retu
  const ft=fadeTo;fadeTo=function(a,v,ms,done){if(a===BGA&&BGG){clearInterval(fadeT);clearTimeout(fadeTo.t);ramp(v,ms);if(done)fadeTo.t=setTimeout(done,ms);return}return ft.apply(this,arguments)};
  fileStart=function(){if(!BGA){BGA=new Audio('bgm.mp3');BGA.loop=true;BGA.preload='auto';try{BGA.crossOrigin='anonymous'}catch(_){}}const g=location.protocol.startsWith('http')?ensureG():null;if(g){BGA.volume=1;clearTimeout(fadeTo.t);ramp(0,10)}else BGA.volume=0;const pr=BGA.play();if(pr&&pr.catch)pr.catch(()=>{});fadeTo(BGA,fileVol(),1200)};
  const dk=duck;duck=function(){if(bgOn==='file'&&BGA&&BGG){clearTimeout(duck.t);ramp(fileVol()*.55,80);duck.t=setTimeout(()=>{if(bgOn==='file')ramp(fileVol(),700)},900);return}return dk.apply(this,arguments)}}
-/* 재생 중 방향키: ←/→ 이전·다음 사건으로, ↑/↓ 이전·다음 장면으로 (멈춰 있을 땐 원래처럼 지도 끌기) */
+/* 재생 중 방향키: ←/→ 한 번 = 이전·다음 사건, 꾹 누르면 빨리 감기·되감기 / ↑↓ 이전·다음 장면(꾹 누르면 계속)
+   멈춰 있을 땐 원래처럼 지도 끌기 */
 {const fOfT=(i,T)=>{let a=0,b=1;for(let k=0;k<30;k++){const m=(a+b)/2;if(tOfF(i,m)<T)a=m;else b=m}return a};
  const KEV=EVENTS.filter(e=>e.f!=null).slice().sort((a,b)=>a.T-b.T||a.id-b.id);
- const seekT=(T)=>{let i=0;for(let j=0;j<FRAMES.length;j++)if(FRAMES[j].t<=T+1e-9)i=j;const f=Math.max(0,Math.min(.9999,fOfT(i,T)));const ch=i!==pos.i;userMoved=false;setPos(i,f,{fit:ch});if(typeof lastT!=='undefined')lastT=curT();holdUntil=performance.now()+250};
- window.addEventListener('keydown',ev=>{const k=ev.key;if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(k))return;const vm=$('v-map');if(!vm||vm.hidden||!playing)return;
-  const t=ev.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;ev.preventDefault();ev.stopImmediatePropagation();
-  const now=curT();
+ const frameOf=T=>{let i=0;for(let j=0;j<FRAMES.length;j++)if(FRAMES[j].t<=T+1e-9)i=j;return i};
+ const seekT=(T,fit)=>{T=Math.max(FRAMES[0].t,T);const i=frameOf(T);const f=Math.max(0,Math.min(.9999,fOfT(i,T)));const ch=i!==pos.i;userMoved=false;setPos(i,f,{fit:fit!==false&&ch});if(typeof lastT!=='undefined')lastT=curT();holdUntil=performance.now()+250};
+ const KS=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'];let hk=null,hT=0,scr=0,rep=0,sLast=0;
+ const stepOnce=k=>{const now=curT();
   if(k==='ArrowRight'){const e=KEV.find(x=>x.T>now+1e-6);if(e)seekT(e.T-1e-4)}
   else if(k==='ArrowLeft'){const past=KEV.filter(x=>x.T<now-1e-6);const e=past.length>1?past[past.length-2]:past[0];if(e)seekT(e.T-1e-4);else seekT(FRAMES[pos.i].t)}
   else if(k==='ArrowDown'){if(pos.i<FRAMES.length-1)seekT(FRAMES[pos.i+1].t)}
-  else if(k==='ArrowUp'){const tgt=pos.f>.08||pos.i===0?pos.i:pos.i-1;seekT(FRAMES[tgt].t)}},true);
- window.addEventListener('keyup',ev=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(ev.key)&&playing&&$('v-map')&&!$('v-map').hidden)ev.stopImmediatePropagation()},true)}
+  else if(k==='ArrowUp'){const tgt=pos.f>.08||pos.i===0?pos.i:pos.i-1;seekT(FRAMES[tgt].t)}};
+ const scrub=now=>{if(!hk){scr=0;return}const dt=Math.min(60,now-sLast);sLast=now;const dir=hk==='ArrowRight'?1:-1;
+  const F=FRAMES[pos.i],span=(FRAMES[pos.i+1]?FRAMES[pos.i+1].t:tOfF(pos.i,1))-F.t;const rate=span/frameDur(pos.i)*7; // 평소의 7배 빠르기
+  const T=curT()+dir*rate*dt;const last=tOfF(FRAMES.length-1,.9999);seekT(Math.min(last,T),true);holdUntil=performance.now()+120;scr=requestAnimationFrame(scrub)};
+ const stopHold=()=>{clearTimeout(hT);clearInterval(rep);cancelAnimationFrame(scr);scr=0;if(hk){hk=null;holdUntil=performance.now()+200}};
+ window.addEventListener('keydown',ev=>{const k=ev.key;if(!KS.includes(k))return;const vm=$('v-map');if(!vm||vm.hidden||!playing)return;
+  const t=ev.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;ev.preventDefault();ev.stopImmediatePropagation();
+  if(ev.repeat||hk===k)return;stopHold();hk=k;stepOnce(k);
+  hT=setTimeout(()=>{if(hk!==k)return;if(k==='ArrowLeft'||k==='ArrowRight'){sLast=performance.now();scr=requestAnimationFrame(scrub)}else rep=setInterval(()=>{if(hk===k)stepOnce(k)},550)},380)},true);
+ window.addEventListener('keyup',ev=>{if(!KS.includes(ev.key))return;if(hk===ev.key){stopHold();ev.stopImmediatePropagation()}else if(playing&&$('v-map')&&!$('v-map').hidden)ev.stopImmediatePropagation()},true);
+ window.addEventListener('blur',stopHold)}
 /* 화면을 나가면(다른 앱·탭으로 가거나 지도 탭을 떠나면) 재생 자동 멈춤 */
 {const stop=()=>{try{if(playing)pause()}catch(_){}};document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});window.addEventListener('pagehide',stop);
  const vm=$('v-map');if(vm)new MutationObserver(()=>{if(vm.hidden)stop()}).observe(vm,{attributes:true,attributeFilter:['hidden']})}
