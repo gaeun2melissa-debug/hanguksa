@@ -448,7 +448,7 @@ function play(){if(pos.i===N-1&&pos.f>.98)setPos(0,0,{fit:true});playing=true;us
 function pause(){if(!playing)return;playing=false;cancelAnimationFrame(raf);$('playic').innerHTML='<path d="M8 5.5v13l11-6.5z"/>';$('play').setAttribute('aria-label','재생');updateTime(false)}
 function toggle(){playing?pause():play()}
 function loop(now){const dt=now-tPrev;tPrev=now;if(now<holdUntil){raf=requestAnimationFrame(loop);return}
-  let f=pos.f+dt/frameDur(pos.i),i=pos.i;
+  let f=pos.f+dt/frameDur(pos.i)*(typeof rzCur!=="undefined"&&rzCur?.6:1),i=pos.i;
   if(f>=1){if(i===N-1){setPos(i,.9999);pause();return}
     const big=stateKey(i)!==stateKey(i+1)||FRAMES[i].era!==FRAMES[i+1].era;i++;f=0;setPos(i,f,{fit:true});holdUntil=now+(big?750:300)/Math.sqrt(speed)}
   else setPos(i,f);raf=requestAnimationFrame(loop)}
