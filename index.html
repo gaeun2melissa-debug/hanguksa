@@ -4556,12 +4556,18 @@ function rzCluster(e){const deg=X(1)-X(0),L=byFrame[pos.i]||[],k=L.indexOf(e),a=
 const rzIn=(e,b)=>rzPts(e).every(([x,y])=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);
 function rzOut(){const now=performance.now(),fi=pos.i;holdUntil=Math.max(holdUntil,now+2200+900+600);clearTimeout(rzOut.t);
   rzOut.t=setTimeout(()=>{if(pos.i!==fi||userMoved)return;rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900)},2200)}
+const RZ_SEQ=[[/^공산 전투/,/^고창 전투/,/^일리천 전투/]];
+function rzSeq(e){for(const sq of RZ_SEQ){if(!sq[0].test(e.t))continue;const evs=sq.map(r=>EVENTS.find(x=>r.test(x.t))).filter(Boolean);const pts=[].concat(...evs.map(rzPts));if(!pts.length)return null;
+  const deg=X(1)-X(0);let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));const minW=deg*1.7;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
+  const fb=fitBox({x:x0-w*.2,y:y0-h*.25,w:w*1.4,h:h*1.5});fb.mem=new Set(evs.map(x=>x.id));fb.last=evs[evs.length-1].id;fb.seq=true;return fb}return null}
 function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved)return;
+  if(rzCur&&rzCur.seq){if(e.id===rzCur.last)rzOut();return}
+  {const q=rzSeq(e);if(q){rzCur=q;animVB(q,900);holdUntil=Math.max(holdUntil,performance.now()+900+RZ_HOLD);return}}
   if(rzCur&&rzCur.mem.has(e.id)){if(e.id===rzCur.last)rzOut();return}
   const c=rzSeen.has(e.id)?null:rzCluster(e);const now=performance.now();
   if(c){c.mem.forEach(id=>rzSeen.add(id));rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,now+900+RZ_HOLD+(RZ_FORCE.test(e.t)?1400:0));if(e.id===c.last)setTimeout(()=>{if(rzCur===c&&playing)rzOut()},900+RZ_HOLD+(RZ_FORCE.test(e.t)?1400:0));return}
   if(rzCur){rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900);holdUntil=Math.max(holdUntil,now+900+500)}}
-{const sp=setPos;setPos=function(i){if(i!==pos.i){rzCur=null;rzSeen.clear();clearTimeout(rzOut.t)}return sp.apply(this,arguments)}}
+{const sp=setPos;setPos=function(i,f,opt){if(i!==pos.i){if(rzCur&&rzCur.seq&&playing&&!userMoved&&(byFrame[i]||[]).some(x=>rzCur.mem.has(x.id))){rzSeen.clear();const r=sp.call(this,i,f,{...(opt||{}),fit:false});const c=rzCur;setTimeout(()=>{if(rzCur===c){const L=EVENTS.find(x=>x.id===c.last);if(L&&L.f===pos.i&&L.T<=curT()+1e-6)rzOut()}},60);return r}rzCur=null;rzSeen.clear();clearTimeout(rzOut.t)}return sp.apply(this,arguments)}}
 {const tk=ticker;ticker=function(e){const r=tk.apply(this,arguments);try{routeZoom(e)}catch(_){}return r}}
 /* ───────── 해외 작은 지도: 멀리 떨어진 곳이 여럿이면 최대 3개, 화면에 보여도 우리나라 밖이면 표시 ───────── */
 {const KOR=e=>e.ll[0]>=124&&e.ll[0]<=131.3&&e.ll[1]>=33&&e.ll[1]<=43.4;
