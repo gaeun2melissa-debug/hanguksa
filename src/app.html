@@ -4694,7 +4694,7 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
   if(!c)return;if(!c.seq)c.mem.forEach(id=>rzSeen.add(id));
   rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,performance.now()+900+1000)}catch(_){}})();
 /* 나라 이름이 장면 중간에 바뀌는 경우 (후고구려 → 마진 → 태봉 → 고려) */
-const NAME_T={'후고구려':[[904,'마진'],[911,'태봉'],[918,'고려']]};
+const NAME_T={'후고구려':[[918,'고려']]};
 function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const tx=o.t;if(o.base==null||!(o.base in NAME_T)){const cur=tx.textContent;if(cur in NAME_T)o.base=cur;else return}
   let nm=o.base;for(const [y,n] of NAME_T[o.base])if(t>=y-1e-6)nm=n;if(tx.textContent!==nm){tx.textContent=nm;o.lc=null;schedLabels()}})}catch(_){}}
 {const ls=labStyle;labStyle=function(L,s){L.o.base=null;const r=ls.apply(this,arguments);applyNameT();return r}}
