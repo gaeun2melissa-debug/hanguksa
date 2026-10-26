@@ -4745,6 +4745,11 @@ applyStates(true);
  setInterval(kick,800);
  const fs=fileStart;fileStart=function(){const r=fs.apply(this,arguments);if(BGA&&!BGA.__wd){BGA.__wd=1;BGA.addEventListener('pause',()=>setTimeout(kick,150))}return r};
  const sx=sfx;sfx=function(){const r=sx.apply(this,arguments);setTimeout(kick,120);setTimeout(kick,600);return r}}
+/* 스페이스바: 지도에서 재생 / 멈춤 */
+document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')return;if(ev.repeat||ev.ctrlKey||ev.metaKey||ev.altKey)return;
+  const t=ev.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+  const vm=$('v-map');if(!vm||vm.hidden)return;const sp=$('setpop');if(sp&&!sp.hidden)return;
+  ev.preventDefault();ev.stopPropagation();try{if(document.activeElement&&document.activeElement.tagName==='BUTTON')document.activeElement.blur()}catch(_){}playing?pause():play()},true);
 </script>
 <script type="module">
 /* 구글 로그인 + 하트·책갈피·설정 동기화 (GitHub 사이트 전용) */
