@@ -141,8 +141,8 @@ function applyFrame(i,anim){
   if(tasks.length){
     const canMorph=typeof flubber!=='undefined'&&!reduceMotion;
     tasks.forEach(k=>{try{k.f=canMorph?flubber.interpolate(k.from,k.to,{maxSegmentLength:7}):null}catch(e){k.f=null}});
-    morphTasks=tasks;const t0=performance.now(),D=1100;
-    const stepM=now=>{let u=Math.min(1,(now-t0)/D);const e=u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;
+    morphTasks=tasks;const t0=performance.now(),D=2000;
+    const stepM=now=>{let u=Math.min(1,(now-t0)/D);const e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
       for(const k of tasks){k.cur.el.setAttribute('d',k.f?(u>=1?k.to:k.f(e)):(e<.5?k.from:k.to));k.cur.lab.o.x=k.l0[0]+(k.l1[0]-k.l0[0])*e;k.cur.lab.o.y=k.l0[1]+(k.l1[1]-k.l0[1])*e}
       placeOV();if(u<1)morphRAF=requestAnimationFrame(stepM);else{morphTasks=[];placeLabels()}};
     morphRAF=requestAnimationFrame(stepM);
