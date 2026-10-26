@@ -147,3 +147,10 @@ function hzLift(){document.querySelectorAll('#ovchart .hzwrap').forEach(w=>{cons
  addEventListener('blur',()=>held.clear());}
 
 addEventListener('pointerdown',e=>{const t=e.target;if(!(t.closest&&t.closest('input,textarea,select,[contenteditable]'))){try{window.focus()}catch(_){}}},true);try{window.focus()}catch(_){}
+/* 구조도: 옆에 남는 자리가 있으면 흐름(→) 카드를 세로로 세워서 끼워 넣기 */
+function trPack(){const tb=$('trbody');if(!tb||!tb.offsetParent)return;const cs=[...tb.children].filter(c=>c.classList.contains('trcard'));
+  cs.forEach(c=>c.classList.remove('vfit'));tb.classList.add('trmeasure');
+  for(let i=1;i<cs.length;i++){const c=cs[i],p=cs[i-1];if(!c.querySelector('.hchain'))continue;if(c.offsetTop===p.offsetTop)continue;
+    c.classList.add('vfit');if(c.offsetTop!==p.offsetTop||c.offsetHeight>p.offsetHeight*1.6)c.classList.remove('vfit')}
+  tb.classList.remove('trmeasure')}
+{const t1=trShow;trShow=function(){const r=t1.apply(this,arguments);requestAnimationFrame(trPack);return r};let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(trPack,300)})}
