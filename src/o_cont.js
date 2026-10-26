@@ -198,7 +198,7 @@ document.addEventListener('click',ev=>{const tb=ev.target.closest('.tclb');if(tb
 function addTclb(root){(root||document).querySelectorAll('li[data-id]:not([data-tc])').forEach(li=>{li.dataset.tc=1;const e=EVENTS.find(x=>String(x.id)===li.dataset.id);if(!treatyTxt(e))return;const p=li.querySelector('p');if(p&&!li.querySelector('.tclb'))p.insertAdjacentHTML('afterend',`<button type="button" class="tclb" data-tcl="${e.id}">조약 내용</button>`)})}
 addTclb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObserver(()=>addTclb(el)).observe(el,{childList:true,subtree:true})});
 /* ───────── 하트 모아 보기: 시대 버튼 대신 정렬 ───────── */
-const HSORTS=[['add','추가한 순'],['time','시간 흐름순'],['imp','중요도순'],['custom','사용자 정의']];
+const HSORTS=[['add','추가한 순'],['time','시간 흐름순'],['imp','빈출순'],['custom','사용자 정의']];
 function hSorted(){const q=($('q').value||'').trim().toLowerCase();const byT=new Map();EVENTS.forEach(e=>{if(!byT.has(e.t))byT.set(e.t,e)});
   let list=[...HEARTS].map(t=>byT.get(t)).filter(Boolean);
   if(q)list=list.filter(e=>(e.t+' '+e.x+' '+(e.p||'')+' '+(e.pp||'')+' '+(e.vs||'')+' '+yearLabel(e)).toLowerCase().includes(q));
