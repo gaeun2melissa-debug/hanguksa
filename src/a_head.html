@@ -1261,3 +1261,8 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 .trcard.vtr .hn{max-width:340px}
 .trcard.vtr .tree{min-width:0!important}</style>
 <style>.trcard.vtr .hkid::before{top:26px!important}.trcard.vtr .hkid:last-child::after{bottom:auto!important;height:27px}.trcard.vtr .hkids.one>.hkid::after{height:27px;bottom:auto!important}</style>
+<style>.trcard.vtr .htree>.hrow>.hkids.grp{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px 16px;margin-left:0;margin-top:8px}
+.trcard.vtr .htree>.hrow>.hkids.grp>.hkid{padding:0}
+.trcard.vtr .htree>.hrow>.hkids.grp>.hkid::before,.trcard.vtr .htree>.hrow>.hkids.grp>.hkid::after{display:none!important}
+.trcard.vtr .htree>.hrow:has(>.hkids.grp)>.hlink{display:none}
+.trcard.vtr .htree>.hrow>.hkids.grp>.hkid>.hrow>.hn{border-width:0 0 0 5px;border-color:var(--trc);border-radius:6px;background:color-mix(in srgb,var(--trc) 12%,var(--panel))}</style>
