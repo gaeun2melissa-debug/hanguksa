@@ -4551,19 +4551,19 @@ function rzCluster(e){const deg=X(1)-X(0),L=byFrame[pos.i]||[],k=L.indexOf(e),a=
   for(let j=k+1;j<L.length;j++){const q=rzPts(L[j]);if(!q.length){gap.push(L[j].id);continue}if(q.some(([x,y])=>Math.hypot(x-cx,y-cy)>deg*RZ_R))break;mem.push(...gap,L[j].id);gap=[];pts=pts.concat(q);n++;if(hasR(L[j]))nr++}
   const force=RZ_FORCE.test(e.t);if((n<3||nr<2)&&!force)return null;
   let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));
-  const minW=deg*(force?1.3:1.7);let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
+  const minW=deg*(force?2.2:2.6);let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
   const pw=w*.18,ph=h*.22,fb=fitBox({x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}),FV=fitVB(FRAMES[pos.i].view);if(fb.w*fb.h>FV.w*FV.h*.5)return null;fb.mem=new Set(mem);fb.last=mem[mem.length-1];return fb}
 const rzIn=(e,b)=>rzPts(e).every(([x,y])=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);
 function rzOut(){const now=performance.now(),fi=pos.i;holdUntil=Math.max(holdUntil,now+2200+900+600);clearTimeout(rzOut.t);
   rzOut.t=setTimeout(()=>{if(pos.i!==fi||userMoved)return;rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900)},2200)}
 const RZ_SEQ=[[/^공산 전투/,/^고창 전투/,/^일리천 전투/]];
 function rzSeq(e){for(const sq of RZ_SEQ){if(!sq[0].test(e.t))continue;const evs=sq.map(r=>EVENTS.find(x=>r.test(x.t))).filter(Boolean);const pts=[].concat(...evs.map(rzPts));if(!pts.length)return null;
-  const deg=X(1)-X(0);let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));const minW=deg*1.7;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
+  const deg=X(1)-X(0);let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));const minW=deg*2.8;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
   const fb=fitBox({x:x0-w*.2,y:y0-h*.25,w:w*1.4,h:h*1.5});fb.mem=new Set(evs.map(x=>x.id));fb.last=evs[evs.length-1].id;fb.seq=true;return fb}return null}
 function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved)return;
-  if(rzCur&&rzCur.seq){if(e.id===rzCur.last)rzOut();return}
+  if(rzCur&&rzCur.seq){if(e.id===rzCur.last)rzOut();else if(!rzCur.shown&&rzCur.mem.has(e.id)){rzCur.shown=1;holdUntil=Math.max(holdUntil,performance.now()+RZ_HOLD)}return}
   {const q=rzSeq(e);if(q){rzCur=q;animVB(q,900);holdUntil=Math.max(holdUntil,performance.now()+900+RZ_HOLD);return}}
-  if(rzCur&&rzCur.mem.has(e.id)){if(e.id===rzCur.last)rzOut();return}
+  if(rzCur&&rzCur.mem.has(e.id)){if(e.id===rzCur.last)rzOut();else if(!rzCur.shown){rzCur.shown=1;holdUntil=Math.max(holdUntil,performance.now()+RZ_HOLD)}return}
   const c=rzSeen.has(e.id)?null:rzCluster(e);const now=performance.now();
   if(c){c.mem.forEach(id=>rzSeen.add(id));rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,now+900+RZ_HOLD+(RZ_FORCE.test(e.t)?1400:0));if(e.id===c.last)setTimeout(()=>{if(rzCur===c&&playing)rzOut()},900+RZ_HOLD+(RZ_FORCE.test(e.t)?1400:0));return}
   if(rzCur){rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900);holdUntil=Math.max(holdUntil,now+900+500)}}
@@ -4679,6 +4679,11 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
  for(const ps of arrOf.values())ps.forEach(p=>{if(!p.g.classList.contains('draw'))p.g.classList.add('drawn')})}
 {const ul=window.updArrLeg;if(ul)window.updArrLeg=function(){const r=ul.apply(this,arguments);try{placeInset()}catch(_){}return r}}
 {const sa=setArrowsAll;setArrowsAll=function(){const r=sa.apply(this,arguments);clearTimeout(updArrLeg.t2);updArrLeg.t2=setTimeout(()=>{try{updArrLeg()}catch(_){}},80);return r}}
+/* 확대는 사건이 나타나기 "전"에: 다음 사건이 확대 묶음의 첫 사건이면 미리 확대하고 멈췄다가 그 사건을 보여 줌 */
+(function rzPre(){requestAnimationFrame(rzPre);try{if(!playing||userMoved||performance.now()<holdUntil)return;
+  const t=curT(),ta=tOfF(pos.i,Math.min(1,pos.f+450/frameDur(pos.i)));const L=byFrame[pos.i]||[];if(rzCur&&rzCur.seq)return;let ev=null,c=null;const x=L.find(x=>x.T>t+1e-9);if(x&&!(rzCur&&rzCur.mem.has(x.id))&&!rzSeen.has(x.id)&&(x.ll||arrOf.has(x.id))){c=rzSeq(x)||rzCluster(x);ev=x}
+  if(!c)return;if(!c.seq)c.mem.forEach(id=>rzSeen.add(id));
+  rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,performance.now()+900+700)}catch(_){}})();
 </script>
 <script type="module">
 /* 구글 로그인 + 하트·책갈피·설정 동기화 (GitHub 사이트 전용) */
