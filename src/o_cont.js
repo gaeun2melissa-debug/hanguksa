@@ -151,15 +151,20 @@ addEventListener('pointerdown',e=>{const t=e.target;if(!(t.closest&&t.closest('i
 function trTight(tb){tb.querySelectorAll('.hn').forEach(h=>h.style.maxWidth='');tb.querySelectorAll('.trcard:not(.vtr) .htree .hn').forEach(h=>{const r0=h.getBoundingClientRect();if(!r0.width)return;let mx=0;const rg=document.createRange();const tw=document.createTreeWalker(h,NodeFilter.SHOW_TEXT);while(tw.nextNode()){const t=tw.currentNode;if(!t.nodeValue.trim())continue;rg.selectNodeContents(t);[...rg.getClientRects()].forEach(r=>{if(r.width)mx=Math.max(mx,r.right)})}h.querySelectorAll('.ha>i').forEach(e=>{const r=e.getBoundingClientRect();if(r.width)mx=Math.max(mx,r.right)});const pr=parseFloat(getComputedStyle(h).paddingRight)||0;const w=Math.ceil(mx-r0.left+pr+1);if(w<r0.width-4)h.style.maxWidth=w+'px'})}
 function trPack(){const tb=$('trbody');if(!tb||!tb.offsetParent)return;const cs=[...tb.children].filter(c=>c.classList.contains('trcard'));
   cs.forEach(c=>c.classList.remove('vtr','vfit','vauto'));trTight(tb);
-  const H=()=>tb.scrollHeight;
+  const H=()=>tb.scrollHeight;const i0=Math.max(0,cs.findIndex(c=>c.id==='tree-abroad'));
   cs.forEach(c=>{const h=c.querySelector('.htree');if(h&&h.scrollWidth>h.clientWidth+2)c.classList.add('vtr','vauto')});
+  /* 앞쪽(개항기까지): 흐름 카드만 옆 자리에 세로로 끼워 넣기 */
+  tb.classList.add('trmeasure');
+  for(let i=1;i<i0;i++){const c=cs[i],p=cs[i-1];if(!c.querySelector('.hchain')||c.classList.contains('vtr'))continue;if(c.offsetTop===p.offsetTop)continue;
+    c.classList.add('vfit');if(c.offsetTop!==p.offsetTop||c.offsetHeight>p.offsetHeight*1.6)c.classList.remove('vfit')}
+  tb.classList.remove('trmeasure');
+  /* 독립운동 이후: 가로·세로 중 효율적인 쪽 */
   const cls=c=>c.querySelector('.htree')?'vtr':'vfit';
-  const ok=c=>c&&!/tree-(laws|orgs|abroad)/.test(c.id)&&!c.classList.contains('vauto')&&(c.querySelector('.htree')||c.querySelector('.hchain'));
-  /* 이웃한 두 카드를 세로로 바꿔 보며 나란히 들어가 전체가 짧아지면 채택 */
-  for(let i=0;i<cs.length-1;i++){const A=cs[i],B=cs[i+1];const h0=H();let best=null,bh=h0-40;
+  const ok=c=>c&&!/tree-(laws|orgs)/.test(c.id)&&!c.classList.contains('vauto')&&(c.querySelector('.htree')||c.querySelector('.hchain'));
+  for(let i=i0;i<cs.length-1;i++){const A=cs[i],B=cs[i+1];const h0=H();let best=null,bh=h0-40;
     for(const [x,y] of [[1,0],[0,1],[1,1]]){if((x&&!ok(A))||(y&&!ok(B)))continue;if(x)A.classList.add(cls(A));if(y)B.classList.add(cls(B));const h=H();if(h<bh){bh=h;best=[x,y]}if(x)A.classList.remove(cls(A));if(y)B.classList.remove(cls(B))}
     if(best){if(best[0])A.classList.add(cls(A));if(best[1])B.classList.add(cls(B));i++}}
-  cs.forEach(c=>{if(!(c.id==='tree-abroad'||ok(c))||c.classList.contains('vauto'))return;const k=cls(c);const h0=H();c.classList.toggle(k);if(!(H()<h0-40))c.classList.toggle(k)});
+  cs.slice(i0).forEach(c=>{if(!ok(c))return;const k=cls(c);const h0=H();c.classList.toggle(k);if(!(H()<h0-40))c.classList.toggle(k)});
   trTight(tb)}
 function keepParens(root){if(!root)return;const RE=/[^\s,()]*\([^()]{1,40}\)[^\s,()]*/g;root.querySelectorAll('.hn small,.hn em,.trflow li').forEach(el=>{const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest('.plw,.kpar')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});const ns=[];while(w.nextNode())ns.push(w.currentNode);
   ns.forEach(tn=>{const t=tn.nodeValue;RE.lastIndex=0;if(!RE.test(t))return;RE.lastIndex=0;const f=document.createDocumentFragment();let i=0,m;while((m=RE.exec(t))){if(m.index>i)f.append(t.slice(i,m.index));const sp=document.createElement('span');sp.className='kpar';sp.textContent=m[0];f.append(sp);i=m.index+m[0].length}if(i<t.length)f.append(t.slice(i));tn.replaceWith(f)})})}
