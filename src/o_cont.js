@@ -8,7 +8,6 @@ function buildCont(){const V=ovDir==='v',sc=$('ovscroll'),parts=[];ovBuilding=tr
   $('v-ov').classList.add('hzsplit');
   $('ovchart').innerHTML=`<div class="hzall">${parts.join('')}</div>`;
   $('ovsum').innerHTML='';$('ovside').innerHTML='';
-  hzLift();
   if(V)vSlice();else hzAlign();
   ovCont={dir:ovDir,w:sc.clientWidth,dirty:false};if(!V)hzSync()}
 /* 세로: 가로 연대표를 화면 폭만큼 잘라 줄줄이 쌓기 (글자 안 잘리는 자리에서 자름) */
@@ -116,4 +115,4 @@ function hzLift(){document.querySelectorAll('#ovchart .hzwrap').forEach(w=>{cons
   ns.forEach(n=>{const b=n.querySelector('button[data-ev]');const lb=b&&top.querySelector(`.hzn[data-ev="${b.dataset.ev}"]`);if(!lb)return;const r=lb.getBoundingClientRect();
     b.remove();n.classList.add('lift');n.style.left=(r.left-r0.left)+'px';n.style.top=(r.bottom-r0.top+4)+'px';inn.appendChild(n);const need=inn.offsetTop+n.offsetTop+n.offsetHeight+12;if(need>top.offsetHeight)top.style.height=need+'px'})})}
 
-{const d=drawHZ;drawHZ=function(k){d(k);if(!ovBuilding)try{hzLift()}catch(e){}}}
+
