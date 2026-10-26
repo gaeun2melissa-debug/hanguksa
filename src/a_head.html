@@ -1329,3 +1329,6 @@ body,button,input,select,textarea{-webkit-font-smoothing:antialiased;-moz-osx-fo
 <style>#map text{filter:url(#txglow)}#insvg text,.inset svg text{filter:url(#txglow)}</style>
 <style>html #v-map svg#map text,html #v-map .inset svg text,html .inset svg text{filter:none!important;stroke:#fff!important;stroke-width:2.4px!important;stroke-linejoin:round!important;stroke-opacity:.95;paint-order:stroke fill!important;-webkit-text-stroke:0!important}
 .ahd.draw{animation:ahead 1s backwards!important}</style>
+<style>.arw.draw:not(.dash) path:not(.aflow){stroke-dasharray:2 2!important;animation:adraw2 1s cubic-bezier(.4,0,.2,1) both!important}
+@keyframes adraw2{from{stroke-dashoffset:2}to{stroke-dashoffset:0}}
+.arw.drawn path:not(.aflow){stroke-dasharray:none!important;animation:none!important}.arw.dash.drawn .af,.arw.dash.drawn .ab{stroke-dasharray:.035 .025!important}</style>

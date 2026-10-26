@@ -283,13 +283,18 @@ FRAMES.forEach((f,i)=>{if(!f.view||f.view===VS)return;const pts=EVENTS.filter(e=
 {const sa=safeArea;safeArea=function(){const a=sa.apply(this,arguments);const s=svg.getBoundingClientRect(),tp=document.querySelector('.top');if(tp){const ov=tp.getBoundingClientRect().bottom-s.top+14;if(ov>a.t){a.h=Math.max(80,a.h-(ov-a.t));a.t=ov}}return a}}
 /* 재생 중 경로가 있는 사건(동학·임진왜란·갑신정변 등)은 경로만큼 확대해 자세히 보여 주고 다시 돌아감 */
 let rzT=0;
-let rzBusy=0;function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved||performance.now()<rzBusy)return;const ps=arrOf.get(e.id);if(!ps||!ps.length)return;
-  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;ps.forEach(p=>{x0=Math.min(x0,p.bb[0]);y0=Math.min(y0,p.bb[1]);x1=Math.max(x1,p.bb[2]);y1=Math.max(y1,p.bb[3])});
-  if(e.ll){x0=Math.min(x0,X(e.ll[0]));x1=Math.max(x1,X(e.ll[0]));y0=Math.min(y0,Y(e.ll[1]));y1=Math.max(y1,Y(e.ll[1]))}
-  const deg=X(1)-X(0),minW=deg*2.2;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
-  const FV=fitVB(FRAMES[pos.i].view);if(w*h>FV.w*FV.h*.3)return; // 이미 충분히 크게 보임
-  const pw=w*.18,ph=h*.18;animVB(fitBox({x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}),850);
-  rzBusy=performance.now()+2800+1800;clearTimeout(rzT);const fi=pos.i;rzT=setTimeout(()=>{if(!playing||userMoved||pos.i!==fi)return;animVB(fitVB(FRAMES[pos.i].view),950)},2800)}
+/* 확대는 한 장면에 작은 경로가 여럿 몰린 경우(임진왜란·동학 농민 운동·6·25 등)만, 장면당 한 번.
+   확대가 끝나면 잠깐 멈춰서 볼 준비할 시간을 주고, 장면이 끝날 때까지 확대 유지 */
+let rzDone=-1;const RZ_HOLD=1600;
+function rzBox(fi){const deg=X(1)-X(0);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,n=0;
+  (byFrame[fi]||[]).forEach(e=>{const ps=arrOf.get(e.id);if(!ps)return;let w=0;ps.forEach(p=>w=Math.max(w,p.bb[2]-p.bb[0],p.bb[3]-p.bb[1]));if(w>deg*1.6)return;n++;
+    ps.forEach(p=>{x0=Math.min(x0,p.bb[0]);y0=Math.min(y0,p.bb[1]);x1=Math.max(x1,p.bb[2]);y1=Math.max(y1,p.bb[3])});
+    if(e.ll){x0=Math.min(x0,X(e.ll[0]));x1=Math.max(x1,X(e.ll[0]));y0=Math.min(y0,Y(e.ll[1]));y1=Math.max(y1,Y(e.ll[1]))}});
+  if(n<3)return null;const minW=deg*2.4;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
+  const FV=fitVB(FRAMES[fi].view);if(w*h>FV.w*FV.h*.45)return null;const pw=w*.16,ph=h*.2;return {x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}}
+function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved||rzDone===pos.i||!arrOf.has(e.id))return;rzDone=pos.i;const bx=rzBox(pos.i);if(!bx)return;
+  const fb=fitBox(bx),FV=fitVB(FRAMES[pos.i].view);if(fb.w*fb.h>FV.w*FV.h*.5)return;animVB(fb,900);holdUntil=Math.max(holdUntil,performance.now()+900+RZ_HOLD)}
+{const sp=setPos;setPos=function(i){if(i!==pos.i)rzDone=-1;return sp.apply(this,arguments)}}
 {const tk=ticker;ticker=function(e){const r=tk.apply(this,arguments);try{routeZoom(e)}catch(_){}return r}}
 /* ───────── 해외 작은 지도: 멀리 떨어진 곳이 여럿이면 최대 3개, 화면에 보여도 우리나라 밖이면 표시 ───────── */
 {const KOR=e=>e.ll[0]>=124&&e.ll[0]<=131.3&&e.ll[1]>=33&&e.ll[1]<=43.4;
@@ -396,3 +401,6 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
 {const NS='http://www.w3.org/2000/svg';const mk=(sv,id)=>{if(!sv||sv.querySelector('#'+id))return;let d=sv.querySelector('defs');if(!d){d=document.createElementNS(NS,'defs');sv.prepend(d)}
   d.insertAdjacentHTML('beforeend',`<filter id="${id}" x="-15%" y="-40%" width="130%" height="180%" color-interpolation-filters="sRGB"><feMorphology in="SourceAlpha" operator="dilate" radius="1.4" result="d"/><feGaussianBlur in="d" stdDeviation="2" result="b"/><feFlood style="flood-color:var(--paper);flood-opacity:.9"/><feComposite in2="b" operator="in" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`)};
  mk($('map'),'txglow');mk($('insvg'),'txglow2')}
+/* 화살표: 그려지는 동작이 끝나면 점선 기법을 풀어 확대/축소 때 중간이 끊기지 않게 */
+{const sa=setArrows;setArrows=function(e,state){const r=sa.apply(this,arguments);const ps=arrOf.get(e.id);if(ps&&state==='draw')ps.forEach(p=>{p.g.classList.remove('drawn');clearTimeout(p.dT);p.dT=setTimeout(()=>p.g.classList.add('drawn'),1050)});return r}
+ for(const ps of arrOf.values())ps.forEach(p=>{if(!p.g.classList.contains('draw'))p.g.classList.add('drawn')})}
