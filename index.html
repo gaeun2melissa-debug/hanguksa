@@ -2802,7 +2802,7 @@ function styleTerr(path,s){
   const fc=`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`;path.style.fill=s.hatch?`url(#${s.hatch})`:fc;path.style.setProperty('--tbc',s.hatch?'none':fc);path.style.stroke='';
 }
 function makeLabel(s){const g=el('g',{class:'slab'},labG);const ln=el('line',{class:'lead',x1:0,y1:0,x2:0,y2:0},g);el('circle',{class:'ldot',r:2.6},g);const t=el('text',{},g);const o=ovItem(g,s.lab[0],s.lab[1]);o.slab=true;o.t=t;o.ln=ln;const L={g,t,o};labStyle(L,s);return L}
-function labStyle(L,s){L.t.textContent=s.name;L.o.area=s.area;L.t.style.fill=`color-mix(in srgb,var(--c-${s.c}) 52%,var(--ink))`;L.t.style.stroke=s.hatch?'var(--land)':`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`}
+function labStyle(L,s){if(/ /.test(s.name)){L.t.textContent='';(()=>{const W=s.name.replace(/ →/g,'\u00a0→').split(' ');let bi=1,bm=1e9;for(let i=1;i<W.length;i++){const m=Math.max(W.slice(0,i).join(' ').length,W.slice(i).join(' ').length);if(m<bm){bm=m;bi=i}}return [W.slice(0,bi).join(' '),W.slice(bi).join(' ')]})().forEach((w,i)=>{const sp=document.createElementNS('http://www.w3.org/2000/svg','tspan');sp.textContent=w;sp.setAttribute('dy',i?'1.12em':'-.56em');L.t.appendChild(sp)})}else L.t.textContent=s.name;L.o.area=s.area;L.t.style.fill=`color-mix(in srgb,var(--c-${s.c}) 52%,var(--ink))`;L.t.style.stroke=s.hatch?'var(--land)':`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`}
 function finishMorph(){cancelAnimationFrame(morphRAF);morphTasks.forEach(k=>{k.cur.el.setAttribute('d',k.to);k.cur.lab.o.x=k.l1[0];k.cur.lab.o.y=k.l1[1]});morphTasks=[];}
 function applyFrame(i,anim){
   finishMorph();showRivers(i);
@@ -2943,20 +2943,20 @@ function placeLabels(){
     p.sp.forEach(([x,y])=>aPts.push(toS(x,y)))}
   const arrHitN=b=>{let n=0;for(const [x,y] of aPts)if(x>b[0]-3&&x<b[2]+3&&y>b[1]-3&&y<b[3]+3)n++;return n};
   const slabs=OV.filter(o=>o.slab).sort((a,b)=>(b.area||0)-(a.area||0));
-  for(const o of slabs){const [sx,sy]=toS(o.x,o.y);const n=o.t.textContent.length;const size=(o.area||300)/k;
+  for(const o of slabs){const [sx,sy]=toS(o.x,o.y);const tsp=[...o.t.children].filter(c=>c.tagName==='tspan');const n=tsp.length?Math.max(...tsp.map(c=>c.textContent.length)):o.t.textContent.length,nl=tsp.length||1;const setX=x=>{o.t.setAttribute('x',x);tsp.forEach(c=>c.setAttribute('x',x))};const size=(o.area||300)/k;
     let fs=Math.max(11,Math.min(19,size/7));
     if(size>=n*11*.98*1.15){ // 영토 안에: 자리가 없으면 글씨를 줄이거나 조금 비켜서라도 안에 둔다
       while(fs>11&&size<n*fs*.98*1.15)fs-=1;
-      const w=n*fs*.98/2+3,hh=fs*.62;let dy=0,dx=0,bs=1e9;
+      const w=n*fs*.98/2+3,hh=fs*.62*nl;let dy=0,dx=0,bs=1e9;
       for(const d of [0,1.1,-1.1,2.1,-2.1,3.1,-3.1])for(const e of [0,.6,-.6,1.2,-1.2]){const b=[sx+e*w-w,sy+d*fs-hh,sx+e*w+w,sy+d*fs+hh];const sc=(hit(b)?100:0)+arrHitN(b)*10+Math.abs(d)+Math.abs(e)*1.5;if(sc<bs){bs=sc;dy=d*fs;dx=e*w}}
       boxes.push([sx+dx-w,sy+dy-hh,sx+dx+w,sy+dy+hh]);
-      o.t.style.fontSize=fs+'px';o.t.setAttribute('x',dx.toFixed(1));o.t.setAttribute('y',dy.toFixed(1));o.t.setAttribute('text-anchor','middle');o.g.classList.remove('out');continue}
+      o.t.style.fontSize=fs+'px';setX(dx.toFixed(1));o.t.setAttribute('y',dy.toFixed(1));o.t.setAttribute('text-anchor','middle');o.g.classList.remove('out');continue}
     // 영토가 작으면 밖으로 빼고 선으로 잇기
-    fs=13;const w=n*fs*.98+4,hh=9;let pick=null;
+    fs=13;const w=n*fs*.98+4,hh=9*nl;let pick=null;
     for(const [dx,dy] of [[48,26],[48,-26],[-48,26],[-48,-26],[0,44],[0,-44],[70,0],[-70,0]]){const x0=dx>0?sx+dx:dx<0?sx+dx-w:sx-w/2;const b=[x0,sy+dy-hh,x0+w,sy+dy+hh];if(!hit(b)){pick=[dx,dy,b];break}}
     if(!pick){const x0=sx+48;pick=[48,26,[x0,sy+26-hh,x0+w,sy+26+hh]]}
     const [dx,dy,b]=pick;boxes.push(b);
-    o.t.style.fontSize=fs+'px';o.t.setAttribute('text-anchor',dx>0?'start':dx<0?'end':'middle');o.t.setAttribute('x',dx>0?dx+2:dx<0?dx-2:0);o.t.setAttribute('y',dy);
+    o.t.style.fontSize=fs+'px';o.t.setAttribute('text-anchor',dx>0?'start':dx<0?'end':'middle');setX(dx>0?dx+2:dx<0?dx-2:0);o.t.setAttribute('y',dy);
     const L=Math.hypot(dx,dy),sh=(L-6)/L;o.ln.setAttribute('x2',(dx*sh).toFixed(1));o.ln.setAttribute('y2',(dy*sh).toFixed(1));o.g.classList.add('out')}
   // 3) 글씨: 중요한 것부터, 오른쪽이 막히면 왼쪽에
   const cand=[];
