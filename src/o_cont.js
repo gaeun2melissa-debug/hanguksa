@@ -492,20 +492,20 @@ document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')retu
  const KEV=EVENTS.filter(e=>e.f!=null).slice().sort((a,b)=>a.T-b.T||a.id-b.id);
  const frameOf=T=>{let i=0;for(let j=0;j<FRAMES.length;j++)if(FRAMES[j].t<=T+1e-9)i=j;return i};
  const seekT=(T,fit)=>{T=Math.max(FRAMES[0].t,T);const i=frameOf(T);const f=Math.max(0,Math.min(.9999,fOfT(i,T)));const ch=i!==pos.i;userMoved=false;setPos(i,f,{fit:fit!==false&&ch});if(typeof lastT!=='undefined')lastT=curT();holdUntil=performance.now()+250};
- const KS=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'];let hk=null,hT=0,scr=0,rep=0,sLast=0;
+ const KS=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'];let hk=null,hT=0,scr=0,rep=0,sLast=0,hStart=0;
  const stepOnce=k=>{const now=curT();
   if(k==='ArrowRight'){const e=KEV.find(x=>x.T>now+1e-6);if(e)seekT(e.T-1e-4)}
   else if(k==='ArrowLeft'){const past=KEV.filter(x=>x.T<now-1e-6);const e=past.length>1?past[past.length-2]:past[0];if(e)seekT(e.T-1e-4);else seekT(FRAMES[pos.i].t)}
   else if(k==='ArrowDown'){if(pos.i<FRAMES.length-1)seekT(FRAMES[pos.i+1].t)}
   else if(k==='ArrowUp'){const tgt=pos.f>.08||pos.i===0?pos.i:pos.i-1;seekT(FRAMES[tgt].t)}};
  const scrub=now=>{if(!hk){scr=0;return}const dt=Math.min(60,now-sLast);sLast=now;const dir=hk==='ArrowRight'?1:-1;
-  const F=FRAMES[pos.i],span=(FRAMES[pos.i+1]?FRAMES[pos.i+1].t:tOfF(pos.i,1))-F.t;const rate=span/frameDur(pos.i)*7; // 평소의 7배 빠르기
+  const F=FRAMES[pos.i],span=(FRAMES[pos.i+1]?FRAMES[pos.i+1].t:tOfF(pos.i,1))-F.t;const hold=(now-hStart)/1000,mul=Math.min(40,8+hold*16);const rate=span/frameDur(pos.i)*mul; // 꾹 누를수록 빨라짐 (8배 → 40배)
   const T=curT()+dir*rate*dt;const last=tOfF(FRAMES.length-1,.9999);seekT(Math.min(last,T),true);holdUntil=performance.now()+120;scr=requestAnimationFrame(scrub)};
  const stopHold=()=>{clearTimeout(hT);clearInterval(rep);cancelAnimationFrame(scr);scr=0;if(hk){hk=null;holdUntil=performance.now()+200}};
  window.addEventListener('keydown',ev=>{const k=ev.key;if(!KS.includes(k))return;const vm=$('v-map');if(!vm||vm.hidden||!playing)return;
   const t=ev.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;ev.preventDefault();ev.stopImmediatePropagation();
   if(ev.repeat||hk===k)return;stopHold();hk=k;stepOnce(k);
-  hT=setTimeout(()=>{if(hk!==k)return;if(k==='ArrowLeft'||k==='ArrowRight'){sLast=performance.now();scr=requestAnimationFrame(scrub)}else rep=setInterval(()=>{if(hk===k)stepOnce(k)},550)},380)},true);
+  hT=setTimeout(()=>{if(hk!==k)return;if(k==='ArrowLeft'||k==='ArrowRight'){sLast=hStart=performance.now();scr=requestAnimationFrame(scrub)}else rep=setInterval(()=>{if(hk===k)stepOnce(k)},550)},240)},true);
  window.addEventListener('keyup',ev=>{if(!KS.includes(ev.key))return;if(hk===ev.key){stopHold();ev.stopImmediatePropagation()}else if(playing&&$('v-map')&&!$('v-map').hidden)ev.stopImmediatePropagation()},true);
  window.addEventListener('blur',stopHold)}
 /* 화면을 나가면(다른 앱·탭으로 가거나 지도 탭을 떠나면) 재생 자동 멈춤 */
