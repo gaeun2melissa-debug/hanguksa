@@ -2819,7 +2819,7 @@ function applyFrame(i,anim){
       cur.d=s.d;
     }else{
       const p=el('path',{d:s.d},G.terr);styleTerr(p,s);
-      cur={el:p,d:s.d,lab:makeLabel(s)};shapes.set(s.id,cur);
+      cur={el:p,d:s.d,lab:makeLabel(s)};cur.lab.o.terr=p;shapes.set(s.id,cur);
       if(anim){cur.lab.g.style.opacity=0;
         if(!reduceMotion){const cid='rv'+(++revealN);const cp=el('clipPath',{id:cid},$('defs'));const ci=el('circle',{cx:s.lab[0],cy:s.lab[1],r:0},cp);p.setAttribute('clip-path',`url(#${cid})`);
           const R=Math.max(400,(s.area||400)*1.6),t0=performance.now();const grow=now=>{const u=Math.min(1,(now-t0)/1400),k=1-Math.pow(1-u,3);ci.setAttribute('r',(R*k).toFixed(1));if(u<1)requestAnimationFrame(grow);else{p.removeAttribute('clip-path');cp.remove()}};requestAnimationFrame(grow);
@@ -2946,8 +2946,14 @@ function placeLabels(){
     let fs=Math.max(11,Math.min(19,size/7));
     if(size>=n*11*.98*1.15){ // 영토 안에: 자리가 없으면 글씨를 줄이거나 조금 비켜서라도 안에 둔다
       while(fs>11&&size<n*fs*.98*1.15)fs-=1;
-      const w=n*fs*.98/2+3,hh=fs*.62*nl;let dy=0,dx=0,bs=1e9;
-      for(const d of [0,1.1,-1.1,2.1,-2.1,3.1,-3.1])for(const e of [0,.6,-.6,1.2,-1.2]){const b=[sx+e*w-w,sy+d*fs-hh,sx+e*w+w,sy+d*fs+hh];const sc=(hit(b)?100:0)+arrHitN(b)*10+Math.abs(d)+Math.abs(e)*1.5;if(sc<bs){bs=sc;dy=d*fs;dx=e*w}}
+      const LK=$('landk'),LC=$('landc');const outN=bx=>{const P=o.terr;if(!P||!P.isPointInFill)return 0;let c=0;for(let i=0;i<=3;i++)for(let j=0;j<=2;j++){const x=vb.x+(bx[0]+(bx[2]-bx[0])*i/3)*k,y=vb.y+(bx[1]+(bx[3]-bx[1])*j/2)*k;try{const q=new DOMPoint(x,y);if(!P.isPointInFill(q)||!(LK.isPointInFill(q)||LC.isPointInFill(q)))c++}catch(_){}}return c};
+      const ck=[pos.i,Math.round(vb.x),Math.round(vb.y),Math.round(vb.w),Math.round(sx),Math.round(sy),aPts.length,boxes.length,fs].join('|');
+      let dy=0,dx=0,bs=1e9,w=0,hh=0,bfs=fs;
+      if(o.lc&&o.lc.k===ck){[dy,dx,w,hh,bfs]=o.lc.v;bs=0}
+      const CAND=placeLabels.C||(placeLabels.C=(()=>{const r=[];for(const d of [0,1.1,-1.1,2.1,-2.1,3.1,-3.1,4.2,-4.2])for(const e of [0,.5,-.5,1,-1,1.6,-1.6])r.push([d,e,Math.abs(d)+Math.abs(e)*1.5]);return r.sort((p,q)=>p[2]-q[2])})());
+      for(let f=fs;f>=11&&bs>=60;f-=1.5){const ww=n*f*.98/2+2,h2=f*.6*nl,fp=(fs-f)*2;
+        for(const [d,e,c0] of CAND){if(c0+fp>=bs)break;const b=[sx+e*ww-ww,sy+d*f-h2,sx+e*ww+ww,sy+d*f+h2];let sc=c0+fp+(hit(b)?100:0);if(sc>=bs)continue;sc+=arrHitN(b)*10;if(sc>=bs)continue;sc+=outN(b)*60;if(sc<bs){bs=sc;dy=d*f;dx=e*ww;w=ww;hh=h2;bfs=f}}}
+      if(bs)o.lc={k:ck,v:[dy,dx,w,hh,bfs]};fs=bfs;
       boxes.push([sx+dx-w,sy+dy-hh,sx+dx+w,sy+dy+hh]);
       o.t.style.fontSize=fs+'px';setX(dx.toFixed(1));o.t.setAttribute('y',dy.toFixed(1));o.t.setAttribute('text-anchor','middle');o.g.classList.remove('out');continue}
     // 영토가 작으면 밖으로 빼고 선으로 잇기
