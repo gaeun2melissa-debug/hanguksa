@@ -1297,3 +1297,9 @@ body,button,input,select,textarea{-webkit-font-smoothing:antialiased;-moz-osx-fo
 <style>/* 어두운 바탕(검정 팝업·눌린 버튼)에서는 얇게 깎는 테두리를 바탕색에 맞춤 */
 .ovtip,.ovtip *,#hovtip,#hovtip *,.inset span,.chip[aria-pressed="true"],.chip[aria-pressed="true"] *,.spd2[aria-pressed="true"],#replay,#replay *{-webkit-text-stroke:0!important}</style>
 <style>.ticker,.ticker *{-webkit-text-stroke:0!important}.ticker b{color:#ff8a7a!important}</style>
+<style>/* 지도: 글씨 테두리(흰 테) 없애기 */
+#v-map svg text,#v-map .ov text,.inset text,.dmlab text{stroke:none!important;stroke-width:0!important}
+/* 교과서식 화살표: 테 없이 굵은 색 선 + 꽉 찬 세모 머리 */
+.arw .ab{display:none!important}
+.arw .af{stroke-width:4.6!important}.arw.inv .af{stroke-width:6.4!important}
+.ahd path.ahf{stroke:none!important;paint-order:normal}</style>
