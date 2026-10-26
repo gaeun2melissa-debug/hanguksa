@@ -453,3 +453,8 @@ function applyStates(fresh){try{const t=curT();for(const [id,S] of Object.entrie
 {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStates(false);return r}}
 {const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);applyStates(true);return r}}
 applyStates(true);
+/* 갔다가 돌아오는 화살표(위화도 회군): 가는 길을 다 그린 뒤 돌아오는 길을 그림 */
+{const sa=setArrows;setArrows=function(e,state){const r=sa.apply(this,arguments);const ps=arrOf.get(e.id);
+  if(ps&&e.seqAr){ps.forEach((p,k)=>{clearTimeout(p.sqT);if(!k)return;if(state==='draw'){p.g.style.visibility=p.hg.style.visibility='hidden';
+      p.sqT=setTimeout(()=>{p.g.style.visibility=p.hg.style.visibility='';[p.g,p.hg].forEach(n=>{n.classList.remove('draw','drawn');void n.getBoundingClientRect();n.classList.add('draw')});clearTimeout(p.dT);p.dT=setTimeout(()=>p.g.classList.add('drawn'),1050)},1100*k)}
+    else p.g.style.visibility=p.hg.style.visibility=''})}return r}}
