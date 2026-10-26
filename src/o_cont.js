@@ -413,7 +413,4 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
 /* 화살표: 그려지는 동작이 끝나면 점선 기법을 풀어 확대/축소 때 중간이 끊기지 않게 */
 {const sa=setArrows;setArrows=function(e,state){const r=sa.apply(this,arguments);const ps=arrOf.get(e.id);if(ps&&state==='draw')ps.forEach(p=>{p.g.classList.remove('drawn');clearTimeout(p.dT);p.dT=setTimeout(()=>p.g.classList.add('drawn'),1050)});return r}
  for(const ps of arrOf.values())ps.forEach(p=>{if(!p.g.classList.contains('draw'))p.g.classList.add('drawn')})}
-/* 깃발: 땅에 꽂힌 느낌(흙더미 + 땅에 박힌 자국) */
-document.querySelectorAll('.pin.flagpin .pole').forEach(pl=>{if(pl.previousSibling&&pl.previousSibling.classList&&pl.previousSibling.classList.contains('mound'))return;
-  const NS='http://www.w3.org/2000/svg',m=document.createElementNS(NS,'path');m.setAttribute('class','mound');m.setAttribute('d','M-6.5,2.6Q-3.5,-1.4 0,-1.2Q3.5,-1.4 6.5,2.6Z');pl.parentNode.insertBefore(m,pl.nextSibling);pl.setAttribute('d','M0,1V-26')});
 {const ul=window.updArrLeg;if(ul)window.updArrLeg=function(){const r=ul.apply(this,arguments);try{placeInset()}catch(_){}return r}}
