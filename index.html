@@ -2832,7 +2832,7 @@ function applyFrame(i,anim){
     }else{
       const p=el('path',{d:s.d},G.terr);styleTerr(p,s);
       cur={el:p,d:s.d,lab:makeLabel(s)};cur.lab.o.terr=p;shapes.set(s.id,cur);
-      if(anim){cur.lab.g.style.opacity=0;
+      if(anim&&!(typeof STATE_STEPS!=='undefined'&&STATE_STEPS[s.id]&&STATE_STEPS[s.id].pre)){cur.lab.g.style.opacity=0;
         if(!reduceMotion){const cid='rv'+(++revealN);const cp=el('clipPath',{id:cid},$('defs'));const fe=EVENTS.find(e=>e.found&&e.ll&&e.f===i&&e.t.replace(/^[^,]*,\s*/,'').startsWith(s.name));const o0=fe?[X(fe.ll[0]),Y(fe.ll[1])]:s.lab;const ci=el('circle',{cx:o0[0],cy:o0[1],r:0},cp);p.setAttribute('clip-path',`url(#${cid})`);
           let R=Math.max(400,(s.area||400)*1.6);try{const bb=p.getBBox();R=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-o0[0],y-o0[1])))+10}catch(_){}const t0=performance.now();const grow=now=>{const u=Math.min(1,(now-t0)/2000),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(R*k).toFixed(1));if(u<1)requestAnimationFrame(grow);else{p.removeAttribute('clip-path');cp.remove()}};requestAnimationFrame(grow);
           setTimeout(()=>{cur.lab.g.style.opacity=''},500)}
