@@ -4129,19 +4129,35 @@ function hzLift(){document.querySelectorAll('#ovchart .hzwrap').forEach(w=>{cons
     b.remove();n.classList.add('lift');n.style.left=(r.left-r0.left)+'px';n.style.top=(r.bottom-r0.top+4)+'px';inn.appendChild(n);const need=inn.offsetTop+n.offsetTop+n.offsetHeight+12;if(need>top.offsetHeight)top.style.height=need+'px'})})}
 
 
-/* 키보드 방향키 = 드래그 (지도: 이동, 연대표: 옆/위아래로 넘기기) */
-document.addEventListener('keydown',e=>{const KM={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],Left:[-1,0],Right:[1,0],Up:[0,-1],Down:[0,1],UIKeyInputLeftArrow:[-1,0],UIKeyInputRightArrow:[1,0],UIKeyInputUpArrow:[0,-1],UIKeyInputDownArrow:[0,1]},KC={37:[-1,0],38:[0,-1],39:[1,0],40:[0,1]};const D=KM[e.key]||KC[e.keyCode];if(!D||e.altKey||e.ctrlKey||e.metaKey)return;
-  const t=e.target;if(t&&(t.isContentEditable||/^(TEXTAREA|SELECT)$/.test(t.tagName)||(t.tagName==='INPUT'&&!/^(range|checkbox|radio|button)$/.test(t.type))))return;if(t&&t.tagName==='INPUT'&&t.type==='range')return;
-  const big=e.shiftKey?3:1,beh=e.repeat?'auto':'smooth';
-  const pick=(root,ax)=>{let best=null,ba=0;[root,...root.querySelectorAll('*')].forEach(el=>{if(!el.offsetParent&&el!==root)return;const cs=getComputedStyle(el),ov=ax?cs.overflowY:cs.overflowX;if(!/auto|scroll/.test(ov))return;const can=ax?el.scrollHeight-el.clientHeight>2:el.scrollWidth-el.clientWidth>2;if(!can)return;const r=el.getBoundingClientRect(),a=r.width*r.height;if(a>ba){ba=a;best=el}});return best};
-  const gen=root=>{let el=pick(root,D[1]?1:0);if(!el&&D[0])el=pick(root,1);if(!el)el=document.scrollingElement;if(!el)return;e.preventDefault();const vert=!!D[1]||!(el.scrollWidth-el.clientWidth>2);const d=(D[0]||D[1])*(vert?Math.max(120,el.clientHeight*.35):Math.max(160,el.clientWidth*.35))*big;el.scrollBy(vert?{top:d,behavior:beh}:{left:d,behavior:beh})};
-  const ovl=[...document.querySelectorAll('#kpage,#ovpop,.modal,[role=dialog]')].find(x=>!x.hidden&&x.offsetParent!==null);if(ovl){gen(ovl);return}
-  if(!$('v-map').hidden){e.preventDefault();const k=kNow(),px=120*big;cancelAnimationFrame(vbRAF);const n={...vb,x:vb.x+D[0]*px*k,y:vb.y+D[1]*px*k};if(e.repeat)setVB(n);else animVB(n,180);userMoved=true;if(typeof schedRecenter==='function')schedRecenter();return}
-  if(!$('v-ov').hidden){e.preventDefault();const sc=$('ovscroll'),rd=$('ovread');
-    if(ovDir==='h'){if(D[0])sc.scrollBy({left:D[0]*260*big,behavior:beh});else{const b=[...sc.querySelectorAll('.hzbot')].find(b=>{const r=b.getBoundingClientRect();return r.right>0&&r.left<innerWidth});if(b)b.scrollBy({top:D[1]*120*big,behavior:beh})}}
-    else rd.scrollBy({top:(D[0]||D[1])*200*big,behavior:beh});return}
-  const v=[...document.querySelectorAll('section.view')].find(x=>!x.hidden);if(v)gen(v);
-},true);
+/* 키보드 방향키 = 부드러운 드래그 (누르고 있는 동안 일정한 속도로, 떼면 서서히 멈춤) */
+{const KM={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],Left:[-1,0],Right:[1,0],Up:[0,-1],Down:[0,1],UIKeyInputLeftArrow:[-1,0],UIKeyInputRightArrow:[1,0],UIKeyInputUpArrow:[0,-1],UIKeyInputDownArrow:[0,1]},KC={37:[-1,0],38:[0,-1],39:[1,0],40:[0,1]};
+ const held=new Map();let raf=0,last=0,vx=0,vy=0,tgt=null,acc={x:0,y:0},boost=1;
+ const keyOf=e=>KM[e.key]||KC[e.keyCode];
+ const typing=t=>t&&(t.isContentEditable||/^(TEXTAREA|SELECT)$/.test(t.tagName)||(t.tagName==='INPUT'&&!/^(checkbox|radio|button)$/.test(t.type)));
+ const pick=(root,ax)=>{let best=null,ba=0;[root,...root.querySelectorAll('*')].forEach(el=>{if(!el.offsetParent&&el!==root)return;const cs=getComputedStyle(el),ov=ax?cs.overflowY:cs.overflowX;if(!/auto|scroll/.test(ov))return;const can=ax?el.scrollHeight-el.clientHeight>2:el.scrollWidth-el.clientWidth>2;if(!can)return;const r=el.getBoundingClientRect(),a=r.width*r.height;if(a>ba){ba=a;best=el}});return best};
+ function findT(D){
+   const ovl=[...document.querySelectorAll('#kpage,#ovpop,.modal,[role=dialog]')].find(x=>!x.hidden&&x.offsetParent!==null);
+   const gen=root=>{const v=pick(root,1),h=pick(root,0);return {v:v||document.scrollingElement,h:h||null}};
+   if(ovl)return gen(ovl);
+   if(!$('v-map').hidden)return {map:true};
+   if(!$('v-ov').hidden){const sc=$('ovscroll');if(ovDir==='h'){const b=[...sc.querySelectorAll('.hzbot')].find(b=>{const r=b.getBoundingClientRect();return r.right>0&&r.left<innerWidth});return {h:sc,v:b||null}}return {v:$('ovread'),h:null}}
+   const v=[...document.querySelectorAll('section.view')].find(x=>!x.hidden);return v?gen(v):null}
+ const MAXV=520; // 화면 px / 초
+ function tick(now){const dt=Math.min(.05,(now-last)/1000);last=now;let dx=0,dy=0;held.forEach(d=>{dx+=d[0];dy+=d[1]});
+   const k=1-Math.exp(-dt*(held.size?6:5));vx+=(dx*MAXV*boost-vx)*k;vy+=(dy*MAXV*boost-vy)*k;
+   if(!held.size&&Math.abs(vx)<4&&Math.abs(vy)<4){raf=0;vx=vy=0;return}
+   const mx=vx*dt,my=vy*dt;
+   if(tgt&&tgt.map){const kk=kNow();setVB({...vb,x:vb.x+mx*kk,y:vb.y+my*kk});userMoved=true}
+   else if(tgt){let H=tgt.h,V=tgt.v,ax=mx,ay=my;if(!H&&V&&tgt.v!==$('ovscroll')&&!(V.scrollWidth-V.clientWidth>2)){ay+=ax;ax=0}
+     if(H&&ax){acc.x+=ax;const s=Math.trunc(acc.x);if(s){H.scrollLeft+=s;acc.x-=s}}
+     if(V&&ay){acc.y+=ay;const s=Math.trunc(acc.y);if(s){V.scrollTop+=s;acc.y-=s}}}
+   raf=requestAnimationFrame(tick)}
+ addEventListener('keydown',e=>{const D=keyOf(e);if(!D||e.altKey||e.ctrlKey||e.metaKey)return;const t=e.target;if(typing(t)||(t&&t.tagName==='INPUT'&&t.type==='range'))return;
+   e.preventDefault();e.stopPropagation();boost=e.shiftKey?2.5:1;if(held.has(e.code||e.key))return;
+   if(!held.size||!tgt){tgt=findT(D);acc={x:0,y:0};if(tgt&&tgt.map){cancelAnimationFrame(vbRAF);if(typeof schedRecenter==='function')schedRecenter()}}
+   held.set(e.code||e.key,D);if(!raf){last=performance.now();vx=D[0]*MAXV*.5*boost;vy=D[1]*MAXV*.5*boost;raf=requestAnimationFrame(tick)}},true);
+ addEventListener('keyup',e=>{if(held.delete(e.code||e.key)&&!held.size&&tgt&&tgt.map&&typeof schedRecenter==='function')schedRecenter();boost=e.shiftKey?2.5:1},true);
+ addEventListener('blur',()=>held.clear());}
 
 addEventListener('pointerdown',e=>{const t=e.target;if(!(t.closest&&t.closest('input,textarea,select,[contenteditable]'))){try{window.focus()}catch(_){}}},true);try{window.focus()}catch(_){}
 </script>
