@@ -198,7 +198,7 @@ function samgukTable(){const cols=[['1~3세기',-100,300],['4세기',300,400],['
 /* 구조도 속 인물 이름 → 누르면 인물 사전 */
 function linkPeople(root){if(!root)return;const btn=(n,lab)=>`<button type="button" class="pl" data-person="${esc(n)}">${esc(lab||n)}</button>`;
   root.querySelectorAll('.hn em:not([data-pl])').forEach(em=>{em.dataset.pl=1;let t=em.textContent.trim();const wrap=/^\(.*\)$/.test(t);if(wrap)t=t.slice(1,-1);
-    em.innerHTML=(wrap?'(':'')+t.split(/\s*,\s*/).map(part=>{const m=part.match(/^([^()]+?)(\s*\(.*\))?$/);if(!m)return esc(part);const nm=m[1].trim();if(nm.length<2||/[0-9]|등$|세력|파$/.test(nm))return esc(part);return btn(nm)+esc(m[2]||'')}).join(', ')+(wrap?')':'')});
+    em.innerHTML=(wrap?'(':'')+t.split(/\s*,\s*/).map(part=>{const m=part.match(/^([^()]+?)(\s*\(.*\))?$/);const W=x=>`<span class="plw">${x}</span>`;if(!m)return W(esc(part));const nm=m[1].trim();if(nm.length<2||/[0-9]|등$|세력|파$/.test(nm))return W(esc(part));return W(btn(nm)+esc((m[2]||'').trim()))}).join(', ')+(wrap?')':'')});
   const known=new Set([...PEOPLE.keys(),...Object.keys(PINFO||{}),...REIGNS.flatMap(D=>D.r.map(r=>pbase(r.name.replace('대통령 ',''))))].filter(n=>n.length>=2));
   root.querySelectorAll('.hn>b:not([data-pl])').forEach(b=>{b.dataset.pl=1;const t=b.textContent.trim();if(known.has(t)||kingOfName(t))b.innerHTML=btn(t)});
   const names=[...known].sort((a,b)=>b.length-a.length).map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));if(!names.length)return;const RE=new RegExp(names.join('|'),'g');
