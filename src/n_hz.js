@@ -4,6 +4,9 @@ let HZAV=9999;
 /* 연대표 아래 칸: 사건 설명 속 꼭 알아 둘 낱말(척화비 같은 것)을 그 사건 자리에 */
 function hzTerms(evs,xT,fitSep){if(typeof GLOSS==='undefined')return [];const used=new Set(),out=[];const titles=evs.map(e=>e.t);
   evs.forEach(e=>{if(!e.x||isSiteO(e))return;const tmp=document.createElement('div');tmp.innerHTML=glx(e.x);[...tmp.querySelectorAll('[data-gl]')].slice(0,2).forEach(s=>{const k=s.dataset.gl;if(used.has(k)||titles.some(t=>t.includes(k)))return;used.add(k);const x=xT(e.T);out.push(fitSep({g:k,from:e.t,a:x-120,b:x+120},x))})});return out}
+/* 맨 위 두꺼운 막대 = 시대, 그 밑 얇은 막대 = 세부 시기 */
+const HZ_T1=[[-700000,-2333,'선사 시대'],[-2333,-108,'고조선'],[-108,371,'초기 여러 나라'],[371,676,'삼국 시대'],[676,698,'통일 신라'],[698,900,'남북국 시대'],[900,936,'후삼국 시대'],[936,1392.55,'고려'],[1392.55,1863.95,'조선'],[1863.95,1897.8,'개항기'],[1897.8,1910.66,'대한 제국'],[1910.66,1945.62,'일제 강점기'],[1945.62,2100,'현대']].map(([s,e,n],i)=>({s,e,n,c:(i%5)+1}));
+const HZ_T2=[...REGIMES.filter(r=>!/^(대한 제국)$/.test(r.n)),{s:-2000,e:-400,n:'청동기 시대',c:3},{s:-400,e:-1,n:'철기 시대',c:4}].sort((a,b)=>a.s-b.s);
 const HZ_ONLY={prehist:['구석기','신석기']};
 const HZ_NOTES={'구석기':['뗀석기','주먹도끼','이동 생활','사냥·채집','동굴·막집','평등 사회'],
  '신석기':['간석기','빗살무늬 토기','농경 시작','정착 생활','움집','씨족 사회']};
@@ -22,7 +25,7 @@ function layHZ(k,SC){
   let h='';
   // 위: 조약 · 개혁안
   const tops=[...evs.filter(e=>e.treaty).map(e=>({kind:'t',e,t:e.T,title:e.t,body:e.x})),...REFORMS.filter(r=>r[0]>=t0&&r[0]<t1).map(r=>({kind:'r',t:r[0],title:r[1],by:r[2],body:r[3]}))].sort((a,b)=>a.t-b.t);
-  const rg=(ALL?ERAS.map((E2,j)=>{const ff=FRAMES.filter(x=>x.era===E2.k);return {s:ff[0].t,e:ff[ff.length-1].t2,n:E2.n,c:(j%5)+1}}):((()=>{const r=REGIMES.filter(r=>r.e>t0&&r.s<t1);return r.length?r:fs.map((F,j)=>({s:F.t,e:F.t2,n:F.title.replace(/^\d세기 · /,''),c:(j%5)+1}))})())).map(r=>({n:r.n,c:r.c,ts:r.s,te:r.e,a:xT(Math.max(r.s,t0)),b:xT(Math.min(r.e,t1))})).filter((r,i,A)=>A.length<2||r.b-r.a>=60);if(rg.length)rg[0].a=Math.min(rg[0].a,0);
+  const rg=(ALL?ERAS.map((E2,j)=>{const ff=FRAMES.filter(x=>x.era===E2.k);return {s:ff[0].t,e:ff[ff.length-1].t2,n:E2.n,c:(j%5)+1}}):(HZ_T1.filter(r=>r.e>t0&&r.s<t1))).map(r=>({n:r.n,c:r.c,ts:r.s,te:r.e,a:xT(Math.max(r.s,t0)),b:xT(Math.min(r.e,t1))})).filter((r,i,A)=>A.length<2||r.b-r.a>=60);if(rg.length)rg[0].a=Math.min(rg[0].a,0);
   const SEPS=rg.slice(1).map(r=>r.a).concat(rg.length?[rg[rg.length-1].b]:[]);
   const fitSep=(o,anchor)=>{const w=o.b-o.a;for(const s of SEPS){if(o.a<s-3&&o.b>s-3){if(anchor<s){o.b=s-5;o.a=o.b-w;o.ra=1}else{o.a=s+5;o.b=o.a+w}}}if(o.a<6){o.a=6;o.b=6+w;o.ra=0}if(o.b>W-6){o.b=W-6;o.a=o.b-w;o.ra=1}return o};
   tops.forEach(o=>{o.a=xT(o.t)-115;o.b=o.a+230;fitSep(o,xT(o.t))});tops.sort((p,q)=>p.a-q.a);const TL=lanes(tops,14);
@@ -38,10 +41,11 @@ function layHZ(k,SC){
   const free=(k,a,b)=>occ[k].every(([p,q])=>b+6<=p||a>=q+6);
   const upP=[...upN].sort((p,q)=>(isMajor(q.e)-isMajor(p.e))||(p.a-q.a));upP.forEach(o=>{o.row=-1;for(let k=0;k<RR;k++)if(free(k,o.a,o.b)){o.row=k;occ[k].push([o.a,o.b]);break}});
   const used=Math.max(OL,...upN.map(o=>o.row+1),0);
-  let y0=TOPH+38+used*RH+(used?10:0);
+  let y0=TOPH+38+(HZ_T2.some(r=>r.e>t0&&r.s<t1)?22:0)+used*RH+(used?10:0);
   const rowY=k=>y0-10-(k+1)*RH+3;const gcAt=x=>{const r=rg.find(r=>x>=r.a&&x<r.b);return r?`var(--g${r.c})`:'transparent'};
   og.forEach(o=>{h+=`<div class="hzog" data-rg="${o.ta}|${o.tb}|${esc(o.n)}" style="left:${o.a}px;top:${rowY(o.li)}px;width:${Math.max(8,o.b-o.a)}px;--tc:var(--t-${o.c})"><span>${esc(o.n)}</span></div>`});
-  let rgH='',stH='';rg.forEach((r,ri)=>{const rb=ri===rg.length-1?Math.max(r.b,W):r.b;stH+=`<div class="hzst" style="left:${ri?r.a:Math.min(r.a,0)}px;width:${Math.max(0,rb-(ri?r.a:Math.min(r.a,0)))}px;--gc:var(--g${r.c})"></div>`;rgH+=`<div class="hzrg" data-rg="${r.ts}|${r.te}|${esc(r.n)}" style="left:${r.a}px;top:4px;width:${Math.max(8,rb-r.a-6)}px;--gc:var(--g${r.c})"><span>${esc(r.n)}</span></div><i class="hzsep" style="left:${r.a}px"></i>`});
+  const rg2=HZ_T2.filter(r=>r.e>t0&&r.s<t1&&!rg.some(q=>q.n===r.n)).map(r=>({n:r.n,c:r.c,ts:r.s,te:r.e,a:xT(Math.max(r.s,t0)),b:xT(Math.min(r.e,t1))})).filter(r=>r.b-r.a>=14);
+  let rgH='',stH='';rg2.forEach(r=>{rgH+=`<div class="hzrg hzrg2" data-rg="${r.ts}|${r.te}|${esc(r.n)}" style="left:${r.a+2}px;top:34px;width:${Math.max(8,r.b-r.a-4)}px;--gc:var(--g${r.c})"><span>${esc(r.n)}</span></div>`});rg.forEach((r,ri)=>{const rb=ri===rg.length-1?Math.max(r.b,W):r.b;stH+=`<div class="hzst" style="left:${ri?r.a:Math.min(r.a,0)}px;width:${Math.max(0,rb-(ri?r.a:Math.min(r.a,0)))}px;--gc:var(--g${r.c})"></div>`;rgH+=`<div class="hzrg" data-rg="${r.ts}|${r.te}|${esc(r.n)}" style="left:${r.a}px;top:4px;width:${Math.max(8,rb-r.a-6)}px;--gc:var(--g${r.c})"><span>${esc(r.n)}</span></div><i class="hzsep" style="left:${r.a}px"></i>`});
   const axY=y0+22;
   // 축 · 연도 · 표시
   h+=`<div class="hzax" style="top:${axY}px;width:${W}px"></div>`;
@@ -56,8 +60,15 @@ function layHZ(k,SC){
   const topH0=nmTop+NLc*24+10,aboveH=axY+3,belowH=topH0-axY-3,half=Math.max(aboveH,belowH),padT=half-aboveH,topH=half*2;
   // 아래 칸: 왕 줄 + 주요 사건 풀이
   let b='';const kr=ALL?[]:REIGNS.map(D=>({D,rs:D.r.filter(r=>Math.min(r.e,t1)-Math.max(r.s,t0)>.3)})).filter(x=>x.rs.length);
-  kr.forEach(({D,rs},j)=>rs.forEach(r=>{const a=xT(Math.max(r.s,t0)),bb=xT(Math.min(r.e,t1));if(bb-a<2)return;const n=r.name.replace('대통령 ','');b+=`<div class="hzk" data-king="${esc(D.n)}|${D.r.indexOf(r)}" style="left:${a}px;top:${6+j*20}px;width:${bb-a-2}px;--rc:var(--c-${D.c})"><span>${esc(n)}</span></div>`}));
-  const KH=kr.length*20+12;
+  /* 나라별 줄: 왕 재위 막대 + 그 밑에 왕 이름·업적 (교과서 정리표처럼) */
+  let KY=6;kr.forEach(({D,rs},j)=>{const y0=KY;const cw=12.2;
+    rs.forEach(r=>{const a=xT(Math.max(r.s,t0)),bb=xT(Math.min(r.e,t1));if(bb-a<2)return;const n=r.name.replace('대통령 ','');b+=`<div class="hzk" data-king="${esc(D.n)}|${D.r.indexOf(r)}" style="left:${a}px;top:${y0+18}px;width:${bb-a-2}px;--rc:var(--c-${D.c})"><span>${esc(n)}</span></div>`});
+    const blk=rs.map(r=>{const ach=(typeof kAch==='function'?kAch(D,r):[])||[];if(!ach.length)return null;const a=xT(Math.max(r.s,t0));const n=r.name.replace('대통령 ','');const L=Math.max(n.length*15,...ach.map(x=>x.length*cw));const w=Math.min(250,Math.max(120,L+22));const lines=ach.reduce((s,x)=>s+Math.max(1,Math.ceil(x.length*cw/(w-22))),0);return {r,n,ach,a,b:a+w,w,h:26+lines*17}}).filter(Boolean);
+    const lanesB=[];blk.forEach(o=>{let li=lanesB.findIndex(L=>L.end<o.a-6);if(li<0){li=lanesB.length;lanesB.push({end:-1e9,h:0})}lanesB[li].end=o.b;lanesB[li].h=Math.max(lanesB[li].h,o.h);o.li=li});
+    let yy=y0+42;const ly=lanesB.map(L=>{const v=yy;yy+=L.h+6;return v});
+    blk.forEach(o=>{b+=`<div class="hzach" style="left:${o.a}px;top:${ly[o.li]}px;width:${o.w}px;--rc:var(--c-${D.c})"><button data-king="${esc(D.n)}|${D.r.indexOf(o.r)}">${esc(o.n)}</button>${o.ach.map(x=>`<p>${glx(x)}</p>`).join('')}</div>`});
+    const bh=Math.max(36,yy-y0);b+=`<div class="hzband" style="top:${y0}px;height:${bh}px;--rc:var(--c-${D.c})"><b>${esc(D.n==='남한'?'대한민국':D.n)}</b></div>`;KY=y0+bh+6});
+  const KH=KY+6;
   const shownT=new Set(tops.filter(o=>o.li<TLc&&o.e).map(o=>o.e.id));
   const shownL=new Set([...upN.filter(o=>o.row>=0),...nm.filter(o=>o.li<NLc)].map(o=>o.e.id));const det=[...evs.filter(e=>(isMajor(e)&&!shownT.has(e.id)&&!shownL.has(e.id))).map(e=>fitSep({e,a:xT(e.T)-120,b:xT(e.T)+120},xT(e.T))),...(()=>{const ne=evs.filter(e=>HZ_NOTES[e.t]);if(!ne.length)return [];if(HZ_ONLY[k]){const as=ne.map(e=>Math.max(8,xT(e.T)+4));return ne.map((e,i)=>({nt:[e],a:as[i],b:Math.min(as[i]+150,i+1<as.length?as[i+1]-2:1e9)}))}const st=Math.max(4,xT(ne[0].T)-34),jn=evs.indexOf(ne[ne.length-1])+1,en=jn<evs.length?xT(evs[jn].T)-6:st+300,cw=Math.min(150,(en-st)/ne.length);return ne.map((e,i)=>({nt:[e],a:st+i*cw,b:st+(i+1)*cw-2}))})(),...tops.filter(o=>o.li>=TLc&&o.kind==='r').map(o=>fitSep({r:o,a:xT(o.t)-120,b:xT(o.t)+120},xT(o.t))),].sort((p,q)=>p.a-q.a);let DL=lanes(det,14);{const nn=det.filter(o=>o.nt);if(nn.length>1){const m=Math.min(...nn.map(o=>o.li));nn.forEach(o=>o.li=m)}}if(HZ_ONLY[k]){det.forEach((o,i)=>{o.li=0;if(o.nt)return;const w=o.b-o.a;o.a=Math.max(6,(o.e?xT(o.e.T):o.a)+8);o.b=o.a+w});DL=1}
   const DB=HZ_ONLY[k]?160:62;const DLc=DL;const lh=[];det.forEach(o=>{const h=o.nt?176:DB;lh[o.li]=Math.max(lh[o.li]||0,h)});const LT=li=>{let t=KH;for(let i=0;i<li;i++)t+=lh[i]||DB;return t};det.filter(o=>o.li<DLc).forEach(o=>{if(o.nt){b+=`<div class="hznt" style="left:${o.a}px;top:${LT(o.li)}px;max-width:${o.b-o.a}px">${o.nt.map(e=>`<div><button data-ev="${e.id}">${esc(e.t)}</button>${HZ_NOTES[e.t].map(v=>`<span>${esc(v)}</span>`).join('')}</div>`).join('')}</div>`;return}if(o.g){b+=`<div class="hzd hzg" style="left:${o.a}px;top:${LT(o.li)}px"><b data-gl="${esc(o.g)}" class="gw">${esc(o.g)}</b><em>${esc(o.from)}</em><p>${esc(hzShort(GLOSS[o.g]))}</p></div>`;return}if(o.r){b+=`<div class="hzd" style="left:${o.a}px;top:${LT(o.li)}px"><b class="rfh">* ${esc(o.r.title)} <em>(${yrTxt(Math.floor(o.r.t))})</em></b><em>${esc(o.r.by)}</em><p>${esc(hzShort(o.r.body))}</p></div>`;return}b+=`<div class="hzd" style="left:${o.a}px;top:${LT(o.li)}px"><button data-ev="${o.e.id}" style="--tc:var(--t-${o.e.tp[0]})">${HZ_NOTES[o.e.t]?'':'* '}${esc(o.e.t)}</button>${o.e.pp?`<em>${esc(o.e.pp)}</em>`:''}${HZ_NOTES[o.e.t]?`<div class="hzkw">${HZ_NOTES[o.e.t].map(v=>`<span>${esc(v)}</span>`).join('')}</div>`:`<p>${esc(hzShort(o.e.x))}</p>`}</div>`});

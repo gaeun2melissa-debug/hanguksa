@@ -318,7 +318,7 @@ function updateInset(){
   if(!outPins.length){inset.hidden=true;if(abroad){abroad=false;animVB(fitVB(FRAMES[pos.i].view))}return}
   inset.hidden=false;
   {const mx=Math.max(0,...outPins.map(e=>(e.s||e.t).length));const narrow=innerWidth<560;const want=Math.round(Math.min(narrow?220:260,Math.max(narrow?128:156,mx*11+44)));inset.style.width=abroad?'':want+'px'}
-  const v=abroad?FRAMES[pos.i].view:outBox(),b=box(v);const W=inset.clientWidth||150,H=(inset.clientHeight||120)-20;const s=Math.max(b.w/W,b.h/H);
+  const v=abroad?FRAMES[pos.i].view:outBox(),b=box(v);const W=Math.max(60,inset.clientWidth||150),H=Math.max(40,(inset.clientHeight||120)-20);const s=Math.max(b.w/W,b.h/H);
   insvg.setAttribute('viewBox',`${b.x+b.w/2-W*s/2} ${b.y+b.h/2-H*s/2} ${W*s} ${H*s}`);
   const g=$('inpins');g.innerHTML='';
   if(!abroad){const vbx=b.x+b.w/2-W*s/2,cx0=b.x+b.w/2;outPins.forEach(e=>{const px=X(e.ll[0]),py=Y(e.ll[1]);el('circle',{cx:px,cy:py,r:4.5*s,style:`fill:var(--t-${e.tp[0]});stroke:var(--panel);stroke-width:${1.5*s}`},g);const right=px>cx0;const tx=el('text',{x:px+(right?-6:6)*s,y:py+4*s,'text-anchor':right?'end':'start',style:`font-size:${10.5*s}px;stroke-width:${2.5*s}px`},g);tx.textContent=e.s||e.t;
@@ -469,12 +469,13 @@ function placeBubble(){if(bubId==null)return;const o=pinOf.get(bubId);if(!o)retu
 function keepFor(e,W){const o=ONGOING.find(o=>Math.abs(o[0]-e.T)<1.2&&e.t.slice(0,2)===o[2].slice(0,2));return o?o[1]-e.T:W}
 const PIN_HOLD=11000,PIN_MIN=5000; /* 사람이 보기에: 최소 5초, 보통 11초는 남아 있게 (겹치면 그 전에 사라짐) */
 function markStale(t,F){const evs=byFrame[pos.i].filter(e=>e.ll);
-  if(!playing){evs.forEach(e=>{const o=pinOf.get(e.id);if(o)o.g.classList.remove('stale');if(arrOf.has(e.id))arrOf.get(e.id).forEach(p=>{p.g.classList.remove('stale');p.hg.classList.remove('stale')})});return}
+  if(!playing){evs.forEach(e=>{const o=pinOf.get(e.id);if(o){o.g.classList.remove('stale');o.stl=0}if(arrOf.has(e.id))arrOf.get(e.id).forEach(p=>{p.g.classList.remove('stale');p.hg.classList.remove('stale')})});return}
   const W=Math.max(.4,(F.t2-F.t)/6);const due=evs.filter(e=>e.T<=t+1e-9).sort((a,b)=>b.T-a.T);const keep=new Set(due.slice(0,2).map(e=>e.id));
   const reignChanged=e=>{const R=kingRef(e);if(!R)return false;const now=R.D.r.find(x=>x.s<=t+1e-9&&t<x.e);return now&&now!==R.r&&!(now.name.replace(/\(.*\)/,'')===R.r.name.replace(/\(.*\)/,''))};
   const now=performance.now();
+  const stM=new Map();
   evs.forEach(e=>{const o=pinOf.get(e.id);let st=false;if(e.T<=t+1e-9&&e.id!==selId){if(o&&!o.seen)o.seen=now;const age=o?now-o.seen:1e9;const ong=ONGOING.find(q=>Math.abs(q[0]-e.T)<1.2&&e.t.slice(0,2)===q[2].slice(0,2));const ongoing=ong&&t<ong[1];
-    st=!ongoing&&!keep.has(e.id)&&(age>PIN_HOLD||(age>PIN_MIN&&reignChanged(e)))}else if(o)o.seen=0;if(o)o.g.classList.toggle('stale',st);if(arrOf.has(e.id))arrOf.get(e.id).forEach(p=>{p.g.classList.toggle('stale',st);p.hg.classList.toggle('stale',st)})})}
+    st=!!(!ongoing&&!keep.has(e.id)&&(age>PIN_HOLD||(age>PIN_MIN&&reignChanged(e))));if(o){if(st)o.stl=1;else if(o.stl&&!ongoing&&!keep.has(e.id))st=true}}else if(o){o.seen=0;o.stl=0}if(o){const m=stM.get(o);stM.set(o,m===undefined?st:(m&&st))}if(arrOf.has(e.id))arrOf.get(e.id).forEach(p=>{p.g.classList.toggle('stale',st);p.hg.classList.toggle('stale',st)})});stM.forEach((v,o)=>o.g.classList.toggle('stale',v))}
 /* 화살표가 겹치면 예전 것은 흐려지다 사라진다 */
 function arrowOverlap(){const list=byFrame[pos.i].filter(e=>arrOf.has(e.id)&&!arrOf.get(e.id)[0].g.classList.contains('hide')).sort((a,b)=>(b.id===selId)-(a.id===selId)||b.T-a.T);
   const kept=[];const ov=(a,b)=>{const w=Math.min(a[2],b[2])-Math.max(a[0],b[0]),h=Math.min(a[3],b[3])-Math.max(a[1],b[1]);if(w<=0||h<=0)return 0;const A=Math.max(30,(a[2]-a[0]))*Math.max(30,(a[3]-a[1])),B=Math.max(30,(b[2]-b[0]))*Math.max(30,(b[3]-b[1]));return w*h/Math.min(A,B)};

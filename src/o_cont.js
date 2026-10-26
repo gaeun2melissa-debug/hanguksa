@@ -31,7 +31,7 @@ function ovGoSec(k,smooth){const s=$('ovchart').querySelector(`.ovsec[data-sec="
   requestAnimationFrame(()=>ovGoSec(k))}}
 {const os=ovShow;ovShow=function(k,keep){if(k==='all'||(!ERA[k]&&k!=='heart'))k='prehist';if(ovCont&&typeof ovDirty!=='undefined'&&ovDirty)ovCont.dirty=true;const had=!!(ovCont&&$('ovchart').querySelector('.ovsec'));const sc=$('ovscroll'),rd=$('ovread'),sl=sc.scrollLeft,st=rd.scrollTop;os(k,keep);if(ovCont&&ERA[k]&&!keep){if(had){sc.scrollLeft=sl;rd.scrollTop=st;requestAnimationFrame(()=>ovGoSec(k,true))}else{ovGoSec(k);requestAnimationFrame(()=>ovGoSec(k))}}}}
 /* 스크롤하면 지금 보이는 시대 버튼에 불 켜기 */
-let ovSpyT=0;function ovSpy(){if(!ovCont)return;clearTimeout(ovSpyT);ovSpyT=setTimeout(()=>{const H=ovDir==='h',ref=H?$('ovscroll').getBoundingClientRect().left+60:$('ovread').getBoundingClientRect().top+80;let cur=null;
+let ovSpyT=0;let ovSpy=function(){if(!ovCont)return;clearTimeout(ovSpyT);ovSpyT=setTimeout(()=>{const H=ovDir==='h',ref=H?$('ovscroll').getBoundingClientRect().left+60:$('ovread').getBoundingClientRect().top+80;let cur=null;
   for(const s of ovSecs()){const r=s.getBoundingClientRect();if((H?r.left:r.top)<=ref)cur=s.dataset.sec}if(!cur||cur===ovSel)return;ovSel=cur;store.set('overa',cur);
   $('ovchips').querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.e===cur));const a=$('ovchips').querySelector(`[data-e="${cur}"]`);if(a)a.scrollIntoView({inline:'nearest',block:'nearest',behavior:'smooth'})},80)}
 $('ovscroll').addEventListener('scroll',ovSpy,{passive:true});$('ovread').addEventListener('scroll',ovSpy,{passive:true});
@@ -91,8 +91,11 @@ document.addEventListener('click',e=>{const b=e.target.closest('.sumtg');if(!b)r
 const circNum=n=>n<=20?String.fromCharCode(0x2460+n-1):n<=35?String.fromCharCode(0x3251+n-21):n<=50?String.fromCharCode(0x32B1+n-36):'('+n+')';
 function evDate(e){if(e.yl||e.y<-3000)return '';if(e.y<0)return 'BC '+(-e.y);return e.y+(e.m&&e.y>=1100?'.'+e.m+'.':'')}
 {const byF=new Map();for(const o of OV){if(!o.pin||!o.t)continue;const f=o.pin.f;if(!byF.has(f))byF.set(f,[]);byF.get(f).push(o)}
- byF.forEach(list=>{list.sort((a,b)=>a.pin.T-b.pin.T);list.forEach((o,i)=>{const e=o.pin,t=o.t;const name=t.textContent;const d=evDate(e);t.textContent='';
-   const s1=document.createElementNS('http://www.w3.org/2000/svg','tspan');s1.setAttribute('class','lnum');s1.textContent=circNum(i+1)+' ';t.appendChild(s1);
+ byF.forEach(list=>{list.sort((a,b)=>a.pin.T-b.pin.T);
+   /* 번호는 이어지는 사건(전쟁·운동처럼 기간이 있는 일)끼리만 */
+   const num=new Map();ONGOING.forEach(q=>{const ser=list.filter(o=>{const e=o.pin;return e.T>=q[0]-.05&&e.T<=q[1]+.3&&(e.tp.includes('war')||e.vs||e.ar||e.t.includes(q[2].slice(0,2)))&&!num.has(o)});if(ser.length>=2)ser.forEach((o,k)=>num.set(o,k+1))});
+   list.forEach((o,i)=>{const e=o.pin,t=o.t;const name=t.textContent;const d=evDate(e);t.textContent='';
+   if(num.has(o)){const s1=document.createElementNS('http://www.w3.org/2000/svg','tspan');s1.setAttribute('class','lnum');s1.textContent=circNum(num.get(o))+' ';t.appendChild(s1)}
    t.appendChild(document.createTextNode(name));if(d){const s2=document.createElementNS('http://www.w3.org/2000/svg','tspan');s2.setAttribute('class','ldate');s2.textContent=' '+d;t.appendChild(s2)}})});
  schedLabels()}
 /* 화살표 범례: 지금 보이는 화살표가 누구의 진로인지 */
@@ -298,7 +301,7 @@ let rzBusy=0;function routeZoom(e){if(typeof playing==='undefined'||!playing||us
  function cluster(ps){const G=[];ps.forEach(e=>{let g=G.find(g=>Math.abs(g.cx-e.ll[0])<16&&Math.abs(g.cy-e.ll[1])<11);if(!g){g={cx:e.ll[0],cy:e.ll[1],l:[]};G.push(g)}g.l.push(e);g.cx=g.l.reduce((s,x)=>s+x.ll[0],0)/g.l.length;g.cy=g.l.reduce((s,x)=>s+x.ll[1],0)/g.l.length});
    G.sort((a,b)=>b.l.length-a.l.length);while(G.length>3){const x=G.pop();let best=G[0],bd=1e9;G.forEach(g=>{const d=Math.hypot(g.cx-x.cx,g.cy-x.cy);if(d<bd){bd=d;best=g}});best.l.push(...x.l)}return G.map(g=>g.l)}
  function draw(btn,ps){const sv=btn.querySelector('svg'),g=btn===inset?$('inpins'):btn.querySelector('.inp');const mx=Math.max(0,...ps.map(e=>(e.s||e.t).length));const narrow=innerWidth<560;btn.style.width=Math.round(Math.min(narrow?200:240,Math.max(narrow?120:150,mx*11+44)))+'px';
-   const b=box(gBox(ps));const W=btn.clientWidth||150,H=(btn.clientHeight||120)-20;const s=Math.max(b.w/W,b.h/H);const vbx=b.x+b.w/2-W*s/2,cx0=b.x+b.w/2;sv.setAttribute('viewBox',`${vbx} ${b.y+b.h/2-H*s/2} ${W*s} ${H*s}`);g.innerHTML='';
+   const b=box(gBox(ps));const W=Math.max(60,btn.clientWidth||150),H=Math.max(40,(btn.clientHeight||120)-20);const s=Math.max(b.w/W,b.h/H);const vbx=b.x+b.w/2-W*s/2,cx0=b.x+b.w/2;sv.setAttribute('viewBox',`${vbx} ${b.y+b.h/2-H*s/2} ${W*s} ${H*s}`);g.innerHTML='';
    ps.forEach(e=>{const px=X(e.ll[0]),py=Y(e.ll[1]);el('circle',{cx:px,cy:py,r:4.5*s,style:`fill:var(--t-${e.tp[0]});stroke:var(--panel);stroke-width:${1.5*s}`},g);const right=px>cx0;const tx=el('text',{x:px+(right?-6:6)*s,y:py+4*s,'text-anchor':right?'end':'start',style:`font-size:${10.5*s}px`},g);tx.textContent=e.s||e.t;
      try{const bb=tx.getBBox();const L=vbx+2*s,R=vbx+W*s-2*s;if(bb.x<L)tx.setAttribute('x',+tx.getAttribute('x')+(L-bb.x));else if(bb.x+bb.width>R)tx.setAttribute('x',+tx.getAttribute('x')-(bb.x+bb.width-R))}catch(_){}});
    {const kept=[];[...g.querySelectorAll('text')].forEach(t=>{try{const bb=t.getBBox();const hitK=kept.some(c=>bb.x<c.x+c.width+1.5*s&&bb.x+bb.width>c.x&&bb.y<c.y+c.height&&bb.y+bb.height>c.y);if(hitK)t.style.display='none';else kept.push(bb)}catch(_){}})}
@@ -322,3 +325,70 @@ let rzBusy=0;function routeZoom(e){if(typeof playing==='undefined'||!playing||us
 /* 다시 보기 버튼: 지도에서 보이는 칸의 한가운데 */
 {const rb=$('replay');const fix=()=>{if(!rb||rb.hidden)return;const w=svg.getBoundingClientRect(),v=$('v-map').getBoundingClientRect(),hb=document.querySelector('header.top').getBoundingClientRect().bottom,dk=$('dock')?$('dock').getBoundingClientRect().top:w.bottom;rb.style.left=(w.left+w.width/2-v.left)+'px';rb.style.top=((Math.max(hb,w.top)+Math.min(dk,w.bottom))/2-v.top)+'px'};
  if(rb){new MutationObserver(fix).observe(rb,{attributes:true,attributeFilter:['hidden']});addEventListener('resize',fix)}}
+/* 시대 막대 이름은 화면 왼쪽에 붙어 따라오게 */
+{const hs=hzSync;hzSync=function(){hs.apply(this,arguments);const sc=$('ovscroll');if(!sc)return;const R=sc.getBoundingClientRect();sc.querySelectorAll('.hzrg,.hzband').forEach(b=>{const sp=b.firstElementChild;if(!sp)return;const r=b.getBoundingClientRect();if(r.right<R.left||r.left>R.right){sp.style.transform='';return}const sw=sp.offsetWidth;const dx=Math.max(0,Math.min(R.left+8-r.left,r.width-sw-16));sp.style.transform=dx>0?`translateX(${dx}px)`:''})};
+ $('ovscroll').addEventListener('scroll',()=>requestAnimationFrame(()=>hzSync()),{passive:true})}
+/* ───────── 시대 버튼 12개 ───────── */
+const ERA12=[['선사 시대','prehist'],['고조선','pre'],['초기 여러 나라','early'],['삼국 시대','three'],['통일 신라','nsk'],['남북국 시대','nsk',698],['후삼국 시대','hsk'],['고려','goryeo'],['조선','joseon1'],['개항기와 대한 제국','modern1'],['일제 강점기','colonial'],['현대 (광복 이후)','contemp']];
+function chipOf(sec,t){if(sec==='joseon2')return 8;if(sec==='nsk')return t!=null&&t>=698?5:4;const i=ERA12.findIndex(x=>x[1]===sec&&x[2]==null);return i}
+function ovGoT(sec,t,smooth){const s=$('ovchart').querySelector(`.ovsec[data-sec="${sec}"]`);if(!s)return ovGoSec(sec,smooth);
+  const evs=[...s.querySelectorAll('.hzn[data-ev],[data-ev]')].map(b=>({b,e:EVENTS.find(x=>x.id===+b.dataset.ev)})).filter(o=>o.e&&o.e.T>=t-.5).sort((a,b)=>a.e.T-b.e.T);if(!evs.length)return ovGoSec(sec,smooth);const b=evs[0].b;
+  if(ovDir==='h'){const sc=$('ovscroll');sc.scrollTo({left:b.getBoundingClientRect().left-sc.getBoundingClientRect().left+sc.scrollLeft-60,behavior:smooth?'smooth':'auto'})}else{const rd=$('ovread');rd.scrollTo({top:b.getBoundingClientRect().top-rd.getBoundingClientRect().top+rd.scrollTop-120,behavior:smooth?'smooth':'auto'})}}
+function hlChip(i){$('ovchips').querySelectorAll('.chip').forEach((c,j)=>c.setAttribute('aria-pressed',j===i));const a=$('ovchips').querySelectorAll('.chip')[i];if(a)a.scrollIntoView({inline:'nearest',block:'nearest',behavior:'smooth'})}
+{const c=$('ovchips');c.innerHTML=ERA12.map(([n,k],i)=>`<button class="chip" data-e="${k}" data-ci="${i}">${esc(n)}</button>`).join('');
+ c.querySelectorAll('.chip').forEach((b,i)=>b.onclick=()=>{const [,k,t]=ERA12[i];ovShow(k);if(t!=null)setTimeout(()=>ovGoT(k,t,true),60);setTimeout(()=>hlChip(i),400)})}
+/* 스크롤 위치 → 버튼 (같은 시대 칸 안에서도 통일 신라/남북국 구분) */
+$('ovscroll').removeEventListener('scroll',ovSpy);$('ovread').removeEventListener('scroll',ovSpy);
+ovSpy=function(){if(!ovCont)return;clearTimeout(ovSpyT);ovSpyT=setTimeout(()=>{const H=ovDir==='h',ref=H?$('ovscroll').getBoundingClientRect().left+60:$('ovread').getBoundingClientRect().top+80;let cur=null;
+  for(const s of ovSecs()){const r=s.getBoundingClientRect();if((H?r.left:r.top)<=ref)cur=s.dataset.sec}if(!cur)return;
+  let t=null;if(cur==='nsk'){const s=$('ovchart').querySelector('.ovsec[data-sec="nsk"]');const bh=[...s.querySelectorAll('[data-ev]')].find(b=>{const e=EVENTS.find(x=>x.id===+b.dataset.ev);return e&&e.T>=698});if(bh){const r=bh.getBoundingClientRect();t=(H?r.left:r.top)<=ref+200?698:676}}
+  if(cur!==ovSel){ovSel=cur;store.set('overa',cur)}hlChip(chipOf(cur,t))},80)};
+$('ovscroll').addEventListener('scroll',ovSpy,{passive:true});$('ovread').addEventListener('scroll',ovSpy,{passive:true});
+/* 연표 화면의 시대 버튼도 같은 12개로 */
+function setTlJump(){const j=$('tljump');if(j){j.innerHTML=ERA12.map(([n,k,t])=>`<button data-e="${k}"${t?` data-t="${t}"`:''} type="button">${esc(n)}</button>`).join('');
+ j.querySelectorAll('button').forEach(b=>b.onclick=()=>{const rd=$('tlread');let target=$('era-'+b.dataset.e);if(b.dataset.t){const t=+b.dataset.t;const li=[...target.querySelectorAll('li[data-id]')].find(l=>{const e=EVENTS.find(x=>x.id===+l.dataset.id);return e&&e.T>=t-.5});if(li)target=li}
+   if(target)rd.scrollTo({top:target.getBoundingClientRect().top-rd.getBoundingClientRect().top+rd.scrollTop-(rd.querySelector('.rhead')?rd.querySelector('.rhead').offsetHeight:0)-6,behavior:'smooth'})})}}
+setTlJump();{const bt=buildTL;buildTL=function(){const r=bt.apply(this,arguments);setTlJump();return r}}
+{const o2=ovShow;ovShow=function(){const r=o2.apply(this,arguments);setTimeout(()=>{try{ovSpy()}catch(_){}},300);return r}}
+/* ───────── 인물 누르면 먼저 작은 팝업 → '자세히 보기'로 이동 ───────── */
+const P_PAIR={'원종':'원종과 애노','애노':'원종과 애노','망이':'망이와 망소이','망소이':'망이와 망소이'};
+Object.assign(PINFO,{'원종과 애노':'신라 말 진성 여왕 때(889) 사벌주(상주)에서 함께 봉기한 농민 지도자. 세금 독촉에 반발한 이 봉기를 시작으로 전국에서 반란이 잇따랐다.',
+ '망이와 망소이':'고려 무신 집권기(1176) 공주 명학소에서 함께 봉기한 형제(소민). 소(所) 주민에 대한 차별에 맞섰고, 명학소는 한때 충순현으로 승격되었다.'});
+function pName(n){return String(n).replace(/\s*\(.*\)\s*/,'').trim()}
+function personPopHTML(n,T){const nm=pName(n),pair=P_PAIR[nm];const title=pair||nm;const k=aliasKing(n)||(()=>{const K=kingOfName(n,T);return K?{dn:K.D.n,i:K.i}:null})();
+  let sub='',body='';if(k){const D=DYN[k.dn],r=D.r[k.i];sub=`${k.dn==='남한'?'대한민국':k.dn} · ${yrTxt(Math.floor(r.s))}~${yrTxt(Math.floor(r.e))}`;const a=(typeof kAch==='function'?kAch(D,r):[])||[];body=a.slice(0,3).map(x=>`<li>${esc(x)}</li>`).join('');body=body?`<ul>${body}</ul>`:''}
+  const info=PINFO[title]||PINFO[nm]||'';const evs=EVENTS.filter(e=>(e.pp||'').split(/,\s*/).some(x=>pName(x)===nm||(pair&&P_PAIR[pName(x)]===pair))).sort((a,b)=>a.T-b.T).slice(0,4);
+  return `<b>${esc(title)}</b>${sub?`<em>${esc(sub)}</em>`:''}${info?`<p>${glx(info)}</p>`:''}${body}${evs.length?`<div class="ppev">${evs.map(e=>`<span>${esc(e.yl||yrTxt(Math.floor(e.T)))} ${esc(e.t)}</span>`).join('')}</div>`:''}<button type="button" class="ppgo" data-go-person="${esc(n)}" data-pt="${T??''}">자세히 보기 →</button>`}
+{const pop=document.createElement('div');pop.id='pppop';pop.className='glpop pppop';pop.hidden=true;document.body.appendChild(pop);
+ const place=(el)=>{const r=el.getBoundingClientRect();pop.hidden=false;const w=pop.offsetWidth,h=pop.offsetHeight;let x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)),y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);pop.style.left=x+'px';pop.style.top=y+'px'};
+ addEventListener('click',ev=>{const go=ev.target.closest('[data-go-person]');if(go){ev.preventDefault();ev.stopPropagation();pop.hidden=true;const T=go.dataset.pt?+go.dataset.pt:null;let n=go.dataset.goPerson;openPerson(n,T);return}
+   const p=ev.target.closest('[data-person]');if(p&&!ev.target.closest('#pppop')&&!ev.target.closest('.kpage .pplist')){ev.preventDefault();ev.stopPropagation();pop.innerHTML=personPopHTML(p.dataset.person,p.dataset.pt?+p.dataset.pt:null);place(p);return}
+   if(!pop.hidden&&!ev.target.closest('#pppop'))pop.hidden=true},true);}
+/* 짝 인물은 한 버튼으로: '원종과 애노' */
+{const wh=whoHTML;whoHTML=function(e,cls){let h=wh.apply(this,arguments);Object.entries({'원종과 애노':['원종','애노'],'망이와 망소이':['망이','망소이']}).forEach(([t,[a,b]])=>{const re=new RegExp(`<button type="button" class="pn" data-person="${a}"([^>]*)>${a}</button>, <button type="button" class="pn" data-person="${b}"[^>]*>${b}</button>`);h=h.replace(re,`<button type="button" class="pn" data-person="${a}"$1>${t}</button>`)});return h}}
+try{buildTL();renderTLFilter();addTclb()}catch(_){}
+/* 밑줄 낱말 팝업: '사전에서 보기' */
+document.addEventListener('click',ev=>{const w=ev.target.closest('[data-gl]');if(!w||ev.target.closest('#glpop'))return;const gp=$('glpop');if(gp.hidden||gp.querySelector('.ppgo.dc'))return;const k=w.dataset.gl;gp.insertAdjacentHTML('beforeend',`<button type="button" class="ppgo dc" data-dc="${esc(k)}">사전에서 자세히 →</button>`)});
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-dc]');if(!b)return;ev.stopPropagation();const k=b.dataset.dc;$('glpop').hidden=true;showView('dc');try{dcShow();dcOnlyBk=false;dcFilter()}catch(_){}setTimeout(()=>{const c=$('dcbody').querySelector(`.gl2>div[data-k="${CSS.escape(k)}"]`);if(c){c.scrollIntoView({block:'center'});c.classList.remove('flash');void c.offsetWidth;c.classList.add('flash')}},120)},true);
+/* ───────── 이야기로 듣는 사건 배경 ───────── */
+const STORY={
+ '무신 정변':'고려는 문신이 높은 자리를 차지하고 무신은 낮게 대접받던 나라였다. 인종 때 김부식의 아들 김돈중은 장난삼아 젊은 무신 정중부의 수염을 촛불로 태워 버렸다. 의종 때인 1170년, 왕이 보현원으로 놀러 가던 길에 무신들에게 맨손 무예 시합(수박희)을 시켰는데, 나이 든 장군 이소응이 힘에 부쳐 물러서자 젊은 문신 한뢰가 그의 뺨을 때렸다. 참다못한 정중부·이의방·이고가 "문관의 관을 쓴 자는 모두 죽여라" 하며 문신들을 죽이고 의종을 내쫓았다. 이렇게 100년 동안 무신이 나라를 쥐는 무신 정권이 시작되었다.',
+ '이자겸의 난':'이자겸은 둘째 딸을 예종의 왕비로, 셋째·넷째 딸을 손자뻘인 인종의 왕비로 들여 권력을 독차지했다. "십팔자(十八子, 李)가 왕이 된다"는 소문까지 돌자 인종이 그를 없애려 했고, 이자겸은 척준경과 함께 궁궐에 불을 지르며 반란을 일으켰다. 인종은 척준경을 몰래 설득해 등을 돌리게 하여 겨우 이자겸을 몰아냈다.',
+ '묘청':'이자겸의 난으로 개경 궁궐이 불타 버리자 서경(평양) 출신 승려 묘청은 "서경으로 도읍을 옮기면 금나라가 항복하고 36개 나라가 조공을 바친다"며 왕을 황제라 부르고 금을 치자고 주장했다. 개경 귀족 김부식 등이 반대해 일이 틀어지자 묘청은 서경에서 나라 이름을 대위, 연호를 천개로 정하고 반란을 일으켰다. 김부식이 이끈 관군에게 1년 만에 진압되었고, 훗날 신채호는 이 사건을 "조선 역사상 일천 년 이래 제일 대사건"이라 불렀다.',
+ '위화도 회군':'명이 철령 북쪽 땅을 내놓으라고 하자 우왕과 최영은 요동을 치기로 했다. 이성계는 "작은 나라가 큰 나라를 거스르면 안 되고, 여름에 군사를 일으키면 안 되며, 왜구가 빈틈을 노리고, 장마철이라 활이 풀리고 병이 돈다"는 4불가론으로 반대했지만 결국 출병했다. 압록강의 섬 위화도에 이르자 그는 군대를 돌려 개경으로 쳐들어가 최영을 몰아내고 우왕을 폐위했다. 이 일로 이성계는 권력을 잡고 조선 건국의 발판을 마련했다.',
+ '계유정난':'열두 살 단종이 왕위에 오르자 김종서·황보인 같은 대신들이 나랏일을 이끌었다. 숙부 수양 대군은 이를 못마땅히 여겨 한명회 등과 일을 꾸몄고, 1453년 밤 김종서의 집을 찾아가 철퇴로 쓰러뜨린 뒤 왕명이라며 대신들을 궁으로 불러들여 죽였다. 권력을 쥔 수양 대군은 2년 뒤 조카에게서 왕위를 넘겨받아 세조가 되었다.',
+ '단종 복위 운동':'성삼문·박팽년 등은 명 사신을 맞는 잔치에서 칼을 차고 왕을 호위하는 별운검 자리를 맡아 세조를 없애고 단종을 다시 왕으로 세우려 했다. 그런데 그날 별운검을 세우지 말라는 명이 내려 거사가 미뤄졌고, 함께하던 김질이 겁을 먹고 고발했다. 성삼문 등은 모진 고문에도 세조를 "나으리"라 부르며 굽히지 않고 죽었다(사육신). 단종은 노산군으로 강등되어 영월로 쫓겨났고 이듬해 세상을 떠났다.',
+ '임오군란':'신식 군대 별기군은 좋은 대우를 받았지만 구식 군인들은 13개월이나 월급을 받지 못했다. 겨우 받은 쌀 한 달 치에 겨와 모래가 섞여 있자 분노한 군인들이 담당자를 때리고, 선혜청 책임자 민겸호의 집을 부수고 일본 공사관까지 공격했다. 쫓겨난 흥선 대원군이 다시 권력을 잡았지만, 청군이 들어와 대원군을 톈진으로 끌고 가 버렸다. 이후 청의 간섭이 심해지고 일본과는 제물포 조약을 맺었다.',
+ '갑신정변':'청의 간섭이 심해지자 김옥균·박영효·홍영식·서광범 등 급진 개화파는 일본의 도움을 약속받고 정변을 일으켰다. 1884년 우정총국 개국 축하 잔치에서 불이 났다고 소란을 피운 틈에 민씨 정권 고관들을 죽이고, 고종을 경우궁으로 옮긴 뒤 새 정부를 세워 14개조 정강을 내놓았다. 그러나 청군이 쳐들어오자 일본군은 슬그머니 물러났고, 정변은 3일 만에 끝났다(삼일천하). 김옥균 등은 일본으로 달아났다.',
+ '을미사변':'청일 전쟁 뒤 러시아·프랑스·독일이 일본을 압박하자(삼국 간섭), 명성 황후는 러시아와 가까이하며 일본을 견제했다. 그러자 1895년 일본 공사 미우라는 낭인과 군인을 경복궁 깊숙한 건청궁으로 들여보내 왕비를 시해하고 시신을 불태웠다. 이 일과 뒤이은 단발령에 분노한 유생들이 을미의병을 일으켰다.',
+ '아관 파천':'왕비가 시해된 뒤 늘 신변의 위협을 느끼던 고종은 1896년 이른 새벽 궁녀의 가마를 타고 몰래 궁을 빠져나가 러시아 공사관으로 옮겼다. 고종은 그곳에서 1년 동안 머물렀고, 친일 내각은 무너졌지만 러시아를 비롯한 열강이 광산·철도 같은 이권을 앞다투어 빼앗아 갔다.',
+ '병인양요':'흥선 대원군이 천주교를 탄압하면서(병인박해) 프랑스 신부 9명이 처형되었다. 이를 구실로 1866년 프랑스 함대가 강화도에 쳐들어왔지만, 한성근이 문수산성에서, 양헌수가 정족산성에서 맞서 물리쳤다. 프랑스군은 물러나면서 외규장각에 있던 의궤 등 귀한 책을 빼앗아 갔고, 이 책들은 2011년에야 돌아왔다.',
+ '신미양요':'1866년 미국 상선 제너럴셔먼호가 대동강을 거슬러 올라와 통상을 요구하며 행패를 부리다가 평양 관민에게 불태워졌다. 이를 핑계로 1871년 미국 함대가 강화도를 공격했고, 광성보에서 어재연 장군과 군사들이 끝까지 싸우다 전사했다. 미군이 물러가자 흥선 대원군은 전국에 척화비를 세워 통상 거부 의지를 알렸다.',
+ '운요호 사건':'1875년 일본 군함 운요호가 강화도 초지진 앞바다에 허락 없이 다가와 조선군과 포격을 주고받고, 영종도에 상륙해 사람들을 죽이고 물건을 빼앗았다. 일본은 오히려 이 일을 따지며 군함을 이끌고 와 조약을 강요했고, 이듬해 강화도 조약이 맺어졌다.',
+ '3·1 운동':'1919년 1월 고종이 갑자기 세상을 떠나자 일본이 독살했다는 소문이 돌았다. 민족 대표 33인은 고종의 장례식(인산일)을 앞둔 3월 1일 태화관에서 독립 선언서를 읽었고, 탑골 공원에서는 학생과 시민이 태극기를 흔들며 만세를 불렀다. 만세 운동은 전국과 해외로 퍼졌고, 이를 계기로 상하이에 대한민국 임시 정부가 세워졌다.'};
+function storyOf(e){if(!e)return null;const k=Object.keys(STORY).find(k=>e.t.includes(k));return k?STORY[k]:null}
+{const ed=evDetailHTML;evDetailHTML=function(e){const h=ed.apply(this,arguments);const s=storyOf(e);return s?h+`<div class="story"><h4>📖 이야기로 보기</h4><p>${glx(s)}</p></div>`:h}}
+document.addEventListener('click',ev=>{const b=ev.target.closest('.stb');if(!b)return;ev.stopPropagation();ev.preventDefault();const e=EVENTS.find(x=>String(x.id)===b.dataset.st);const nx=b.nextElementSibling;if(nx&&nx.classList.contains('story')){nx.remove();b.classList.remove('on');return}b.insertAdjacentHTML('afterend',`<div class="story"><p>${glx(storyOf(e))}</p></div>`);b.classList.add('on')},true);
+function addStb(root){(root||document).querySelectorAll('li[data-id]:not([data-sb])').forEach(li=>{li.dataset.sb=1;const e=EVENTS.find(x=>String(x.id)===li.dataset.id);if(!storyOf(e))return;const p=li.querySelector('p');if(p)p.insertAdjacentHTML('afterend',`<button type="button" class="stb" data-st="${e.id}">📖 이야기</button>`)})}
+addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObserver(()=>addStb(el)).observe(el,{childList:true,subtree:true})});
+{const gp=$('glpop');let busy=false;new MutationObserver(()=>{if(busy||gp.hidden||gp.querySelector('[data-dc]'))return;const b=gp.querySelector('b');if(!b)return;const k=(b.childNodes[0]&&b.childNodes[0].nodeType===3?b.childNodes[0].nodeValue:b.textContent).trim();if(!GLOSS[k])return;busy=true;gp.insertAdjacentHTML('beforeend',`<button type="button" class="ppgo dc" data-dc="${esc(k)}">사전에서 자세히 →</button>`);busy=false}).observe(gp,{childList:true,attributes:true,attributeFilter:['hidden']})}
