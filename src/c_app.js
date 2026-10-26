@@ -243,7 +243,7 @@ function placeLabels(){
   {const ins=$('inset');if(ins&&!ins.hidden){const r=ins.getBoundingClientRect(),s=svg.getBoundingClientRect();boxes.push([r.left-s.left-4,r.top-s.top-4,r.right-s.left+4,r.bottom-s.top+4])}}
   pins.filter(o=>!isW(o)).forEach(o=>{const [sx,sy]=toS(o.x,o.y);const r=o.pin.tp[0]==='war'?11:9;boxes.push([sx-r,sy-r,sx+r,sy+r])});
   capItems.forEach(o=>{const [sx,sy]=toS(o.x,o.y);boxes.push([sx-5,sy-5,sx+5,sy+5])});
-  const aPts=[];for(const ps of arrOf.values())for(const p of ps){const c=p.g.classList;if(c.contains('hide')||c.contains('gone')||c.contains('stale'))continue;
+  const aPts=[];for(const ps of arrOf.values())for(const p of ps){const c=p.g.classList;if(c.contains('hide')||c.contains('gone')||c.contains('stale')||c.contains('dim'))continue;
     if(!p.sp){const pa=p.g.querySelector('.af');p.sp=[];try{const L=pa.getTotalLength();for(let t=0;t<=L;t+=Math.max(6,L/60)){const q=pa.getPointAtLength(t);p.sp.push([q.x,q.y])}}catch(_){}}
     p.sp.forEach(([x,y])=>aPts.push(toS(x,y)))}
   const arrHitN=b=>{let n=0;for(const [x,y] of aPts)if(x>b[0]-3&&x<b[2]+3&&y>b[1]-3&&y<b[3]+3)n++;return n};

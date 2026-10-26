@@ -105,7 +105,7 @@ function arrName(c,e){const y=e.y;const k=n=>n;
   if(c==='han'){const src=(e.vs||'')+' '+e.t;let best=null,bi=1e9;FOREIGN.forEach(f=>{const re=new RegExp('(^|[^가-힣])'+f+'(군|$|[^가-힣])');const m=src.match(re);if(m&&m.index<bi){bi=m.index;best=f}});return best?(/군$/.test(best)?best:best+'군'):'중국·북방 세력'}
   const D=REIGNS.find(D=>D.c===c);return D?(D.n==='남한'?'국군':D.n+'군'):c}
 {const lg=document.createElement('div');lg.id='arrleg';lg.hidden=true;$('v-map').appendChild(lg);
- window.updArrLeg=function(){const seen=new Map();(byFrame[pos.i]||[]).forEach(e=>{const ps=arrOf.get(e.id);if(!ps)return;ps.forEach(p=>{const cl=p.g.classList;if(cl.contains('hide')||cl.contains('gone')||cl.contains('stale'))return;const nm=arrName(p.c,e);const key=nm+'|'+p.dash;if(!seen.has(key))seen.set(key,{nm,col:acol(p.c),dash:p.dash})})});
+ window.updArrLeg=function(){const seen=new Map();(byFrame[pos.i]||[]).forEach(e=>{const ps=arrOf.get(e.id);if(!ps)return;ps.forEach(p=>{const cl=p.g.classList;if(cl.contains('hide')||cl.contains('gone')||cl.contains('stale')||cl.contains('dim'))return;const nm=arrName(p.c,e);const key=nm+'|'+p.dash;if(!seen.has(key))seen.set(key,{nm,col:acol(p.c),dash:p.dash})})});
    if(!seen.size||$('v-map').hidden){lg.hidden=true;return}lg.hidden=false;{const dk=$('dock'),vm=$('v-map');if(dk&&vm){const a=vm.getBoundingClientRect(),b2=dk.getBoundingClientRect();lg.style.bottom=Math.max(10,a.bottom-b2.top+10)+'px'}}lg.innerHTML=[...seen.values()].slice(0,6).map(o=>`<div><svg viewBox="0 0 30 10"><path d="M2 5H20" style="stroke:${o.col};stroke-width:3"${o.dash?' stroke-dasharray="4 3"':''}/><path d="M18 0.8L28 5L18 9.2Z" style="fill:${o.col};stroke:none"/></svg>${esc(o.nm)} ${o.dash?'이동':'진로'}</div>`).join('')};
  const ut=updateTime;updateTime=function(ch){ut(ch);clearTimeout(updArrLeg.t);updArrLeg.t=setTimeout(updArrLeg,60)}}
 
@@ -414,3 +414,4 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
 {const sa=setArrows;setArrows=function(e,state){const r=sa.apply(this,arguments);const ps=arrOf.get(e.id);if(ps&&state==='draw')ps.forEach(p=>{p.g.classList.remove('drawn');clearTimeout(p.dT);p.dT=setTimeout(()=>p.g.classList.add('drawn'),1050)});return r}
  for(const ps of arrOf.values())ps.forEach(p=>{if(!p.g.classList.contains('draw'))p.g.classList.add('drawn')})}
 {const ul=window.updArrLeg;if(ul)window.updArrLeg=function(){const r=ul.apply(this,arguments);try{placeInset()}catch(_){}return r}}
+{const sa=setArrowsAll;setArrowsAll=function(){const r=sa.apply(this,arguments);clearTimeout(updArrLeg.t2);updArrLeg.t2=setTimeout(()=>{try{updArrLeg()}catch(_){}},80);return r}}
