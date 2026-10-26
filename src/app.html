@@ -4130,8 +4130,8 @@ function hzLift(){document.querySelectorAll('#ovchart .hzwrap').forEach(w=>{cons
 
 
 /* 키보드 방향키 = 드래그 (지도: 이동, 연대표: 옆/위아래로 넘기기) */
-document.addEventListener('keydown',e=>{const D={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!D||e.altKey||e.ctrlKey||e.metaKey)return;
-  const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+document.addEventListener('keydown',e=>{const KM={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],Left:[-1,0],Right:[1,0],Up:[0,-1],Down:[0,1],UIKeyInputLeftArrow:[-1,0],UIKeyInputRightArrow:[1,0],UIKeyInputUpArrow:[0,-1],UIKeyInputDownArrow:[0,1]},KC={37:[-1,0],38:[0,-1],39:[1,0],40:[0,1]};const D=KM[e.key]||KC[e.keyCode];if(!D||e.altKey||e.ctrlKey||e.metaKey)return;
+  const t=e.target;if(t&&(t.isContentEditable||/^(TEXTAREA|SELECT)$/.test(t.tagName)||(t.tagName==='INPUT'&&!/^(range|checkbox|radio|button)$/.test(t.type))))return;if(t&&t.tagName==='INPUT'&&t.type==='range')return;
   const big=e.shiftKey?3:1,beh=e.repeat?'auto':'smooth';
   const pick=(root,ax)=>{let best=null,ba=0;[root,...root.querySelectorAll('*')].forEach(el=>{if(!el.offsetParent&&el!==root)return;const cs=getComputedStyle(el),ov=ax?cs.overflowY:cs.overflowX;if(!/auto|scroll/.test(ov))return;const can=ax?el.scrollHeight-el.clientHeight>2:el.scrollWidth-el.clientWidth>2;if(!can)return;const r=el.getBoundingClientRect(),a=r.width*r.height;if(a>ba){ba=a;best=el}});return best};
   const gen=root=>{let el=pick(root,D[1]?1:0);if(!el&&D[0])el=pick(root,1);if(!el)el=document.scrollingElement;if(!el)return;e.preventDefault();const vert=!!D[1]||!(el.scrollWidth-el.clientWidth>2);const d=(D[0]||D[1])*(vert?Math.max(120,el.clientHeight*.35):Math.max(160,el.clientWidth*.35))*big;el.scrollBy(vert?{top:d,behavior:beh}:{left:d,behavior:beh})};
@@ -4142,4 +4142,6 @@ document.addEventListener('keydown',e=>{const D={ArrowLeft:[-1,0],ArrowRight:[1,
     else rd.scrollBy({top:(D[0]||D[1])*200*big,behavior:beh});return}
   const v=[...document.querySelectorAll('section.view')].find(x=>!x.hidden);if(v)gen(v);
 },true);
+
+addEventListener('pointerdown',e=>{const t=e.target;if(!(t.closest&&t.closest('input,textarea,select,[contenteditable]'))){try{window.focus()}catch(_){}}},true);try{window.focus()}catch(_){}
 </script>
