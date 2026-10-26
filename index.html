@@ -4704,9 +4704,9 @@ applyNameT();
 /* 장면 중간에 세워진 나라는 세운 해부터 땅이 생김 (후고구려 901) */
 const STATE_FROM={taebong:901}; /* 세우기 전엔 신라 땅 색으로 */
 function applyStateFrom(){try{const t=curT();for(const [id,y] of Object.entries(STATE_FROM)){const c=shapes.get(id);if(!c)continue;const on=t>=y-1e-6;
-  if(c.el.dataset.sf!==String(on)){c.el.dataset.sf=on;const sl=shapes.get('silla');c.el.style.transition='fill .8s';c.el.style.fill=on||!sl?'':getComputedStyle(sl.el).fill;c.lab.g.style.visibility=on?'':'hidden'}}}catch(_){}}
+  if(c.el.dataset.sf!==String(on)){c.el.dataset.sf=on;const sl=shapes.get('silla');c.el.style.transition='fill .8s';if(!('of' in c.el.dataset))c.el.dataset.of=c.el.style.fill;c.el.style.fill=on||!sl?c.el.dataset.of:getComputedStyle(sl.el).fill;c.lab.g.style.visibility=on?'':'hidden'}}}catch(_){}}
 {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStateFrom();return r}}
-{const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);for(const id in STATE_FROM){const c=shapes.get(id);if(c)delete c.el.dataset.sf}applyStateFrom();return r}}
+{const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);for(const id in STATE_FROM){const c=shapes.get(id);if(c){delete c.el.dataset.sf;delete c.el.dataset.of}}applyStateFrom();return r}}
 applyStateFrom();
 </script>
 <script type="module">
