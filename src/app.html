@@ -2935,15 +2935,19 @@ function placeLabels(){
   {const ins=$('inset');if(ins&&!ins.hidden){const r=ins.getBoundingClientRect(),s=svg.getBoundingClientRect();boxes.push([r.left-s.left-4,r.top-s.top-4,r.right-s.left+4,r.bottom-s.top+4])}}
   pins.filter(o=>!isW(o)).forEach(o=>{const [sx,sy]=toS(o.x,o.y);const r=o.pin.tp[0]==='war'?11:9;boxes.push([sx-r,sy-r,sx+r,sy+r])});
   capItems.forEach(o=>{const [sx,sy]=toS(o.x,o.y);boxes.push([sx-5,sy-5,sx+5,sy+5])});
+  const aPts=[];for(const ps of arrOf.values())for(const p of ps){const c=p.g.classList;if(c.contains('hide')||c.contains('gone')||c.contains('stale'))continue;
+    if(!p.sp){const pa=p.g.querySelector('.af');p.sp=[];try{const L=pa.getTotalLength();for(let t=0;t<=L;t+=Math.max(6,L/60)){const q=pa.getPointAtLength(t);p.sp.push([q.x,q.y])}}catch(_){}}
+    p.sp.forEach(([x,y])=>aPts.push(toS(x,y)))}
+  const arrHitN=b=>{let n=0;for(const [x,y] of aPts)if(x>b[0]-3&&x<b[2]+3&&y>b[1]-3&&y<b[3]+3)n++;return n};
   const slabs=OV.filter(o=>o.slab).sort((a,b)=>(b.area||0)-(a.area||0));
   for(const o of slabs){const [sx,sy]=toS(o.x,o.y);const n=o.t.textContent.length;const size=(o.area||300)/k;
     let fs=Math.max(11,Math.min(19,size/7));
     if(size>=n*11*.98*1.15){ // 영토 안에: 자리가 없으면 글씨를 줄이거나 조금 비켜서라도 안에 둔다
       while(fs>11&&size<n*fs*.98*1.15)fs-=1;
-      const w=n*fs*.98/2+3,hh=fs*.62;let dy=0;
-      for(const d of [0,1.1,-1.1,2.1,-2.1]){const b=[sx-w,sy+d*fs-hh,sx+w,sy+d*fs+hh];if(!hit(b)){dy=d*fs;break}}
-      boxes.push([sx-w,sy+dy-hh,sx+w,sy+dy+hh]);
-      o.t.style.fontSize=fs+'px';o.t.setAttribute('x',0);o.t.setAttribute('y',dy.toFixed(1));o.t.setAttribute('text-anchor','middle');o.g.classList.remove('out');continue}
+      const w=n*fs*.98/2+3,hh=fs*.62;let dy=0,dx=0,bs=1e9;
+      for(const d of [0,1.1,-1.1,2.1,-2.1,3.1,-3.1])for(const e of [0,.6,-.6,1.2,-1.2]){const b=[sx+e*w-w,sy+d*fs-hh,sx+e*w+w,sy+d*fs+hh];const sc=(hit(b)?100:0)+arrHitN(b)*10+Math.abs(d)+Math.abs(e)*1.5;if(sc<bs){bs=sc;dy=d*fs;dx=e*w}}
+      boxes.push([sx+dx-w,sy+dy-hh,sx+dx+w,sy+dy+hh]);
+      o.t.style.fontSize=fs+'px';o.t.setAttribute('x',dx.toFixed(1));o.t.setAttribute('y',dy.toFixed(1));o.t.setAttribute('text-anchor','middle');o.g.classList.remove('out');continue}
     // 영토가 작으면 밖으로 빼고 선으로 잇기
     fs=13;const w=n*fs*.98+4,hh=9;let pick=null;
     for(const [dx,dy] of [[48,26],[48,-26],[-48,26],[-48,-26],[0,44],[0,-44],[70,0],[-70,0]]){const x0=dx>0?sx+dx:dx<0?sx+dx-w:sx-w/2;const b=[x0,sy+dy-hh,x0+w,sy+dy+hh];if(!hit(b)){pick=[dx,dy,b];break}}
