@@ -1098,11 +1098,12 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
         <g id="lshg"><use href="#coastc" class="lsh"/><use href="#coastk" class="lsh"/></g>
         <path class="coast" id="coastc"/>
         <path class="coast" id="coastk"/>
+        <g><path id="cl1" class="coastl"/><path id="cl2" class="coastl"/></g>
         <path class="land" id="landc"/>
         <path class="land" id="landk"/>
-        <g id="chn" mask="url(#landmask)"></g>
-        <g id="terr" mask="url(#landmask)"></g>
-        <g mask="url(#seamask)"><path id="cl1" class="coastl"/><path id="cl2" class="coastl"/></g>
+        <clipPath id="landclip" clipPathUnits="userSpaceOnUse"><path id="cpk"/><path id="cpc"/></clipPath>
+        <g id="chn" clip-path="url(#landclip)"></g>
+        <g id="terr" clip-path="url(#landclip)"></g>
         <g id="rivers"></g>
         <g id="arrows"></g>
         <g id="ovl" class="ov"></g>
@@ -1340,3 +1341,5 @@ body,button,input,select,textarea{-webkit-font-smoothing:antialiased;-moz-osx-fo
 .arw.dim,.ahd.dim{opacity:0!important;transition:opacity .6s ease!important;pointer-events:none!important}</style>
 <style>.elist li.bin .t::after{content:'빈출';font-size:.68em;font-weight:700;color:#b45309;border:1px solid #f59e0b;border-radius:4px;padding:0 3px;margin-left:5px;vertical-align:1px;white-space:nowrap}</style>
 <style>.topban .bk{font-size:12px;font-weight:600;color:color-mix(in srgb,var(--ink) 60%,transparent);margin-left:2px}</style>
+<style>/* 렉 줄이기: 화살표 그림자 필터 끔 */.arw .af,.arw:not(.dim) .af,.ahd path.ahf,.ahd:not(.dim) path.ahf{filter:none!important}</style>
+<style>/* 렉 줄이기 */.app.onmap .top{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:color-mix(in srgb,var(--panel) 93%,transparent)!important}</style>

@@ -458,3 +458,12 @@ applyStates(true);
   if(ps&&e.seqAr){ps.forEach((p,k)=>{clearTimeout(p.sqT);if(!k)return;if(state==='draw'){p.g.style.visibility=p.hg.style.visibility='hidden';
       p.sqT=setTimeout(()=>{p.g.style.visibility=p.hg.style.visibility='';[p.g,p.hg].forEach(n=>{n.classList.remove('draw','drawn');void n.getBoundingClientRect();n.classList.add('draw')});clearTimeout(p.dT);p.dT=setTimeout(()=>p.g.classList.add('drawn'),1050)},1100*k)}
     else p.g.style.visibility=p.hg.style.visibility=''})}return r}}
+/* 렉 줄이기: 재생 중 목록 시간 표시는 0.25초마다만 */
+{const ml=markListTime;let last=0,tm=0;markListTime=function(force){const now=performance.now();if(force||!playing||now-last>250){last=now;return ml.apply(this,arguments)}clearTimeout(tm);tm=setTimeout(()=>{last=performance.now();ml()},260)}}
+/* 렉 줄이기: 해안선은 가벼운 버전을 기본으로, 아주 크게 확대했을 때만 자세한 버전 */
+{let hi=false;const IDS=['landk','coastk','clipk','cl1','sm1','cpk'];{const a=$('cpk'),c=$('cpc');if(a)a.setAttribute('d',LAND.kor);if(c)c.setAttribute('d',LAND.ctx)}
+ let lt=0;function landLOD(){if(!LAND.korHi)return;const want=hi?vb.w<240:vb.w<200;if(want===hi)return;clearTimeout(lt);lt=setTimeout(()=>{const w2=hi?vb.w<240:vb.w<200;if(w2===hi)return;hi=w2;const d=hi?LAND.korHi:LAND.kor;IDS.forEach(id=>{const n=$(id);if(n)n.setAttribute('d',d)})},400)}
+ const sv=setVB;setVB=function(){const r=sv.apply(this,arguments);landLOD();return r}}
+/* 렉 줄이기: 움직이는 동안만 가벼운 클립, 멈추면 매끈한 마스크 */
+{const G2=['chn','terr'].map(id=>$(id));let mT=0,moving=false;const setM=m=>{G2.forEach(g=>{if(!g)return;if(m){g.removeAttribute('clip-path');g.setAttribute('mask','url(#landmask)')}else{g.removeAttribute('mask');g.setAttribute('clip-path','url(#landclip)')}})};setM(true);
+ const sv=setVB;setVB=function(){const r=sv.apply(this,arguments);if(!moving){moving=true;setM(false)}clearTimeout(mT);mT=setTimeout(()=>{moving=false;setM(true)},220);return r}}

@@ -219,7 +219,7 @@ function animVB(n,D=700){cancelAnimationFrame(vbRAF);if(reduceMotion||!D){setVB(
   const stepV=now=>{const u=Math.min(1,(now-t0)/D),e=1-Math.pow(1-u,3);
     const w=a.w*Math.pow(n.w/a.w,e);const cx=(a.x+a.w/2)+((n.x+n.w/2)-(a.x+a.w/2))*e,cy=(a.y+a.h/2)+((n.y+n.h/2)-(a.y+a.h/2))*e;const hh=w*(n.h/n.w);
     setVB({x:cx-w/2,y:cy-hh/2,w,h:hh});if(u<1)vbRAF=requestAnimationFrame(stepV)};vbRAF=requestAnimationFrame(stepV)}
-function kNow(){const r=svg.clientWidth||1;return vb.w/r}
+let svgCW=0;function kNow(){if(!svgCW){svgCW=svg.clientWidth;if(window.ResizeObserver&&!kNow.ro){kNow.ro=new ResizeObserver(()=>{svgCW=svg.clientWidth});kNow.ro.observe(svg)}}return vb.w/(svgCW||1)}
 function placeOV(){const k=kNow();$('lshg').setAttribute('transform',`translate(${(1.2*k).toFixed(2)},${(2.2*k).toFixed(2)})`);for(const o of OV)o.g.setAttribute('transform',`translate(${o.x.toFixed(1)},${o.y.toFixed(1)})${o.rot!=null?` rotate(${o.rot.toFixed(1)})`:''} scale(${k.toFixed(4)})`);placeBubble()}
 
 /* 겹치는 글자 숨기기 */
