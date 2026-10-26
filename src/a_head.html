@@ -1327,7 +1327,7 @@ body,button,input,select,textarea{-webkit-font-smoothing:antialiased;-moz-osx-fo
 .stb{margin:4px 6px 2px 0;border:1px solid color-mix(in srgb,#b45309 40%,var(--rule));background:color-mix(in srgb,#b45309 8%,var(--panel));color:#b45309;border-radius:999px;padding:2px 12px;font:inherit;font-size:12.5px;cursor:pointer}
 .gl2>div.flash{animation:dcflash 1.6s ease}@keyframes dcflash{0%,40%{box-shadow:0 0 0 3px color-mix(in srgb,var(--seal) 50%,transparent)}100%{box-shadow:none}}</style>
 <style>#map text{filter:url(#txglow)}#insvg text,.inset svg text{filter:url(#txglow)}</style>
-<style>html #v-map svg#map text,html #v-map .inset svg text,html .inset svg text{filter:none!important;stroke:#fff!important;stroke-width:2.4px!important;stroke-linejoin:round!important;stroke-opacity:.95;paint-order:stroke fill!important;-webkit-text-stroke:0!important}
+<style>html #v-map svg#map text,html #v-map .inset svg text,html .inset svg text{filter:none!important;stroke:var(--paper,#fff)!important;stroke-width:2.4px!important;stroke-linejoin:round!important;stroke-opacity:.95;paint-order:stroke fill!important;-webkit-text-stroke:0!important}
 .ahd.draw{animation:ahead 1s backwards!important}</style>
 <style>.arw.draw:not(.dash) path:not(.aflow){stroke-dasharray:2 2!important;animation:adraw2 1s cubic-bezier(.4,0,.2,1) both!important}
 @keyframes adraw2{from{stroke-dashoffset:2}to{stroke-dashoffset:0}}
@@ -1339,3 +1339,4 @@ body,button,input,select,textarea{-webkit-font-smoothing:antialiased;-moz-osx-fo
 <style>html #v-map svg#map .slab text{stroke:none!important}
 .arw.dim,.ahd.dim{opacity:0!important;transition:opacity .6s ease!important;pointer-events:none!important}</style>
 <style>.elist li.bin .t::after{content:'빈출';font-size:.68em;font-weight:700;color:#b45309;border:1px solid #f59e0b;border-radius:4px;padding:0 3px;margin-left:5px;vertical-align:1px;white-space:nowrap}</style>
+<style>.topban .bk{font-size:12px;font-weight:600;color:color-mix(in srgb,var(--ink) 60%,transparent);margin-left:2px}</style>

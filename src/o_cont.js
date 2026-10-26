@@ -435,21 +435,21 @@ function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const 
 applyNameT();
 /* 장면 중간에 세워진 나라: 세운 해부터 땅이 생기고(그 전엔 신라 땅 색), 이름이 바뀌면 색도 바뀜.
    재생 중에는 도읍에서 사악 퍼지듯이 */
-const STATE_STEPS={taebong:{from:901,pre:'silla',steps:[[901,null,[126.55,37.97]],[918,'goryeo',[126.55,37.97]]]}};
+const STATE_STEPS={taebong:{pre:'silla',steps:[[901,null,[126.55,37.97]],[918,'goryeo',[127.31,38.25]]]},goguryeo:{pre:null,steps:[[-37,null,[125.4,41.27]]]}};
 const tcol=k=>`color-mix(in srgb,var(--c-${k}) 66%,var(--land))`,lcol=k=>`color-mix(in srgb,var(--c-${k}) 52%,var(--ink))`;
-function spreadFill(c,fill,ll){const p=c.el;if(c.sp){c.sp.end()}
+function spreadFill(c,fill,ll){const p=c.el;if(c.sp){c.sp.end()}if(!fill)fill=getComputedStyle(p).fill;
   const cid='sp'+Math.random().toString(36).slice(2,8),cp=el('clipPath',{id:cid},$('defs')),ci=el('circle',{cx:X(ll[0]),cy:Y(ll[1]),r:0},cp);
   const cl=p.cloneNode(false);cl.removeAttribute('id');cl.style.transition='none';cl.style.fill=fill;cl.style.pointerEvents='none';cl.setAttribute('clip-path',`url(#${cid})`);p.after(cl);
   const bb=p.getBBox(),cx=X(ll[0]),cy=Y(ll[1]);const R=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))+10;
-  const t0=performance.now(),D=1600;let raf=0;const end=()=>{cancelAnimationFrame(raf);p.style.transition='none';p.style.fill=fill;cl.remove();cp.remove();c.sp=null};c.sp={end};
+  cl.style.opacity='1';const t0=performance.now(),D=1600;let raf=0;const end=()=>{cancelAnimationFrame(raf);p.style.transition='none';p.style.fill=fill;p.style.opacity='';cl.remove();cp.remove();c.sp=null};c.sp={end};
   const step=now=>{const u=Math.min(1,(now-t0)/D),k=1-Math.pow(1-u,3);ci.setAttribute('r',(R*k).toFixed(1));if(u<1)raf=requestAnimationFrame(step);else end()};raf=requestAnimationFrame(step)}
 function applyStates(fresh){try{const t=curT();for(const [id,S] of Object.entries(STATE_STEPS)){const c=shapes.get(id);if(!c)continue;
-    if(fresh||c.base==null){c.base=c.el.style.fill;c.lbase=c.lab.t.style.fill;c.stk=null}
+    if(fresh||c.base==null){c.base=c.el.style.fill||getComputedStyle(c.el).fill;c.lbase=c.lab.t.style.fill;c.stk=null}
     let k=-1;S.steps.forEach(([y],i)=>{if(t>=y-1e-6)k=i});const key=String(k);if(c.stk===key)continue;
-    const fill=k<0?tcol(S.pre):(S.steps[k][1]?tcol(S.steps[k][1]):c.base),lf=k<0?null:(S.steps[k][1]?lcol(S.steps[k][1]):c.lbase);
+    const hid=k<0&&!S.pre;const fill=k<0?(S.pre?tcol(S.pre):c.base):(S.steps[k][1]?tcol(S.steps[k][1]):c.base),lf=k<0?null:(S.steps[k][1]?lcol(S.steps[k][1]):c.lbase);
     const anim=!fresh&&c.stk!=null&&+key>+c.stk&&playing&&!reduceMotion;c.stk=key;
     c.lab.g.style.visibility=k<0?'hidden':'';if(lf)c.lab.t.style.fill=lf;
-    if(anim)spreadFill(c,fill,S.steps[k][2]);else{if(c.sp)c.sp.end();c.el.style.transition='none';c.el.style.fill=fill}}}catch(_){}}
+    if(anim)spreadFill(c,fill,S.steps[k][2]);else{if(c.sp)c.sp.end();c.el.style.transition='none';c.el.style.fill=fill;c.el.style.opacity=hid?'0':''}}}catch(_){}}
 {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStates(false);return r}}
 {const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);applyStates(true);return r}}
 applyStates(true);

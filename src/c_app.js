@@ -127,8 +127,8 @@ function applyFrame(i,anim){
       const p=el('path',{d:s.d},G.terr);styleTerr(p,s);
       cur={el:p,d:s.d,lab:makeLabel(s)};cur.lab.o.terr=p;shapes.set(s.id,cur);
       if(anim){cur.lab.g.style.opacity=0;
-        if(!reduceMotion){const cid='rv'+(++revealN);const cp=el('clipPath',{id:cid},$('defs'));const ci=el('circle',{cx:s.lab[0],cy:s.lab[1],r:0},cp);p.setAttribute('clip-path',`url(#${cid})`);
-          const R=Math.max(400,(s.area||400)*1.6),t0=performance.now();const grow=now=>{const u=Math.min(1,(now-t0)/1400),k=1-Math.pow(1-u,3);ci.setAttribute('r',(R*k).toFixed(1));if(u<1)requestAnimationFrame(grow);else{p.removeAttribute('clip-path');cp.remove()}};requestAnimationFrame(grow);
+        if(!reduceMotion){const cid='rv'+(++revealN);const cp=el('clipPath',{id:cid},$('defs'));const fe=EVENTS.find(e=>e.found&&e.ll&&e.f===i&&e.t.replace(/^[^,]*,\s*/,'').startsWith(s.name));const o0=fe?[X(fe.ll[0]),Y(fe.ll[1])]:s.lab;const ci=el('circle',{cx:o0[0],cy:o0[1],r:0},cp);p.setAttribute('clip-path',`url(#${cid})`);
+          let R=Math.max(400,(s.area||400)*1.6);try{const bb=p.getBBox();R=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-o0[0],y-o0[1])))+10}catch(_){}const t0=performance.now();const grow=now=>{const u=Math.min(1,(now-t0)/1600),k=1-Math.pow(1-u,3);ci.setAttribute('r',(R*k).toFixed(1));if(u<1)requestAnimationFrame(grow);else{p.removeAttribute('clip-path');cp.remove()}};requestAnimationFrame(grow);
           setTimeout(()=>{cur.lab.g.style.opacity=''},500)}
         else requestAnimationFrame(()=>{cur.lab.g.style.opacity=''})}
     }
