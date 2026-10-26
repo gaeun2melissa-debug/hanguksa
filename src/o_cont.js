@@ -120,8 +120,12 @@ function hzLift(){document.querySelectorAll('#ovchart .hzwrap').forEach(w=>{cons
 document.addEventListener('keydown',e=>{const D={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!D||e.altKey||e.ctrlKey||e.metaKey)return;
   const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
   const big=e.shiftKey?3:1,beh=e.repeat?'auto':'smooth';
+  const pick=(root,ax)=>{let best=null,ba=0;[root,...root.querySelectorAll('*')].forEach(el=>{if(!el.offsetParent&&el!==root)return;const cs=getComputedStyle(el),ov=ax?cs.overflowY:cs.overflowX;if(!/auto|scroll/.test(ov))return;const can=ax?el.scrollHeight-el.clientHeight>2:el.scrollWidth-el.clientWidth>2;if(!can)return;const r=el.getBoundingClientRect(),a=r.width*r.height;if(a>ba){ba=a;best=el}});return best};
+  const gen=root=>{let el=pick(root,D[1]?1:0);if(!el&&D[0])el=pick(root,1);if(!el)el=document.scrollingElement;if(!el)return;e.preventDefault();const vert=!!D[1]||!(el.scrollWidth-el.clientWidth>2);const d=(D[0]||D[1])*(vert?Math.max(120,el.clientHeight*.35):Math.max(160,el.clientWidth*.35))*big;el.scrollBy(vert?{top:d,behavior:beh}:{left:d,behavior:beh})};
+  const ovl=[...document.querySelectorAll('#kpage,#ovpop,.modal,[role=dialog]')].find(x=>!x.hidden&&x.offsetParent!==null);if(ovl){gen(ovl);return}
   if(!$('v-map').hidden){e.preventDefault();const k=kNow(),px=120*big;cancelAnimationFrame(vbRAF);const n={...vb,x:vb.x+D[0]*px*k,y:vb.y+D[1]*px*k};if(e.repeat)setVB(n);else animVB(n,180);userMoved=true;if(typeof schedRecenter==='function')schedRecenter();return}
   if(!$('v-ov').hidden){e.preventDefault();const sc=$('ovscroll'),rd=$('ovread');
     if(ovDir==='h'){if(D[0])sc.scrollBy({left:D[0]*260*big,behavior:beh});else{const b=[...sc.querySelectorAll('.hzbot')].find(b=>{const r=b.getBoundingClientRect();return r.right>0&&r.left<innerWidth});if(b)b.scrollBy({top:D[1]*120*big,behavior:beh})}}
     else rd.scrollBy({top:(D[0]||D[1])*200*big,behavior:beh});return}
+  const v=[...document.querySelectorAll('section.view')].find(x=>!x.hidden);if(v)gen(v);
 },true);
