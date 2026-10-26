@@ -4130,6 +4130,15 @@ function hzLift(){document.querySelectorAll('#ovchart .hzwrap').forEach(w=>{cons
     b.remove();n.classList.add('lift');n.style.left=(r.left-r0.left)+'px';n.style.top=(r.bottom-r0.top+4)+'px';inn.appendChild(n);const need=inn.offsetTop+n.offsetTop+n.offsetHeight+12;if(need>top.offsetHeight)top.style.height=need+'px'})})}
 
 
+/* 키보드 방향키 = 드래그 (지도: 이동, 연대표: 옆/위아래로 넘기기) */
+document.addEventListener('keydown',e=>{const D={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!D||e.altKey||e.ctrlKey||e.metaKey)return;
+  const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+  const big=e.shiftKey?3:1,beh=e.repeat?'auto':'smooth';
+  if(!$('v-map').hidden){e.preventDefault();const k=kNow(),px=120*big;cancelAnimationFrame(vbRAF);const n={...vb,x:vb.x+D[0]*px*k,y:vb.y+D[1]*px*k};if(e.repeat)setVB(n);else animVB(n,180);userMoved=true;if(typeof schedRecenter==='function')schedRecenter();return}
+  if(!$('v-ov').hidden){e.preventDefault();const sc=$('ovscroll'),rd=$('ovread');
+    if(ovDir==='h'){if(D[0])sc.scrollBy({left:D[0]*260*big,behavior:beh});else{const b=[...sc.querySelectorAll('.hzbot')].find(b=>{const r=b.getBoundingClientRect();return r.right>0&&r.left<innerWidth});if(b)b.scrollBy({top:D[1]*120*big,behavior:beh})}}
+    else rd.scrollBy({top:(D[0]||D[1])*200*big,behavior:beh});return}
+},true);
 </script>
 <script type="module">
 /* 구글 로그인 + 하트·책갈피·설정 동기화 (GitHub 사이트 전용) */
