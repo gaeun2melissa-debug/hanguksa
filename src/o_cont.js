@@ -194,3 +194,33 @@ document.addEventListener('click',ev=>{const tb=ev.target.closest('.tclb');if(tb
 {const rh=rowHTML;rowHTML=function(e){const h=rh.apply(this,arguments);if(!treatyTxt(e))return h;return h.replace(/(<p>[\s\S]*?<\/p>)/,`$1<button type="button" class="tclb" data-tcl="${e.id}">조약 내용</button>`)}}
 function addTclb(root){(root||document).querySelectorAll('li[data-id]:not([data-tc])').forEach(li=>{li.dataset.tc=1;const e=EVENTS.find(x=>String(x.id)===li.dataset.id);if(!treatyTxt(e))return;const p=li.querySelector('p');if(p&&!li.querySelector('.tclb'))p.insertAdjacentHTML('afterend',`<button type="button" class="tclb" data-tcl="${e.id}">조약 내용</button>`)})}
 addTclb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObserver(()=>addTclb(el)).observe(el,{childList:true,subtree:true})});
+/* ───────── 하트 모아 보기: 시대 버튼 대신 정렬 ───────── */
+const HSORTS=[['add','추가한 순'],['time','시간 흐름순'],['imp','중요도순'],['custom','사용자 정의']];
+function hSorted(){const q=($('q').value||'').trim().toLowerCase();const byT=new Map();EVENTS.forEach(e=>{if(!byT.has(e.t))byT.set(e.t,e)});
+  let list=[...HEARTS].map(t=>byT.get(t)).filter(Boolean);
+  if(q)list=list.filter(e=>(e.t+' '+e.x+' '+(e.p||'')+' '+(e.pp||'')+' '+(e.vs||'')+' '+yearLabel(e)).toLowerCase().includes(q));
+  const m=store.get('hsort','add');
+  if(m==='add')list.reverse();
+  else if(m==='time')list.sort((a,b)=>a.T-b.T);
+  else if(m==='imp'){const sc=e=>(e.top?2:0)+(isMajor(e)?1:0);list.sort((a,b)=>sc(b)-sc(a)||a.T-b.T)}
+  else if(m==='custom'){const o=store.get('hord',[]);const ix=t=>{const i=o.indexOf(t);return i<0?1e6:i};const add=[...HEARTS];list.sort((a,b)=>ix(a.t)-ix(b.t)||add.indexOf(b.t)-add.indexOf(a.t))}
+  return list}
+function renderHList(){const body=$('tlbody'),v=$('v-tl');const on=tlHeart==='h';v.classList.toggle('hmode',on);let box=$('hlist');
+  if(!on){if(box)box.remove();return}
+  if(!box){box=document.createElement('section');box.id='hlist';const kh=$('tlkh');kh?kh.after(box):body.prepend(box)}
+  const m=store.get('hsort','add'),list=hSorted(),cu=m==='custom';
+  box.innerHTML=`<div class="hlh"><h3>하트한 사건 <small>${list.length}</small></h3><div class="hsort"><button type="button" class="hsbtn" aria-haspopup="true" aria-expanded="false">정렬 · ${HSORTS.find(s=>s[0]===m)[1]} ▾</button><div class="hsmenu" hidden>${HSORTS.map(([k,n])=>`<button type="button" data-hs="${k}" aria-pressed="${k===m}">${n}</button>`).join('')}</div></div></div>${cu&&list.length>1?'<p class="hshint">⠿ 를 잡고 위아래로 끌어 순서를 바꿔요</p>':''}<ol class="tl hl${cu?' cu':''}">${list.map(e=>{const r=rowHTML(e);return cu?r.replace('<li ','<li draggable="false" ').replace(/(<div class="d">)/,'<span class="hdrag" title="끌어서 순서 바꾸기">⠿</span>$1'):r}).join('')}</ol>${list.length?'':`<p class="dcempty">${$('q').value?'찾는 사건이 없어요.':'아직 하트한 사건이 없어요. 사건의 ♡를 누르면 여기 모여요.'}</p>`}`;
+  $('tlnone').hidden=true;try{addTclb(box)}catch(_){}}
+{const rt=renderTLFilter;renderTLFilter=function(){rt.apply(this,arguments);renderHList()}}
+document.addEventListener('click',ev=>{const b=ev.target.closest('.hsbtn');const mn=document.querySelector('#hlist .hsmenu');
+  if(b){ev.stopPropagation();mn.hidden=!mn.hidden;b.setAttribute('aria-expanded',!mn.hidden);return}
+  const s=ev.target.closest('[data-hs]');if(s){ev.stopPropagation();if(s.dataset.hs==='custom'&&!store.get('hord',[]).length)store.set('hord',hSorted().map(e=>e.t));store.set('hsort',s.dataset.hs);renderHList();return}
+  if(mn&&!mn.hidden&&!ev.target.closest('.hsmenu'))mn.hidden=true},true);
+/* 사용자 정의: ⠿ 잡고 끌어서 순서 바꾸기 */
+{let drag=null;
+ document.addEventListener('pointerdown',ev=>{const h=ev.target.closest('#hlist .hdrag');if(!h)return;ev.preventDefault();const li=h.closest('li');drag={li,ol:li.parentElement,id:ev.pointerId};li.classList.add('dragging');try{h.setPointerCapture(ev.pointerId)}catch(_){}} ,true);
+ document.addEventListener('pointermove',ev=>{if(!drag)return;ev.preventDefault();const y=ev.clientY;const sib=[...drag.ol.children].filter(x=>x!==drag.li);let before=null;for(const s of sib){const r=s.getBoundingClientRect();if(y<r.top+r.height/2){before=s;break}}
+   if(before!==drag.li.nextElementSibling||(!before&&drag.ol.lastElementChild!==drag.li))drag.ol.insertBefore(drag.li,before);
+   const rd=$('tlread'),rr=rd.getBoundingClientRect();if(y<rr.top+60)rd.scrollTop-=12;else if(y>rr.bottom-60)rd.scrollTop+=12},{passive:false});
+ const end=()=>{if(!drag)return;drag.li.classList.remove('dragging');const byId=new Map(EVENTS.map(e=>[String(e.id),e.t]));const ord=[...drag.ol.children].map(li=>byId.get(li.dataset.id)).filter(Boolean);store.set('hord',ord);drag=null};
+ document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end)}
