@@ -4708,6 +4708,15 @@ function applyStateFrom(){try{const t=curT();for(const [id,y] of Object.entries(
 {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStateFrom();return r}}
 {const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);for(const id in STATE_FROM){const c=shapes.get(id);if(c){delete c.el.dataset.sf;delete c.el.dataset.of}}applyStateFrom();return r}}
 applyStateFrom();
+/* 이름이 바뀌면 색도 (후고구려 → 918 고려: 고려 색) */
+const STATE_COL={taebong:[[918,'goryeo']]};
+function applyStateCol(){try{const t=curT();for(const [id,L] of Object.entries(STATE_COL)){const c=shapes.get(id);if(!c||t<STATE_FROM[id]-1e-6)continue;let col=null;for(const [y,k] of L)if(t>=y-1e-6)col=k;
+  const key=String(col);if(c.el.dataset.sc===key)continue;c.el.dataset.sc=key;if(!('of' in c.el.dataset))c.el.dataset.of=c.el.style.fill;if(!('lf' in c.el.dataset))c.el.dataset.lf=c.lab.t.style.fill;
+  c.el.style.transition='fill .8s';c.el.style.fill=col?`color-mix(in srgb,var(--c-${col}) 66%,var(--land))`:c.el.dataset.of;c.lab.t.style.fill=col?`color-mix(in srgb,var(--c-${col}) 52%,var(--ink))`:c.el.dataset.lf}}catch(_){}}
+{const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStateCol();return r}}
+{const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);for(const id in STATE_COL){const c=shapes.get(id);if(c){delete c.el.dataset.sc;delete c.el.dataset.lf}}applyStateFrom();applyStateCol();return r}}
+{const asf=applyStateFrom;applyStateFrom=function(){const c=shapes.get('taebong');const was=c&&c.el.dataset.sf;asf();if(c&&c.el.dataset.sf!==was)delete c.el.dataset.sc;applyStateCol()}}
+applyStateCol();
 </script>
 <script type="module">
 /* 구글 로그인 + 하트·책갈피·설정 동기화 (GitHub 사이트 전용) */
