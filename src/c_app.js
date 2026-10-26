@@ -163,7 +163,7 @@ EVENTS.forEach(e=>{if(!e.ar)return;const parts=[];
     el('path',{class:'ab',d:'M'+sm.map(xy).join('L')},g);
     const p=el('path',{class:'af',d:'M'+sm.map(xy).join('L'),pathLength:1,style:`stroke:${acol(c)}`},g);el('path',{class:'aflow',d:'M'+sm.map(xy).join('L'),pathLength:1},g);
     const a=sm[sm.length-2],b=sm[sm.length-1];const ang=Math.atan2(Y(b[1])-Y(a[1]),X(b[0])-X(a[0]))*180/Math.PI;
-    const hg=el('g',{class:'ahd hide'+(inv?' inv':'')},headG);{const d=inv?'M-15,-11L5,0L-15,11Z':'M-12,-8.5L4,0L-12,8.5Z';el('path',{class:'ahf',d,style:`fill:${acol(c)}`},hg)}
+    const hg=el('g',{class:'ahd hide'+(inv?' inv':'')},headG);{const d=inv?'M-15,-7.2Q-6,-2.6 5,0Q-6,2.6 -15,7.2L-11,0Z':'M-12.5,-6Q-5,-2.2 4,0Q-5,2.2 -12.5,6L-9,0Z';el('path',{class:'ahf',d,style:`fill:${acol(c)}`},hg)}
     const o=ovItem(hg,X(b[0]),Y(b[1]),ang);const xs=sm.map(q=>X(q[0])),ys=sm.map(q=>Y(q[1]));parts.push({g,hg,o,c,dash:!!dash,inv,bb:[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)]})});
   arrOf.set(e.id,parts)});
 function setArrows(e,state){const ps=arrOf.get(e.id);if(!ps)return;ps.forEach(p=>{

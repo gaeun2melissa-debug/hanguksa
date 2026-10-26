@@ -290,18 +290,20 @@ function rzPts(e){const deg=X(1)-X(0),r=[];if(e.ll&&e.tp[0]!=='wld'&&e.ll[0]>117
   const ps=arrOf.get(e.id);if(ps){let w=0;ps.forEach(p=>w=Math.max(w,p.bb[2]-p.bb[0],p.bb[3]-p.bb[1]));if(w<=deg*1.6)ps.forEach(p=>{r.push([p.bb[0],p.bb[1]],[p.bb[2],p.bb[3]])})}return r}
 function rzCluster(e){const deg=X(1)-X(0),L=byFrame[pos.i]||[],k=L.indexOf(e),a=rzPts(e);if(k<0||!a.length)return null;
   const hasR=x=>rzPts(x).length>(x.ll?1:0);const cx=a[0][0],cy=a[0][1];let pts=a.slice(),n=1,nr=hasR(e)?1:0,mem=[e.id],gap=[];
-  for(let j=k+1;j<L.length;j++){const q=rzPts(L[j]);if(!q.length){gap.push(L[j].id);continue}mem.push(...gap,L[j].id);gap=[];if(q.some(([x,y])=>Math.hypot(x-cx,y-cy)>deg*RZ_R))break;pts=pts.concat(q);n++;if(hasR(L[j]))nr++}
+  for(let j=k+1;j<L.length;j++){const q=rzPts(L[j]);if(!q.length){gap.push(L[j].id);continue}if(q.some(([x,y])=>Math.hypot(x-cx,y-cy)>deg*RZ_R))break;mem.push(...gap,L[j].id);gap=[];pts=pts.concat(q);n++;if(hasR(L[j]))nr++}
   const force=RZ_FORCE.test(e.t);if((n<3||nr<2)&&!force)return null;
   let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));
-  const minW=deg*(force?1.5:2.2);let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
-  const pw=w*.18,ph=h*.22,fb=fitBox({x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}),FV=fitVB(FRAMES[pos.i].view);if(fb.w*fb.h>FV.w*FV.h*.5)return null;fb.mem=new Set(mem);return fb}
+  const minW=deg*(force?1.3:1.7);let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
+  const pw=w*.18,ph=h*.22,fb=fitBox({x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}),FV=fitVB(FRAMES[pos.i].view);if(fb.w*fb.h>FV.w*FV.h*.5)return null;fb.mem=new Set(mem);fb.last=mem[mem.length-1];return fb}
 const rzIn=(e,b)=>rzPts(e).every(([x,y])=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);
+function rzOut(){const now=performance.now(),fi=pos.i;holdUntil=Math.max(holdUntil,now+2200+900+600);clearTimeout(rzOut.t);
+  rzOut.t=setTimeout(()=>{if(pos.i!==fi||userMoved)return;rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900)},2200)}
 function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved)return;
-  if(rzCur&&rzCur.mem.has(e.id))return;
+  if(rzCur&&rzCur.mem.has(e.id)){if(e.id===rzCur.last)rzOut();return}
   const c=rzSeen.has(e.id)?null:rzCluster(e);const now=performance.now();
-  if(c){c.mem.forEach(id=>rzSeen.add(id));rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,now+900+RZ_HOLD+(RZ_FORCE.test(e.t)?1400:0));return}
+  if(c){c.mem.forEach(id=>rzSeen.add(id));rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,now+900+RZ_HOLD+(RZ_FORCE.test(e.t)?1400:0));if(e.id===c.last)setTimeout(()=>{if(rzCur===c&&playing)rzOut()},900+RZ_HOLD+(RZ_FORCE.test(e.t)?1400:0));return}
   if(rzCur){rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900);holdUntil=Math.max(holdUntil,now+900+500)}}
-{const sp=setPos;setPos=function(i){if(i!==pos.i){rzCur=null;rzSeen.clear()}return sp.apply(this,arguments)}}
+{const sp=setPos;setPos=function(i){if(i!==pos.i){rzCur=null;rzSeen.clear();clearTimeout(rzOut.t)}return sp.apply(this,arguments)}}
 {const tk=ticker;ticker=function(e){const r=tk.apply(this,arguments);try{routeZoom(e)}catch(_){}return r}}
 /* ───────── 해외 작은 지도: 멀리 떨어진 곳이 여럿이면 최대 3개, 화면에 보여도 우리나라 밖이면 표시 ───────── */
 {const KOR=e=>e.ll[0]>=124&&e.ll[0]<=131.3&&e.ll[1]>=33&&e.ll[1]<=43.4;
@@ -322,7 +324,7 @@ function routeZoom(e){if(typeof playing==='undefined'||!playing||userMoved)retur
    return {wrap,dock,card,hb}};
  function placeAll(list){const {wrap,dock,card,hb}=corners();if(!wrap.width)return;const pts=[];document.querySelectorAll('#pins .pin:not(.hide):not(.wait):not(.stale):not(.buried):not(.gone), #ovl text:not(.hide), #arrleg:not([hidden])').forEach(g=>{const r=g.getBoundingClientRect();if(r.width){const lab=g.matches('.pin')?110:0;pts.push([r.left-wrap.left-(lab?40:0),r.top-wrap.top,r.right-wrap.left+lab,r.bottom-wrap.top])}});
    const used=[];list.forEach(btn=>{const iw=btn.offsetWidth||150,ih=btn.offsetHeight||124;const bottomY=Math.min(wrap.height,dock.top-wrap.top)-ih-52,topY=Math.max(12,card.bottom-wrap.top+10,hb+10);
-     const C={br:[wrap.width-iw-12,bottomY],bl:[12,bottomY],tr:[wrap.width-iw-60,Math.max(12,hb+10)],tl:[12,topY]};
+     const lgE=$('arrleg'),lg=lgE&&!lgE.hidden?lgE.getBoundingClientRect():null;const C={br:[wrap.width-iw-12,bottomY],bl:[12,lg&&lg.width?Math.min(bottomY,lg.top-wrap.top-ih-10):bottomY],tr:[wrap.width-iw-60,Math.max(12,hb+10)],tl:[12,topY]};
      const sc=k=>{const [x,y]=C[k];if(y<0||x<0||used.includes(k))return 1e9;let s=0;pts.forEach(([a,b,c,d])=>{if(c>x-4&&a<x+iw+4&&d>y-4&&b<y+ih+4)s++});return s+(k==='br'?-.1:0)-(btn.dataset.corner===k?1.6:0)};
      let best=null,bs=1e10;['br','bl','tr','tl'].forEach(k=>{const s=sc(k);if(s<bs){bs=s;best=k}});used.push(best);btn.dataset.corner=best;const [x,y]=C[best];btn.style.left=x+'px';btn.style.top=y+'px';btn.style.right='auto';btn.style.bottom='auto';pts.push([x,y,x+iw,y+ih])})}
  const orig=updateInset;
@@ -411,3 +413,7 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
 /* 화살표: 그려지는 동작이 끝나면 점선 기법을 풀어 확대/축소 때 중간이 끊기지 않게 */
 {const sa=setArrows;setArrows=function(e,state){const r=sa.apply(this,arguments);const ps=arrOf.get(e.id);if(ps&&state==='draw')ps.forEach(p=>{p.g.classList.remove('drawn');clearTimeout(p.dT);p.dT=setTimeout(()=>p.g.classList.add('drawn'),1050)});return r}
  for(const ps of arrOf.values())ps.forEach(p=>{if(!p.g.classList.contains('draw'))p.g.classList.add('drawn')})}
+/* 깃발: 땅에 꽂힌 느낌(흙더미 + 땅에 박힌 자국) */
+document.querySelectorAll('.pin.flagpin .pole').forEach(pl=>{if(pl.previousSibling&&pl.previousSibling.classList&&pl.previousSibling.classList.contains('mound'))return;
+  const NS='http://www.w3.org/2000/svg',m=document.createElementNS(NS,'path');m.setAttribute('class','mound');m.setAttribute('d','M-6.5,2.6Q-3.5,-1.4 0,-1.2Q3.5,-1.4 6.5,2.6Z');pl.parentNode.insertBefore(m,pl.nextSibling);pl.setAttribute('d','M0,1V-26')});
+{const ul=window.updArrLeg;if(ul)window.updArrLeg=function(){const r=ul.apply(this,arguments);try{placeInset()}catch(_){}return r}}
