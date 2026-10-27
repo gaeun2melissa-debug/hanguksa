@@ -429,7 +429,7 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
   if(!c.seq)c.mem.forEach(id=>rzSeen.add(id));
   rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,performance.now()+900+1000)}catch(_){}})();
 /* 나라 이름이 장면 중간에 바뀌는 경우 (후고구려 → 마진 → 태봉 → 고려) */
-const NAME_T={'후고구려':[[918,'고려']],'마한':[[369,'백제']],'진한':[[-57,'신라']],'변한':[[42,'가야']]};
+const NAME_T={'후고구려':[[918,'고려']],'진한':[[-57,'신라']],'변한':[[42,'가야']]};
 function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const tx=o.t;if(o.base==null||!(o.base in NAME_T)){const cur=tx.textContent;if(cur in NAME_T)o.base=cur;else return}
   let nm=o.base;for(const [y,n] of NAME_T[o.base])if(t>=y-1e-6)nm=n;if(tx.textContent!==nm){tx.textContent=nm;o.lc=null;schedLabels()}})}catch(_){}}
 {const ls=labStyle;labStyle=function(L,s){L.o.base=null;const r=ls.apply(this,arguments);applyNameT();return r}}
@@ -573,12 +573,14 @@ document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelec
 /* 백제: 기원전 18년 위례성에서 작게 생겨(둥) 369년 마한 복속까지 조금씩 넓어짐 */
 {const FR=3,T0=-18,T1=369,LL=[127.11,37.52];const deg=X(1)-X(0);const lay=el('g',{},G.terr);
  const cp=el('clipPath',{id:'bjgrow',clipPathUnits:'userSpaceOnUse'},$('defs')),cpp=el('path',{},cp);
- const ci=el('circle',{cx:X(LL[0]),cy:Y(LL[1]),r:0,'clip-path':'url(#bjgrow)',style:'stroke:none'},lay);let shown=false,grow=0,ra=0,R1=0,rt=0;
- function upd(){try{const h=shapes.get('mahan');const on=pos.i===FR&&h&&h.el.style.visibility!=='hidden',t=curT();lay.style.display=on?'':'none';if(!on||!h)return;if(G.terr.lastChild!==lay)G.terr.appendChild(lay);
+ const ci=el('circle',{cx:X(LL[0]),cy:Y(LL[1]),r:0,'clip-path':'url(#bjgrow)',style:'stroke:none'},lay);let shown=false,grow=0,ra=0,R1=0,rt=0;const bl=el('g',{class:'bhlab bjlab'},labG);const bt=el('text',{x:-20,y:-13},bl);bt.textContent='백제';bt.style.fill='color-mix(in srgb,var(--c-baekje) 60%,var(--ink))';ovItem(bl,X(LL[0]),Y(LL[1]));bl.style.display='none';
+ function upd(){try{const h=shapes.get('mahan');const on=pos.i===FR&&h&&h.el.style.visibility!=='hidden',t=curT();lay.style.display=on?'':'none';bl.style.display=on&&t>=T0-1e-6&&t<T1-1e-6?'':'none';if(!on||!h)return;if(G.terr.lastChild!==lay)G.terr.appendChild(lay);
    const d=h.el.getAttribute('d');if(cpp.getAttribute('d')!==d){cpp.setAttribute('d',d);try{const bb=h.el.getBBox(),cx=X(LL[0]),cy=Y(LL[1]);R1=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))}catch(_){R1=deg*3}}
    ci.style.fill=h.el.dataset.full||STATE_FULL();
-   if(t<T0-1e-6||t>=T1-1e-6){ci.setAttribute('r',0);shown=false;cancelAnimationFrame(ra);grow=0;return}
+   const setName=n=>{const tx=h.lab.t;if(tx.textContent!==n){tx.textContent=n;h.lab.o.lc=null;schedLabels()}};
+   if(t<T0-1e-6||t>=T1-1e-6){ci.setAttribute('r',0);shown=false;cancelAnimationFrame(ra);grow=0;setName(t>=T1-1e-6?'백제':'마한');return}
    const p=(t-T0)/(T1-T0),R=deg*.3+(R1-deg*.3)*Math.pow(p,1.15);rt=R;
+   {const dl=Math.hypot(h.lab.o.x-X(LL[0]),h.lab.o.y-Y(LL[1]));const big=R>dl+deg*.25;setName(big?'백제':'마한');bl.style.display=big?'none':''}
    if(!shown){shown=true;if(!reduceMotion){const t0=performance.now();grow=1;const st=now=>{const u=Math.min(1,(now-t0)/2000),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(rt*k).toFixed(1));if(u<1)ra=requestAnimationFrame(st);else grow=0};ra=requestAnimationFrame(st);return}}
    if(!grow)ci.setAttribute('r',R.toFixed(1))}catch(_){}}
  const STATE_FULL=()=>{const c=shapes.get('mahan');return c&&c.base?c.base:'color-mix(in srgb,var(--c-baekje) 66%,var(--land))'};
