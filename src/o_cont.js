@@ -578,9 +578,9 @@ document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelec
    const d=h.el.getAttribute('d');if(cpp.getAttribute('d')!==d){cpp.setAttribute('d',d);try{const bb=h.el.getBBox(),cx=X(LL[0]),cy=Y(LL[1]);R1=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))}catch(_){R1=deg*3}}
    ci.style.fill=h.el.dataset.full||STATE_FULL();
    const setName=n=>{const tx=h.lab.t;if(tx.textContent!==n){tx.textContent=n;h.lab.o.lc=null;schedLabels()}};
-   if(t<T0-1e-6||t>=T1-1e-6){ci.setAttribute('r',0);shown=false;cancelAnimationFrame(ra);grow=0;setName(t>=T1-1e-6?'백제':'마한');return}
+   if(t<T0-1e-6||t>=T1-1e-6){ci.setAttribute('r',0);shown=false;cancelAnimationFrame(ra);grow=0;setName(t>=T1-1e-6?'백제':'마한');h.lab.g.style.opacity='';return}
    const p=(t-T0)/(T1-T0),R=deg*.3+(R1-deg*.3)*Math.pow(p,1.15);rt=R;
-   {const dl=Math.hypot(h.lab.o.x-X(LL[0]),h.lab.o.y-Y(LL[1]));const big=R>dl+deg*.25;setName(big?'백제':'마한');bl.style.display=big?'none':''}
+   {const dl=Math.hypot(h.lab.o.x-X(LL[0]),h.lab.o.y-Y(LL[1]));const big=R>dl+deg*.25;setName('마한');h.lab.g.style.opacity=big?'0':'';h.lab.g.style.transition='opacity .6s';bl.style.display='';const bo=OV.find(o=>o.g===bl);if(bo){if(big){const t2=h.lab.t,ty=+(t2.getAttribute('y')||0),tx=+(t2.getAttribute('x')||0);bo.x=h.lab.o.x;bo.y=h.lab.o.y;bt.setAttribute('x',tx);bt.setAttribute('y',ty);bt.setAttribute('text-anchor','middle');bt.style.fontSize=t2.style.fontSize||'18px'}else{bo.x=X(LL[0]);bo.y=Y(LL[1]);bt.setAttribute('x',-20);bt.setAttribute('y',-13);bt.style.fontSize=''}placeOV()}}
    if(!shown){shown=true;if(!reduceMotion){const t0=performance.now();grow=1;const st=now=>{const u=Math.min(1,(now-t0)/2000),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(rt*k).toFixed(1));if(u<1)ra=requestAnimationFrame(st);else grow=0};ra=requestAnimationFrame(st);return}}
    if(!grow)ci.setAttribute('r',R.toFixed(1))}catch(_){}}
  const STATE_FULL=()=>{const c=shapes.get('mahan');return c&&c.base?c.base:'color-mix(in srgb,var(--c-baekje) 66%,var(--land))'};
