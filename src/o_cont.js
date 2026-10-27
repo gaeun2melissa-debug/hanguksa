@@ -668,3 +668,33 @@ document.querySelectorAll('.pin.flagpin .psh').forEach(e=>{e.setAttribute('cx',0
  {let lt=0;const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);const n=performance.now();if(n-lt>700){lt=n;build()}return r}}
  build()}
 document.querySelectorAll('.pin .sealt').forEach(t=>t.setAttribute('y','0.5'));
+/* 낱말 풀이 → 한 번 더 누르면 더 자세히 (누가·왜·무엇을·배경 이야기), '사전에서 보기'는 사전으로 */
+const DEEP={
+'갑오개혁':[['누가','군국기무처(김홍집·유길준 등), 뒤에 김홍집·박영효 연립 내각'],['왜','동학 농민 운동과 청일 전쟁 속에서 일본이 경복궁을 점령하고 개혁을 요구함. 농민들의 폐정 개혁 요구도 일부 반영'],['일본과','일본의 간섭 아래 진행 — 그래서 자주적 개혁이라는 평가와 일본에 이용당했다는 평가가 함께 있음'],['무엇을','1차: 개국 기년 사용, 과거제 폐지, 신분제(양반·상민) 폐지, 노비제 폐지, 과부 재가 허용, 조세 금납화, 은 본위제, 도량형 통일 · 2차: 홍범 14조 반포, 8도 → 23부, 재판소 설치(사법권 독립), 교육 입국 조서'],['흐름','동학 농민 운동(1894) → 갑오개혁 → 을미사변·을미개혁(1895) → 아관 파천(1896)으로 중단']],
+'갑신정변':[['누가','김옥균·박영효·홍영식·서광범·서재필 등 급진 개화파'],['왜','임오군란 뒤 청의 간섭이 심해지고 민씨 정권이 청에 기대자, 일본처럼 빠르게 근대화하려 함'],['일본과','일본 공사관이 군대 지원을 약속 → 청군이 개입하자 일본군이 물러나 3일 만에 실패(삼일천하)'],['무엇을','14개조 정강: 청에 대한 사대 폐지, 문벌 폐지·인민 평등, 지조법(토지세) 개혁, 호조로 재정 일원화, 내각 중심 정치'],['결과','한성 조약(조선-일본), 톈진 조약(청-일본: 함께 철수, 파병 시 서로 알림) → 청일 전쟁의 씨앗']],
+'을미개혁':[['누가','김홍집 친일 내각'],['왜','삼국 간섭으로 일본 세력이 약해지자 명성 황후를 시해(을미사변)하고 친일 내각이 다시 개혁 추진'],['무엇을','단발령, 태양력 사용, "건양" 연호, 종두법, 소학교 설치, 우체사, 친위대·진위대'],['결과','단발령과 을미사변에 반발해 을미의병 → 아관 파천으로 중단']],
+'임오군란':[['누가','구식 군인과 도시 하층민, 흥선 대원군이 다시 집권'],['왜','신식 군대 별기군과 차별받고 밀린 녹봉으로 겨와 모래 섞인 쌀을 받음'],['결과','청군이 대원군을 납치하고 진압 → 제물포 조약(일본 공사관 경비병 주둔), 조청 상민 수륙 무역 장정(청 상인 내륙 진출) → 청의 내정 간섭 강화']],
+'강화도 조약':[['누가','조선(신헌) - 일본(구로다)'],['왜','운요호 사건(1875)을 구실로 일본이 군함을 끌고 와 개항 요구'],['무엇을','조선은 자주국(→ 청의 간섭 배제 노림), 부산·원산·인천 개항, 해안 측량권, 치외 법권(영사 재판권)'],['성격','최초의 근대적 조약이자 불평등 조약 · 부록과 무역 규칙으로 일본 화폐 사용, 양곡 무제한 유출, 무관세']],
+'을사늑약':[['누가','이토 히로부미가 강요, 찬성한 대신 5명 = 을사오적(이완용·박제순·이지용·이근택·권중현)'],['왜','러일 전쟁에서 이긴 일본이 가쓰라·태프트 밀약, 제2차 영일 동맹, 포츠머스 조약으로 열강의 인정을 받음'],['무엇을','대한 제국의 외교권 박탈, 통감부 설치(초대 통감 이토 히로부미)'],['저항','장지연 「시일야방성대곡」, 민영환 자결, 헤이그 특사(1907), 을사의병(최익현·신돌석)']],
+'척화비':[['누가','흥선 대원군'],['왜','병인양요(1866, 프랑스)와 신미양요(1871, 미국)를 물리친 뒤 서양과 수교하지 않겠다는 뜻을 널리 알리려고'],['내용','"洋夷侵犯 非戰則和 主和賣國" — 서양 오랑캐가 쳐들어오는데 싸우지 않으면 화친이요, 화친을 주장함은 나라를 파는 것'],['결과','통상 수교 거부 정책의 상징 · 대원군이 물러난 뒤 강화도 조약(1876)으로 개항, 임오군란 뒤 대부분 뽑혀 묻힘']],
+'대동법':[['누가','광해군 때 이원익의 건의로 경기도부터(1608) → 숙종 때 전국(평안·함경 제외)'],['왜','공납(특산물)을 대신 내주고 비싸게 받아 내는 방납의 폐단'],['무엇을','특산물 대신 토지 1결당 쌀 12두(또는 베·동전)로 냄 → 땅 많은 사람이 많이 냄'],['결과','선혜청 설치, 관청에 물건을 대는 공인 등장 → 상품 화폐 경제 발달']],
+'균역법':[['누가','영조(1750)'],['왜','군포 2필 부담이 무겁고 백골징포·황구첨정 같은 폐단'],['무엇을','군포 1필로 줄임 · 모자란 재정은 결작(토지 1결당 쌀 2두), 선무군관포, 어장세·염세·선박세로 보충']],
+'과전법':[['누가','이성계·조준·정도전 등 신진 사대부(1391)'],['왜','권문세족의 대농장으로 나라 재정이 무너지고 신진 사대부에게 줄 땅이 없음'],['무엇을','경기 지역 토지의 수조권을 전·현직 관리에게 줌, 세습 원칙적 금지(수신전·휼양전 예외)'],['흐름','과전법 → 직전법(세조, 현직만) → 관수 관급제(성종) → 직전법 폐지(명종)']],
+'전시과':[['누가','고려 경종(시정 전시과) → 목종(개정) → 문종(경정 전시과)'],['무엇을','관리에게 등급에 따라 곡물을 거두는 땅(전지)과 땔감을 얻는 땅(시지)의 수조권을 줌'],['흐름','시정(관품+인품) → 개정(관품만) → 경정(현직 관리만)']],
+'독립 협회':[['누가','서재필(창립, 『독립신문』), 윤치호·이상재·남궁억'],['왜','아관 파천 뒤 열강의 이권 침탈과 러시아의 간섭'],['무엇을','자주 국권(독립문, 러시아 절영도 조차 요구 저지), 자유 민권, 자강 개혁(관민 공동회, 헌의 6조, 의회식 중추원 관제)'],['결과','보수 세력이 공화정 수립 모함 → 황국 협회 동원, 고종이 해산(1898)']],
+'신간회':[['누가','민족주의 좌파(이상재·안재홍) + 사회주의 세력, 1927'],['왜','일제의 자치론 등장과 정우회 선언 — 함께 손잡자'],['무엇을','민족 단결, 정치·경제적 각성, 기회주의 배격 · 광주 학생 항일 운동 진상 조사단 파견'],['결과','민족 협동 전선 최대 조직 · 1931 해소']]};
+{const gp=$('glpop');const rowsAuto=k=>{const e=EVENTS.find(x=>x.t===k||x.s===k)||EVENTS.find(x=>x.t.startsWith(k));if(!e)return [];const r=[['시기',(typeof yearLabel==='function'?yearLabel(e):e.y)+''],e.pp?['인물',e.pp]:null,e.vs?['대립',e.vs]:null,e.x?['내용',e.x]:null,(typeof STORY!=='undefined'&&STORY[e.t])?['배경 이야기',STORY[e.t]]:null];return r.filter(Boolean)};
+ new MutationObserver(()=>{if(gp.hidden||gp.querySelector('.gdmore'))return;const dc=gp.querySelector('[data-dc]');if(!dc)return;const k=dc.dataset.dc;const R=DEEP[k]||rowsAuto(k);dc.textContent='사전에서 보기 →';if(!R.length)return;
+   dc.insertAdjacentHTML('beforebegin',`<button type="button" class="ppgo gdmore">더 자세히 ▾</button>`)}).observe(gp,{childList:true,subtree:true});
+ gp.addEventListener('click',ev=>{const b=ev.target.closest('.gdmore');if(!b)return;ev.stopPropagation();ev.preventDefault();const dc=gp.querySelector('[data-dc]');const k=dc&&dc.dataset.dc;let d=gp.querySelector('.gdeep');if(d){d.remove();b.textContent='더 자세히 ▾';return}
+   const R=DEEP[k]||rowsAuto(k);b.insertAdjacentHTML('beforebegin',`<div class="gdeep">${R.map(([a,t])=>`<div class="gdr"><i>${esc(a)}</i><span>${typeof glx==='function'?glx(t):esc(t)}</span></div>`).join('')}</div>`);b.textContent='접기 ▴';const r=gp.getBoundingClientRect();if(r.bottom>innerHeight-8)gp.style.top=Math.max(8,innerHeight-8-r.height)+'px'},true)}
+/* 이전 버튼: 모든 화면에서 — 열린 창 먼저 닫고, 사전 낱말·구조도·지도 사건 이동도 되돌림 */
+{const dcJump=k=>{showView('dc');try{dcShow();dcOnlyBk=false;dcFilter()}catch(_){}setTimeout(()=>{const c=$('dcbody').querySelector(`.gl2>div[data-k="${CSS.escape(k)}"]`);if(c){c.scrollIntoView({block:'center'});c.classList.remove('flash');void c.offsetWidth;c.classList.add('flash')}},120)};
+ const ha=hApply;hApply=function(en){if(en.d||en.t||en.e!=null){hLock=true;try{if(en.d)dcJump(en.d);else if(en.t){$('kpage').hidden=true;showView('tr');openTree(en.t)}else{$('kpage').hidden=true;showView('map');const e=EVENTS.find(x=>x.id===en.e);if(e)selectEvent(e,{pan:!!e.ll})}}finally{hLock=false}hSync();return}return ha.apply(this,arguments)};
+ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-dc]');if(b&&!hLock)setTimeout(()=>{hPush({d:b.dataset.dc});const pv=HIST[hIdx-1];if(pv&&pv.v==='dc'){HIST.splice(hIdx-1,1);hIdx--;hSync()}},0)},true);
+ const ot=openTree;openTree=function(k){const r=ot.apply(this,arguments);if(!hLock){hPush({t:k});}return r};
+ const se=selectEvent;selectEvent=function(e,opt){const r=se.apply(this,arguments);try{if(e&&!$('v-map').hidden)hPush({e:e.id})}catch(_){}return r};
+ const openPops=()=>['glpop','pppop','ovpop','trpop','setpop'].map(id=>$(id)).filter(p=>p&&!p.hidden);
+ $('hback').onclick=()=>{const P=openPops();if(P.length){P.forEach(p=>{if(p.id==='setpop'&&typeof closeSet==='function')closeSet();else p.hidden=true});try{closeBubble(true)}catch(_){}hSync();return}if(!$('kpage').hidden&&hIdx<=0){$('kpage').hidden=true;return}if(hIdx>0){hIdx--;hApply(HIST[hIdx])}};
+ const hs=hSync;hSync=function(){hs();$('hback').disabled=hIdx<=0&&!openPops().length&&$('kpage').hidden};
+ document.addEventListener('click',()=>setTimeout(hSync,50),true)}

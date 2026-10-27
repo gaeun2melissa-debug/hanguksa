@@ -285,3 +285,14 @@ function GLRE_SET(){window.GLRE2=new RegExp('('+Object.keys(GLOSS).sort((a,b)=>b
 const GL_NOT={'동인':/^도/,'서인':/^도|^주/,'남인':/^도/,'북인':/^도/,'노론':/^문/,'사림':/^원/};
 glx=function(s,skip){const seen=new Set();return esc(s).replace(GLRE2,(m,...a)=>{const off=a[a.length-2],str=a[a.length-1];const nx=str.slice(off+m.length,off+m.length+2);if(GL_NOT[m]&&GL_NOT[m].test(nx))return m;if(seen.has(m)||(skip&&skip.includes(m)))return m;seen.add(m);return `<span class="gw${TREE_OF[m]?' tr':''}" role="button" tabindex="0" data-gl="${m}">${m}</span>`})};
 
+/* 자주 나오는 사건 이름도 낱말 풀이에 */
+Object.assign(GLOSS,Object.fromEntries(Object.entries({
+'갑오개혁':'1894~1895년 군국기무처와 김홍집 내각이 추진한 근대적 개혁. 신분제 폐지, 과거제 폐지, 은 본위 화폐 등을 시행하였다.',
+'을미개혁':'1895년 을미사변 뒤 친일 내각이 추진한 개혁. 단발령, 태양력 사용, 종두법 실시 등.',
+'갑신정변':'1884년 김옥균 등 급진 개화파가 일본의 도움을 받아 일으킨 정변. 청군의 개입으로 3일 만에 실패하였다.',
+'임오군란':'1882년 차별 대우에 불만을 품은 구식 군인들이 일으킨 난. 청이 군대를 보내 진압하고 간섭을 강화하였다.',
+'강화도 조약':'1876년 조선이 일본과 맺은 최초의 근대적 조약이자 불평등 조약. 부산 등 3개 항구를 열었다.',
+'을사늑약':'1905년 일본이 강제로 맺은 조약. 대한 제국의 외교권을 빼앗고 통감부를 두었다.',
+'위화도 회군':'1388년 요동 정벌에 나선 이성계가 위화도에서 군대를 돌려 정권을 잡은 사건.',
+'무신 정변':'1170년 정중부 등 무신들이 문신 중심 정치에 반발해 일으킨 정변. 이후 약 100년간 무신 정권이 이어졌다.'
+}).filter(([k])=>!GLOSS[k])));
