@@ -15,7 +15,7 @@ function vSlice(){const sc=$('ovscroll'),cw=Math.max(280,sc.clientWidth-20),out=
   for(const s of $('ovchart').querySelectorAll('.hsec')){const top=s.querySelector('.hztop');if(!top)continue;const r0=top.getBoundingClientRect(),W=top.scrollWidth||r0.width,H=top.offsetHeight;
     const iv=[],bx=[];top.querySelectorAll('*').forEach(el=>{if(el.children.length&&!(el instanceof SVGElement))return;const r=el.getBoundingClientRect();if(!r.width||!r.height)return;const L=r.left-r0.left,T=r.top-r0.top;if(r.height<H*.8)bx.push([L,L+r.width,T,T+r.height]);if(r.width>cw*.6)return;iv.push([L-3,L+r.width+3])});
     const ok=x=>!iv.some(([a,b])=>x>a&&x<b);const Wc=Math.min(W,Math.max(0,...iv.map(q=>q[1]))+12);let x0=0;const rows=[];
-    const nR=Math.max(1,Math.ceil((Wc-2)/(cw*1.0)));let left=nR;while(x0<Wc-2){const step=(Wc-x0)/left;let x1=Math.min(Wc,x0+Math.min(cw,step));if(x1<Wc-2){let best=null;for(let dd=0;dd<cw*.3&&best==null;dd+=4){if(x1-dd>x0+cw*.4&&ok(x1-dd))best=x1-dd;else if(x1+dd<=x0+cw&&ok(x1+dd))best=x1+dd}if(best!=null)x1=best}rows.push([x0,x1]);x0=x1;left=Math.max(1,left-1)}
+    const nR=Math.max(1,Math.ceil((Wc-2)/(cw*1.0)));let left=nR;while(x0<Wc-2){const step=(Wc-x0)/left;let x1=Math.min(Wc,x0+Math.min(cw,step));if(x1<Wc-2){const cutN=c=>iv.reduce((n,[a,b])=>n+(c>a&&c<b?1:0),0);let best=x1,bc=1e9;for(let c=x0+cw*.3;c<=Math.min(Wc,x0+cw);c+=3){const sc=cutN(c)*1000+Math.abs(c-x1);if(sc<bc){bc=sc;best=c}}x1=best}rows.push([x0,x1]);x0=x1;left=Math.max(1,left-1)}
     const inner=top.outerHTML;
     out.push(`<section class="ovsec vsec vcut" data-sec="${s.dataset.sec}">${rows.map(([a,b])=>{const ys=bx.filter(q=>q[1]>a&&q[0]<b);const y0=Math.max(0,Math.min(...ys.map(q=>q[2]))-6),y1=Math.min(H,Math.max(...ys.map(q=>q[3]))+6);const t=isFinite(y0)?y0:0,h=isFinite(y1)?y1-t:H;return `<div class="vrow" style="width:${Math.ceil(b-a)}px;height:${h}px"><div class="vrin" style="left:${-a}px;top:${-t}px;width:${W}px;height:${H}px">${inner}</div></div>`}).join('')}</section>`)}
   $('v-ov').classList.remove('hzsplit');$('ovchart').innerHTML=out.join('')}
@@ -621,3 +621,15 @@ document.querySelectorAll('.pin.flagpin .psh').forEach(e=>{e.setAttribute('cx',0
    let M=meas();const N={};for(const k in M){const {W,cw}=M[k];if(!W)continue;const q=W/cw;N[k]=Math.max(1,q-Math.floor(q)>.3?Math.ceil(q):Math.floor(q))}
    for(let it=0;it<2;it++){for(const k in M){const {W,cw}=M[k];if(!W||!N[k])continue;const tgt=N[k]*cw*.97;F[k]=Math.max(.85,Math.min(9,(F[k]||1)*tgt/W))}if(it<1)M=meas()}
    window.HZ_GAPF=F;const r=bc.apply(this,arguments);window.HZ_GAPF={};return r}}
+/* 연대표 세로: 줄 경계에서 글씨가 잘리지 않게 — 글씨는 자기 자리(가운데)가 있는 줄에 통째로 보이고, 다른 줄 것은 숨김 */
+{const vs=vSlice;vSlice=function(){const r=vs.apply(this,arguments);if(window.__ovMeasure)return r;try{vFix()}catch(_){}return r};
+ window.__vFix=()=>vFix();function vFix(){const sc=$("ovscroll"),cw=Math.max(280,sc.clientWidth-20);
+  document.querySelectorAll('#ovchart .vrow').forEach(row=>{const inn=row.querySelector('.vrin');if(!inn)return;const a=-parseFloat(inn.style.left)||0,w=parseFloat(row.style.width)||row.clientWidth,b=a+w;
+   const pad=Math.max(0,Math.min(36,(cw-w)/2));row.style.width=Math.min(cw,w+pad*2)+'px';inn.style.left=(-(a-pad))+'px';
+   const r0=inn.getBoundingClientRect(),ox=r0.left;
+   inn.querySelectorAll('*').forEach(el=>{if(el.children.length&&!(el instanceof SVGElement))return;const r=el.getBoundingClientRect();if(!r.width)return;const L=r.left-ox,R=r.right-ox;
+     if(r.width>cw*.6){const cl=Math.max(0,a-L),cr=Math.max(0,R-b);if(cl||cr)el.style.clipPath=`inset(0px ${cr}px 0px ${cl}px)`;return}
+     const c=(L+R)/2;if(c<a||c>=b){el.style.visibility='hidden';return}
+    });
+   const rr=row.getBoundingClientRect(),sec=row.closest('.ovsec'),sr=sec?sec.getBoundingClientRect():rr,vis0=Math.max(rr.left,sr.left)-ox,vis1=Math.min(rr.right,sr.right,innerWidth)-ox;
+   inn.querySelectorAll('.hzn').forEach(bt=>{if(getComputedStyle(bt).visibility==='hidden')return;const sp=bt.firstElementChild&&getComputedStyle(bt.firstElementChild).visibility!=='hidden'?bt.firstElementChild:bt;sp.style.translate='';const q=sp.getBoundingClientRect();if(!q.width)return;const L=q.left-ox,R=q.right-ox;let dx=0;if(L<vis0+2)dx=vis0+2-L;else if(R>vis1-2)dx=vis1-2-R;if(dx&&q.width<vis1-vis0-4){if(getComputedStyle(sp).display==="inline")sp.style.display="inline-block";sp.style.translate=`${dx.toFixed(1)}px 0`}})})}}
