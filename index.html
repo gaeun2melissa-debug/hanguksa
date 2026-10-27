@@ -4865,7 +4865,7 @@ document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelec
 {const FR=3,T0=-18,T1=369,LL=[127.11,37.52];const deg=X(1)-X(0);const lay=el('g',{},G.terr);
  const cp=el('clipPath',{id:'bjgrow',clipPathUnits:'userSpaceOnUse'},$('defs')),cpp=el('path',{},cp);
  const ci=el('circle',{cx:X(LL[0]),cy:Y(LL[1]),r:0,'clip-path':'url(#bjgrow)',style:'stroke:none'},lay);let shown=false,grow=0,ra=0,R1=0,rt=0;
- function upd(){try{const on=pos.i===FR,t=curT(),h=shapes.get('mahan');lay.style.display=on?'':'none';if(!on||!h)return;if(G.terr.lastChild!==lay)G.terr.appendChild(lay);
+ function upd(){try{const h=shapes.get('mahan');const on=pos.i===FR&&h&&h.el.style.visibility!=='hidden',t=curT();lay.style.display=on?'':'none';if(!on||!h)return;if(G.terr.lastChild!==lay)G.terr.appendChild(lay);
    const d=h.el.getAttribute('d');if(cpp.getAttribute('d')!==d){cpp.setAttribute('d',d);try{const bb=h.el.getBBox(),cx=X(LL[0]),cy=Y(LL[1]);R1=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))}catch(_){R1=deg*3}}
    ci.style.fill=h.el.dataset.full||STATE_FULL();
    if(t<T0-1e-6||t>=T1-1e-6){ci.setAttribute('r',0);shown=false;cancelAnimationFrame(ra);grow=0;return}
@@ -4875,7 +4875,7 @@ document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelec
  const STATE_FULL=()=>{const c=shapes.get('mahan');return c&&c.base?c.base:'color-mix(in srgb,var(--c-baekje) 66%,var(--land))'};
  {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);upd();return r}}
  {const af=applyFrame;applyFrame=function(){shown=false;grow=0;const r=af.apply(this,arguments);upd();return r}}
- upd()}
+ setInterval(()=>{if(pos.i===FR&&lay.style.display==='none')upd()},300);upd()}
 /* 영토 변화를 역사 흐름대로: 한 장면 안에서 다음 장면 영토로 시간에 맞춰 조금씩 바뀜 (장면 경계에서 한번에 바뀌지 않게) */
 {const EXC={3:['mahan','jinhan','byeonhan','goguryeo'],6:['silla','goguryeo','gaya'],10:['taebong']};const cache=new Map();let lastU=0,lastP=-1,lastI=-1;
  const pairs=i=>{if(cache.has(i))return cache.get(i);const A=FRAMES[i],B=FRAMES[i+1],L=[];
