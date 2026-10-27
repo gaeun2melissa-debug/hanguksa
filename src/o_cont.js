@@ -437,7 +437,7 @@ function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const 
 applyNameT();
 /* 장면 중간에 세워진 나라: 세운 해부터 땅이 생기고(그 전엔 신라 땅 색), 이름이 바뀌면 색도 바뀜.
    재생 중에는 도읍에서 사악 퍼지듯이 */
-const STATE_STEPS={taebong:{pre:'silla',steps:[[901,null,[126.55,37.97]],[918,'goryeo',[127.31,38.25]]]},goguryeo:{pre:null,steps:[[-37,null,[125.4,41.27]]]},mahan:{preTint:1,keepLab:1,steps:[[369,null,[127.11,37.52]]],ban:{y:369,t:'백제, 마한 복속',tp:['pol'],ll:[127.11,37.52]}},jinhan:{preTint:1,keepLab:1,steps:[[-57,null,[129.21,35.83]]]},byeonhan:{preTint:1,keepLab:1,steps:[[42,null,[128.88,35.23]]]}};
+const STATE_STEPS={taebong:{pre:'silla',steps:[[901,null,[126.55,37.97]],[918,'goryeo',[127.31,38.25]]]},goguryeo:{pre:null,steps:[[-37,null,[125.4,41.27]]]},baekje:{fr:7,keepLab:1,hideLab:1,steps:[[660,'silla',[126.92,36.28]]]},mahan:{preTint:1,keepLab:1,steps:[[369,null,[127.11,37.52]]],ban:{y:369,t:'백제, 마한 복속',tp:['pol'],ll:[127.11,37.52]}},jinhan:{preTint:1,keepLab:1,steps:[[-57,null,[129.21,35.83]]]},byeonhan:{preTint:1,keepLab:1,steps:[[42,null,[128.88,35.23]]]}};
 const tcol=k=>`color-mix(in srgb,var(--c-${k}) 66%,var(--land))`,lcol=k=>`color-mix(in srgb,var(--c-${k}) 52%,var(--ink))`;
 function spreadFill(c,fill,ll){const p=c.el;if(c.sp){c.sp.end()}if(!fill)fill=getComputedStyle(p).fill;
   const cid='sp'+Math.random().toString(36).slice(2,8),cp=el('clipPath',{id:cid},$('defs')),ci=el('circle',{cx:X(ll[0]),cy:Y(ll[1]),r:0},cp);
@@ -446,11 +446,12 @@ function spreadFill(c,fill,ll){const p=c.el;if(c.sp){c.sp.end()}if(!fill)fill=ge
   cl.style.opacity='1';const t0=performance.now(),D=2000;let raf=0;const end=()=>{cancelAnimationFrame(raf);p.style.transition='none';p.style.fill=fill;p.style.opacity='';cl.remove();cp.remove();c.sp=null};c.sp={end};
   const step=now=>{const u=Math.min(1,(now-t0)/D),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(R*k).toFixed(1));if(u<1)raf=requestAnimationFrame(step);else end()};raf=requestAnimationFrame(step)}
 function applyStates(fresh){try{const t=curT();for(const [id,S] of Object.entries(STATE_STEPS)){const c=shapes.get(id);if(!c)continue;
+    if(S.fr!=null&&pos.i!==S.fr){if(c.stk!=null){c.stk=null;c.lab.g.style.visibility=''}continue}
     if(fresh||c.base==null){c.base=c.el.style.fill||getComputedStyle(c.el).fill;c.lbase=c.lab.t.style.fill;c.stk=null}
     let k=-1;S.steps.forEach(([y],i)=>{if(t>=y-1e-6)k=i});const key=String(k);if(c.stk===key)continue;
     const hid=k<0&&!S.pre&&!S.preTint;const fill=k<0?(S.preTint?`color-mix(in srgb,${c.base} 32%,var(--land))`:S.pre?tcol(S.pre):c.base):(S.steps[k][1]?tcol(S.steps[k][1]):c.base),lf=k<0?null:(S.steps[k][1]?lcol(S.steps[k][1]):c.lbase);
     const anim=!fresh&&c.stk!=null&&+key>+c.stk&&!reduceMotion;c.stk=key;
-    c.lab.g.style.visibility=k<0&&!S.keepLab?'hidden':'';if(lf)c.lab.t.style.fill=lf;
+    c.lab.g.style.visibility=(k<0&&!S.keepLab)||(k>=0&&S.hideLab)?'hidden':'';if(lf)c.lab.t.style.fill=lf;
     if(anim&&S.ban&&k>=0){try{const b=Object.assign({T:S.ban.y,f:pos.i,id:-1},S.ban);topBanner(b)}catch(_){}}
     if(anim)spreadFill(c,fill,S.steps[k][2]);else{if(c.sp)c.sp.end();c.el.style.transition='none';c.el.style.fill=fill;c.el.style.opacity=hid?'0':''}}}catch(_){}}
 {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStates(false);return r}}
@@ -653,3 +654,14 @@ document.querySelectorAll('.pin.flagpin .psh').forEach(e=>{e.setAttribute('cx',0
    if(anim){snap.forEach(([d,f])=>add(d,f));const P=FRAMES[i-1]||{st:[]};(FRAMES[i].st||[]).forEach(s=>{if(!P.st.some(x=>x.id===s.id||x.id===s.from))return;const c=shapes.get(s.id);if(c&&visOK(c.el))add(s.d,curFill(c))});bT=setTimeout(()=>{if(pos.i===i)flowBase(i)},2150)}
    else flowBase(i);return r};
  flowBase(pos.i)}
+/* 삼국 시대부터: 한반도 땅에 주인 없는 흰 땅이 안 보이게, 가장 가까운 나라 색으로 메움 (실제 영토 밑에 깔림) */
+{const NS='http://www.w3.org/2000/svg';const cp=el('clipPath',{id:'korclip',clipPathUnits:'userSpaceOnUse'},$('defs'));el('path',{d:LAND.korHi||LAND.kor},cp);
+ const fill=document.createElementNS(NS,'g');fill.setAttribute('clip-path','url(#korclip)');fill.setAttribute('class','terrfill');
+ const deg=X(1)-X(0);
+ function build(){fill.innerHTML='';if(pos.i<4){fill.remove();return}const base=G.terr.querySelector('.terrbase');if(base)G.terr.insertBefore(fill,base);else G.terr.insertBefore(fill,G.terr.firstChild);
+   const sts=(FRAMES[pos.i].st||[]).map(s=>shapes.get(s.id)).filter(c=>c&&getComputedStyle(c.el).opacity>.05&&getComputedStyle(c.el).visibility!=='hidden');
+   sts.forEach(c=>{const f=getComputedStyle(c.el).fill;if(!f||f==='none'||/url/.test(f))return;const p=document.createElementNS(NS,'path');p.setAttribute('d',c.el.getAttribute('d'));p.style.fill=f;p.style.stroke=f;p.style.strokeWidth=(deg*1.6)+'px';p.style.strokeLinejoin='round';fill.appendChild(p)})}
+ const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);clearTimeout(build.t);build();build.t=setTimeout(build,2200);return r};
+ {let lt=0;const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);const n=performance.now();if(n-lt>700){lt=n;build()}return r}}
+ build()}
+document.querySelectorAll('.pin .sealt').forEach(t=>t.setAttribute('y','0.5'));
