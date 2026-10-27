@@ -15,7 +15,7 @@ function vSlice(){const sc=$('ovscroll'),cw=Math.max(280,sc.clientWidth-20),out=
   for(const s of $('ovchart').querySelectorAll('.hsec')){const top=s.querySelector('.hztop');if(!top)continue;const r0=top.getBoundingClientRect(),W=top.scrollWidth||r0.width,H=top.offsetHeight;
     const iv=[],bx=[];top.querySelectorAll('*').forEach(el=>{if(el.children.length&&!(el instanceof SVGElement))return;const r=el.getBoundingClientRect();if(!r.width||!r.height)return;const L=r.left-r0.left,T=r.top-r0.top;if(r.height<H*.8)bx.push([L,L+r.width,T,T+r.height]);if(r.width>cw*.6)return;iv.push([L-3,L+r.width+3])});
     const ok=x=>!iv.some(([a,b])=>x>a&&x<b);const Wc=Math.min(W,Math.max(0,...iv.map(q=>q[1]))+12);let x0=0;const rows=[];
-    while(x0<Wc-2){let x1=Math.min(Wc,x0+cw);if(x1<Wc){let c=x1;while(c>x0+cw*.45&&!ok(c))c-=4;if(c>x0+cw*.45)x1=c}rows.push([x0,x1]);x0=x1}
+    const nR=Math.max(1,Math.ceil((Wc-2)/(cw*1.0)));let left=nR;while(x0<Wc-2){const step=(Wc-x0)/left;let x1=Math.min(Wc,x0+Math.min(cw,step));if(x1<Wc-2){let best=null;for(let dd=0;dd<cw*.3&&best==null;dd+=4){if(x1-dd>x0+cw*.4&&ok(x1-dd))best=x1-dd;else if(x1+dd<=x0+cw&&ok(x1+dd))best=x1+dd}if(best!=null)x1=best}rows.push([x0,x1]);x0=x1;left=Math.max(1,left-1)}
     const inner=top.outerHTML;
     out.push(`<section class="ovsec vsec vcut" data-sec="${s.dataset.sec}">${rows.map(([a,b])=>{const ys=bx.filter(q=>q[1]>a&&q[0]<b);const y0=Math.max(0,Math.min(...ys.map(q=>q[2]))-6),y1=Math.min(H,Math.max(...ys.map(q=>q[3]))+6);const t=isFinite(y0)?y0:0,h=isFinite(y1)?y1-t:H;return `<div class="vrow" style="width:${Math.ceil(b-a)}px;height:${h}px"><div class="vrin" style="left:${-a}px;top:${-t}px;width:${W}px;height:${H}px">${inner}</div></div>`}).join('')}</section>`)}
   $('v-ov').classList.remove('hzsplit');$('ovchart').innerHTML=out.join('')}
@@ -612,3 +612,12 @@ document.querySelectorAll('.pin.flagpin .psh').forEach(e=>{e.setAttribute('cx',0
 /* 렉 줄이기: 재생 중 작은 지도 자리 계산은 0.3초에 한 번만 */
 {const thr=(fn,ms)=>{let last=0,tm=0;return function(){const now=performance.now();if(!playing||now-last>ms){last=now;clearTimeout(tm);tm=0;return fn.apply(this,arguments)}if(!tm)tm=setTimeout(()=>{tm=0;last=performance.now();fn()},ms-(now-last))}};
  updateInset=thr(updateInset,300);placeInset=thr(placeInset,300)}
+/* 연대표 세로: 줄마다 화면 폭을 꽉 채우도록 시대별 간격을 늘려서 다시 배치 */
+{const vs=vSlice;vSlice=function(){if(window.__ovMeasure){const sc=$('ovscroll'),cw=Math.max(280,sc.clientWidth-20),M={};
+   for(const s of $('ovchart').querySelectorAll('.hsec')){const top=s.querySelector('.hztop');if(!top)continue;const r0=top.getBoundingClientRect();let R=0;top.querySelectorAll('*').forEach(el=>{if(el.children.length&&!(el instanceof SVGElement))return;const r=el.getBoundingClientRect();if(!r.width||r.width>cw*.6)return;R=Math.max(R,r.right-r0.left)});M[s.dataset.sec]={W:R+12,cw}}
+   window.__ovM=M;return}return vs.apply(this,arguments)};
+ const bc=buildCont;buildCont=function(){if(ovDir!=='v'||window.__ovMeasure)return bc.apply(this,arguments);
+   let F={};const meas=()=>{window.HZ_GAPF=F;window.__ovMeasure=1;try{bc.apply(this,arguments)}finally{window.__ovMeasure=0}return window.__ovM||{}};
+   let M=meas();const N={};for(const k in M){const {W,cw}=M[k];if(!W)continue;const q=W/cw;N[k]=Math.max(1,q-Math.floor(q)>.3?Math.ceil(q):Math.floor(q))}
+   for(let it=0;it<2;it++){for(const k in M){const {W,cw}=M[k];if(!W||!N[k])continue;const tgt=N[k]*cw*.97;F[k]=Math.max(.85,Math.min(9,(F[k]||1)*tgt/W))}if(it<1)M=meas()}
+   window.HZ_GAPF=F;const r=bc.apply(this,arguments);window.HZ_GAPF={};return r}}
