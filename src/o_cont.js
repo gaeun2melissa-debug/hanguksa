@@ -568,7 +568,7 @@ document.querySelectorAll('.pin.flagpin').forEach(g=>{const p=g.querySelector('.
 /* 독립운동(만세 운동 등) 깃발은 태극기 */
 document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelector('.flg');if(!f||g.querySelector('.tgk'))return;f.classList.add('tgflag');
  const t=document.createElementNS('http://www.w3.org/2000/svg','g');t.setAttribute('class','tgk');t.setAttribute('transform','translate(0,4.6)');
- t.innerHTML='<g transform="rotate(35 7.9 -20.2)"><path class="tgr" d="M5.300000000000001,-20.2A2.6,2.6 0 0 1 10.5,-20.2A1.3,1.3 0 0 1 7.9,-20.2A1.3,1.3 0 0 0 5.300000000000001,-20.2Z"/><path class="tgb" d="M5.300000000000001,-20.2A2.6,2.6 0 0 0 10.5,-20.2A1.3,1.3 0 0 0 7.9,-20.2A1.3,1.3 0 0 1 5.300000000000001,-20.2Z"/></g><path class="tgt" d="M3.01,-24.99L1.70,-23.10M3.66,-24.54L2.34,-22.66M4.30,-24.10L2.99,-22.21M14.08,-22.86L13.61,-23.59M13.30,-24.06L12.82,-24.79M13.43,-22.44L12.17,-24.36M12.78,-22.01L12.30,-22.74M11.99,-23.21L11.52,-23.94M1.69,-17.06L3.05,-15.21M2.32,-17.53L2.83,-16.83M3.17,-16.37L3.68,-15.67M2.95,-17.99L4.31,-16.14M12.79,-15.41L13.28,-16.13M13.60,-16.59L14.10,-17.30M12.14,-15.86L12.64,-16.57M12.96,-17.03L13.46,-17.74M11.50,-16.30L12.00,-17.01M12.32,-17.47L12.81,-18.19"/>';
+ t.innerHTML='<clipPath id="tgcl"><circle cx="7.9" cy="-20.2" r="2.6"/></clipPath><circle class="tgb" cx="7.9" cy="-20.2" r="2.6"/><path class="tgsp" clip-path="url(#tgcl)" d="M7.02,-22.37 L7.29,-22.41 L7.55,-22.43 L7.81,-22.41 L8.06,-22.37 L8.31,-22.30 L8.53,-22.21 L8.74,-22.09 L8.94,-21.95 L9.11,-21.79 L9.26,-21.62 L9.39,-21.43 L9.49,-21.23 L9.57,-21.03 L9.63,-20.82 L9.65,-20.61 L9.66,-20.41 L9.64,-20.20 L9.60,-20.01 L9.53,-19.82 L9.45,-19.65 L9.35,-19.49 L9.23,-19.34 L9.10,-19.22 L8.96,-19.11 L8.80,-19.02 L8.65,-18.95 L8.49,-18.90 L8.32,-18.87 L8.16,-18.86 L8.00,-18.87 L7.85,-18.89 L7.71,-18.94 L7.57,-19.00 L7.45,-19.07 L7.33,-19.16 L7.24,-19.25 L7.15,-19.36 L7.08,-19.47 L7.03,-19.58 L6.99,-19.70 L6.96,-19.82 L6.95,-19.94 L6.96,-20.05 L6.98,-20.16 L7.01,-20.27 L7.05,-20.36 L7.10,-20.45 L7.16,-20.53 L7.23,-20.60 L7.30,-20.65 L7.38,-20.70 L7.46,-20.73 L7.54,-20.76 L7.62,-20.77 L7.69,-20.77 L7.77,-20.77 L7.84,-20.75 L7.90,-20.72 L7.96,-20.69 L8.01,-20.66"/><path class="tgt" d="M3.01,-24.99L1.70,-23.10M3.66,-24.54L2.34,-22.66M4.30,-24.10L2.99,-22.21M14.08,-22.86L13.61,-23.59M13.30,-24.06L12.82,-24.79M13.43,-22.44L12.17,-24.36M12.78,-22.01L12.30,-22.74M11.99,-23.21L11.52,-23.94M1.69,-17.06L3.05,-15.21M2.32,-17.53L2.83,-16.83M3.17,-16.37L3.68,-15.67M2.95,-17.99L4.31,-16.14M12.79,-15.41L13.28,-16.13M13.60,-16.59L14.10,-17.30M12.14,-15.86L12.64,-16.57M12.96,-17.03L13.46,-17.74M11.50,-16.30L12.00,-17.01M12.32,-17.47L12.81,-18.19"/>';
  f.after(t)});
 /* 백제: 기원전 18년 위례성에서 작게 생겨(둥) 369년 마한 복속까지 조금씩 넓어짐 */
 {const FR=3,T0=-18,T1=369,LL=[127.11,37.52];const deg=X(1)-X(0);const lay=el('g',{},G.terr);
@@ -590,7 +590,8 @@ document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelec
 /* 영토 변화를 역사 흐름대로: 한 장면 안에서 다음 장면 영토로 시간에 맞춰 조금씩 바뀜 (장면 경계에서 한번에 바뀌지 않게) */
 {const EXC={3:['mahan','jinhan','byeonhan','goguryeo'],6:['silla','goguryeo','gaya'],10:['taebong']};const cache=new Map();let lastU=0,lastP=-1,lastI=-1;
  const pairs=i=>{if(cache.has(i))return cache.get(i);const A=FRAMES[i],B=FRAMES[i+1],L=[];
-   if(A&&B&&typeof flubber!=='undefined'){const ex=new Set(EXC[i]||[]);A.st.forEach(s=>{if(ex.has(s.id))return;const n=B.st.find(x=>x.id===s.id);if(!n||n.d===s.d)return;L.push({id:s.id,d0:s.d,d1:n.d,l0:s.lab,l1:n.lab,f:null})})}
+   const same=A&&B&&A.st.length===B.st.length&&A.st.every(x=>B.st.some(y=>y.id===x.id));
+   if(same&&typeof flubber!=='undefined'){const ex=new Set(EXC[i]||[]);A.st.forEach(s=>{if(ex.has(s.id))return;const n=B.st.find(x=>x.id===s.id);if(!n||n.d===s.d)return;L.push({id:s.id,d0:s.d,d1:n.d,l0:s.lab,l1:n.lab,f:null})})}
    cache.set(i,L);return L};
  function flow(force){try{if(reduceMotion)return;const i=pos.i,L=pairs(i);if(!L.length)return;const now=performance.now();if(!force&&now-lastU<(playing?180:90))return;
    const A=FRAMES[i],t1=FRAMES[i+1].t,p=Math.max(0,Math.min(1,(curT()-A.t)/(t1-A.t)));if(!force&&i===lastI&&Math.abs(p-lastP)<.004)return;lastU=now;lastP=p;lastI=i;
@@ -635,3 +636,20 @@ document.querySelectorAll('.pin.flagpin .psh').forEach(e=>{e.setAttribute('cx',0
     });
    const rr=row.getBoundingClientRect(),sec=row.closest('.ovsec'),sr=sec?sec.getBoundingClientRect():rr,vis0=Math.max(rr.left,sr.left)-ox,vis1=Math.min(rr.right,sr.right,innerWidth)-ox;
    inn.querySelectorAll('.hzn').forEach(bt=>{if(getComputedStyle(bt).visibility==='hidden')return;const sp=bt.firstElementChild&&getComputedStyle(bt.firstElementChild).visibility!=='hidden'?bt.firstElementChild:bt;sp.style.translate='';const q=sp.getBoundingClientRect();if(!q.width)return;const L=q.left-ox,R=q.right-ox;let dx=0;if(L<vis0+2)dx=vis0+2-L;else if(R>vis1-2)dx=vis1-2-R;if(dx&&q.width<vis1-vis0-4){if(getComputedStyle(sp).display==="inline")sp.style.display="inline-block";sp.style.translate=`${dx.toFixed(1)}px 0`}})})}}
+/* 영토 바뀔 때 빈틈·흰 바탕 막기: 영토 밑에 '바탕 영토'를 깔아 둠
+   (바뀌는 동안엔 이전 나라 + 바뀔 모양, 그 뒤엔 지금 모양 + 다음 장면 모양) → 틈이 나도 흰색이 아니라 원래 있던 나라 색이 보임 */
+{const NS='http://www.w3.org/2000/svg';const base=document.createElementNS(NS,'g');base.setAttribute('class','terrbase');G.terr.insertBefore(base,G.terr.firstChild);
+ const EXC2={3:['mahan','jinhan','byeonhan','goguryeo'],6:['silla','goguryeo','gaya'],10:['taebong']};
+ const visOK=el=>{const cs=getComputedStyle(el);return cs.visibility!=='hidden'&&cs.display!=='none'&&+cs.opacity>.05&&el.style.opacity!=='0'};
+ const add=(d,fill)=>{if(!d||!fill||fill==='none')return;const p=document.createElementNS(NS,'path');p.setAttribute('d',d);p.style.fill=fill;p.style.stroke=fill;p.style.strokeWidth='3px';p.style.strokeLinejoin='round';p.style.vectorEffect='non-scaling-stroke';base.appendChild(p)};
+ const curFill=c=>getComputedStyle(c.el).fill;
+ function keepFirst(){if(G.terr.firstChild!==base)G.terr.insertBefore(base,G.terr.firstChild)}
+ function flowBase(i){base.innerHTML='';keepFirst();const B=FRAMES[i+1],A=FRAMES[i],ex=new Set(EXC2[i]||[]);
+   const same=A&&B&&A.st.length===B.st.length&&A.st.every(x=>B.st.some(y=>y.id===x.id));if(same)B.st.forEach(s=>{if(ex.has(s.id)||!A.st.some(x=>x.id===s.id))return;const c=shapes.get(s.id);if(c&&visOK(c.el))add(s.d,curFill(c))});
+   A&&A.st.forEach(s=>{const c=shapes.get(s.id);if(c&&visOK(c.el))add(c.el.getAttribute('d'),curFill(c))})}
+ let bT=0;const af=applyFrame;applyFrame=function(i,anim){
+   const snap=anim?[...G.terr.children].filter(p=>p.tagName==='path'&&visOK(p)).map(p=>[p.getAttribute('d'),getComputedStyle(p).fill]):[];
+   const r=af.apply(this,arguments);clearTimeout(bT);base.innerHTML='';keepFirst();
+   if(anim){snap.forEach(([d,f])=>add(d,f));const P=FRAMES[i-1]||{st:[]};(FRAMES[i].st||[]).forEach(s=>{if(!P.st.some(x=>x.id===s.id||x.id===s.from))return;const c=shapes.get(s.id);if(c&&visOK(c.el))add(s.d,curFill(c))});bT=setTimeout(()=>{if(pos.i===i)flowBase(i)},2150)}
+   else flowBase(i);return r};
+ flowBase(pos.i)}
