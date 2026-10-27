@@ -469,7 +469,8 @@ applyStates(true);
  const sv=setVB;setVB=function(){const r=sv.apply(this,arguments);landLOD();return r}}
 /* 렉 줄이기: 움직이는 동안만 가벼운 클립, 멈추면 매끈한 마스크 */
 {const G2=['chn','terr'].map(id=>$(id));let mT=0,moving=false;const setM=m=>{G2.forEach(g=>{if(!g)return;if(m){g.removeAttribute('clip-path');g.setAttribute('mask','url(#landmask)')}else{g.removeAttribute('mask');g.setAttribute('clip-path','url(#landclip)')}})};setM(true);
- const sv=setVB;setVB=function(){const r=sv.apply(this,arguments);if(!moving){moving=true;setM(false)}clearTimeout(mT);mT=setTimeout(()=>{moving=false;setM(true)},220);return r}}
+ const sv=setVB;setVB=function(){const r=sv.apply(this,arguments);if(!moving){moving=true;setM(false)}clearTimeout(mT);mT=setTimeout(()=>{moving=false;if(!playing)setM(true)},220);return r};
+ const p0=play,p1=pause;play=function(){const r=p0.apply(this,arguments);setM(false);return r};pause=function(){const r=p1.apply(this,arguments);if(!moving)setM(true);return r}}
 /* 배경 음악이 효과음(건국 '둥' 등) 때문에 멈추면 다시 켜기 (모바일 브라우저에서 음악이 끊기는 문제) */
 {const want=()=>bgOn==='file'&&SND.bgm&&(SND.when==='always'||playing)&&!document.hidden;
  const kick=()=>{try{if(want()&&BGA&&BGA.paused){const pr=BGA.play();if(pr&&pr.catch)pr.catch(()=>{})}if(AC&&AC.state!=='running'&&AC.state!=='closed'&&(want()||bgOn===true))AC.resume()}catch(_){}};
@@ -589,7 +590,7 @@ document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelec
  const pairs=i=>{if(cache.has(i))return cache.get(i);const A=FRAMES[i],B=FRAMES[i+1],L=[];
    if(A&&B&&typeof flubber!=='undefined'){const ex=new Set(EXC[i]||[]);A.st.forEach(s=>{if(ex.has(s.id))return;const n=B.st.find(x=>x.id===s.id);if(!n||n.d===s.d)return;L.push({id:s.id,d0:s.d,d1:n.d,l0:s.lab,l1:n.lab,f:null})})}
    cache.set(i,L);return L};
- function flow(force){try{if(reduceMotion)return;const i=pos.i,L=pairs(i);if(!L.length)return;const now=performance.now();if(!force&&now-lastU<90)return;
+ function flow(force){try{if(reduceMotion)return;const i=pos.i,L=pairs(i);if(!L.length)return;const now=performance.now();if(!force&&now-lastU<(playing?180:90))return;
    const A=FRAMES[i],t1=FRAMES[i+1].t,p=Math.max(0,Math.min(1,(curT()-A.t)/(t1-A.t)));if(!force&&i===lastI&&Math.abs(p-lastP)<.004)return;lastU=now;lastP=p;lastI=i;
    const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
    for(const q of L){const c=shapes.get(q.id);if(!c||(c.mr))continue;if(!q.f){try{q.f=flubber.interpolate(q.d0,q.d1,{maxSegmentLength:9})}catch(_){q.f=false}}if(!q.f)continue;
@@ -606,3 +607,8 @@ document.querySelectorAll('.pin.flagpin .psh').forEach(e=>{e.setAttribute('cx',0
 /* 마한·진한·변한 사이 경계선 없애기 */
 {const IDS=['mahan','jinhan','byeonhan'];const f=()=>IDS.forEach(id=>{const c=shapes.get(id);if(c){c.el.style.stroke='none'}});
  const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);f();return r};f()}
+/* 렉 줄이기: 재생 중 글자 배치는 0.15초에 한 번만 */
+{const sl=schedLabels;let last=0,tm=0;schedLabels=function(){const now=performance.now();if(!playing||now-last>150){last=now;return sl()}if(!tm)tm=setTimeout(()=>{tm=0;last=performance.now();sl()},150-(now-last))}}
+/* 렉 줄이기: 재생 중 작은 지도 자리 계산은 0.3초에 한 번만 */
+{const thr=(fn,ms)=>{let last=0,tm=0;return function(){const now=performance.now();if(!playing||now-last>ms){last=now;clearTimeout(tm);tm=0;return fn.apply(this,arguments)}if(!tm)tm=setTimeout(()=>{tm=0;last=performance.now();fn()},ms-(now-last))}};
+ updateInset=thr(updateInset,300);placeInset=thr(placeInset,300)}

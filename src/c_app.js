@@ -224,6 +224,11 @@ function placeOV(){const k=kNow();$('lshg').setAttribute('transform',`translate(
 
 /* 겹치는 글자 숨기기 */
 let labT=0;function schedLabels(){if(labT)return;labT=requestAnimationFrame(()=>{labT=0;placeLabels()})}
+/* 땅 위인지 빠르게 판정: 해안선을 한 번 작은 그림으로 그려 두고 점을 찍어 봄 */
+let LMASK=null;function landAt(x,y){if(!LMASK){try{const S=.5;const P=new Path2D((LAND.korHi||LAND.kor)+' '+LAND.ctx);const tmp=document.createElementNS('http://www.w3.org/2000/svg','path');tmp.setAttribute('d',LAND.ctx);svg.appendChild(tmp);const b1=tmp.getBBox();tmp.setAttribute('d',LAND.kor);const b2=tmp.getBBox();tmp.remove();
+  const x0=Math.min(b1.x,b2.x),y0=Math.min(b1.y,b2.y),x1=Math.max(b1.x+b1.width,b2.x+b2.width),y1=Math.max(b1.y+b1.height,b2.y+b2.height);const W=Math.ceil((x1-x0)*S),H=Math.ceil((y1-y0)*S);
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.setTransform(S,0,0,S,-x0*S,-y0*S);g.fill(P);g.lineWidth=3;g.stroke(P);LMASK={x0,y0,S,W,H,d:g.getImageData(0,0,W,H).data}}catch(_){LMASK={fail:1}}}
+ if(LMASK.fail)return true;const i=Math.floor((x-LMASK.x0)*LMASK.S),j=Math.floor((y-LMASK.y0)*LMASK.S);if(i<0||j<0||i>=LMASK.W||j>=LMASK.H)return false;return LMASK.d[(j*LMASK.W+i)*4+3]>40}
 function placeLabels(){
   const k=kNow(),boxes=[];
   const toS=(x,y)=>[(x-vb.x)/k,(y-vb.y)/k];
@@ -253,19 +258,19 @@ function placeLabels(){
     let ox=0,oy=0;{const W=svg.clientWidth,H=svg.clientHeight,m=40;if(o.terr&&o.terr.isPointInFill&&(sx<m||sy<m||sx>W-m||sy>H-m)){
       const ck2=[Math.round(vb.x/8),Math.round(vb.y/8),Math.round(vb.w/8),Math.round(o.x),Math.round(o.y)].join('|');
       if(!o.vc||o.vc.k!==ck2){let best=null,bd=1e18;const LKk=$('landk'),LCc=$('landc');
-        for(let i=1;i<10;i++)for(let j=1;j<7;j++){const px=W*i/10,py=H*j/7,q=new DOMPoint(vb.x+px*k,vb.y+py*k);let ok=false;try{ok=o.terr.isPointInFill(q)}catch(_){}if(!ok)continue;const dd=(px-sx)**2+(py-sy)**2;if(dd<bd){let land=false;try{land=LKk.isPointInFill(q)||LCc.isPointInFill(q)}catch(_){}if(land){bd=dd;best=[px,py]}}}
+        for(let i=1;i<10;i++)for(let j=1;j<7;j++){const px=W*i/10,py=H*j/7,q=new DOMPoint(vb.x+px*k,vb.y+py*k);if(!landAt(q.x,q.y))continue;let ok=false;try{ok=o.terr.isPointInFill(q)}catch(_){}if(!ok)continue;const dd=(px-sx)**2+(py-sy)**2;if(dd<bd){bd=dd;best=[px,py]}}
         o.vc={k:ck2,v:best}}
       if(o.vc.v){ox=o.vc.v[0]-sx;oy=o.vc.v[1]-sy;sx+=ox;sy+=oy}}}
     if(size>=n*11*.98*1.15){ // 영토 안에: 자리가 없으면 글씨를 줄이거나 조금 비켜서라도 안에 둔다
       while(fs>11&&size<n*fs*.98*1.15)fs-=1;
-      const LK=$('landk'),LC=$('landc');const outN=bx=>{const P=o.terr;if(!P||!P.isPointInFill)return 0;let c=0;for(let i=0;i<=3;i++)for(let j=0;j<=2;j++){const x=vb.x+(bx[0]+(bx[2]-bx[0])*i/3)*k,y=vb.y+(bx[1]+(bx[3]-bx[1])*j/2)*k;try{const q=new DOMPoint(x,y);if(!P.isPointInFill(q)||!(LK.isPointInFill(q)||LC.isPointInFill(q)))c++}catch(_){}}return c};
+      const LK=$('landk'),LC=$('landc');const outN=bx=>{const P=o.terr;if(!P||!P.isPointInFill)return 0;let c=0;for(let i=0;i<=3;i++)for(let j=0;j<=2;j++){const x=vb.x+(bx[0]+(bx[2]-bx[0])*i/3)*k,y=vb.y+(bx[1]+(bx[3]-bx[1])*j/2)*k;try{if(!landAt(x,y)){c++;continue}const q=new DOMPoint(x,y);if(!P.isPointInFill(q))c++}catch(_){}}return c};
       const ck=[pos.i,Math.round(vb.x),Math.round(vb.y),Math.round(vb.w),Math.round(sx),Math.round(sy),aPts.length,boxes.length,fs].join('|');
       let dy=0,dx=0,bs=1e9,w=0,hh=0,bfs=fs;
-      if(o.lc&&o.lc.k===ck){[dy,dx,w,hh,bfs]=o.lc.v;bs=0}
+      const nowT=performance.now();if(o.lc&&(o.lc.k===ck||(o.lc.i===pos.i&&nowT-o.lc.t<900&&Math.abs(o.lc.w-vb.w)<vb.w*.04&&Math.hypot(o.lc.sx-sx,o.lc.sy-sy)<14))){[dy,dx,w,hh,bfs]=o.lc.v;bs=0}
       const CAND=placeLabels.C||(placeLabels.C=(()=>{const r=[];for(const d of [0,1.1,-1.1,2.1,-2.1,3.1,-3.1,4.2,-4.2])for(const e of [0,.5,-.5,1,-1,1.6,-1.6])r.push([d,e,Math.abs(d)+Math.abs(e)*1.5]);return r.sort((p,q)=>p[2]-q[2])})());
       for(let f=fs;f>=11&&bs>=60;f-=1.5){const ww=n*f*.98/2+2,h2=f*.6*nl,fp=(fs-f)*2;
         for(const [d,e,c0] of CAND){if(c0+fp>=bs)break;const b=[sx+e*ww-ww,sy+d*f-h2,sx+e*ww+ww,sy+d*f+h2];let sc=c0+fp+(hit(b)?100:0);if(sc>=bs)continue;sc+=arrHitN(b)*10;if(sc>=bs)continue;sc+=outN(b)*60;if(sc<bs){bs=sc;dy=d*f;dx=e*ww;w=ww;hh=h2;bfs=f}}}
-      if(bs)o.lc={k:ck,v:[dy,dx,w,hh,bfs]};fs=bfs;
+      if(bs)o.lc={k:ck,v:[dy,dx,w,hh,bfs],t:performance.now(),i:pos.i,w:vb.w,sx,sy};fs=bfs;
       boxes.push([sx+dx-w,sy+dy-hh,sx+dx+w,sy+dy+hh]);
       o.t.style.fontSize=fs+'px';setX((dx+ox).toFixed(1));o.t.setAttribute('y',(dy+oy).toFixed(1));o.t.setAttribute('text-anchor','middle');o.g.classList.remove('out');continue}
     // 영토가 작으면 밖으로 빼고 선으로 잇기
