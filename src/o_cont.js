@@ -705,3 +705,33 @@ const DEEP={
  $('hback').onclick=()=>{const P=openPops();if(P.length){P.forEach(p=>{if(p.id==='setpop'&&typeof closeSet==='function')closeSet();else p.hidden=true});try{closeBubble(true)}catch(_){}hSync();return}if(!$('kpage').hidden&&hIdx<=0){$('kpage').hidden=true;return}if(hIdx>0){hIdx--;hApply(HIST[hIdx])}};
  const hs=hSync;hSync=function(){hs();$('hback').disabled=hIdx<=0&&!openPops().length&&$('kpage').hidden};
  document.addEventListener('click',()=>setTimeout(hSync,50),true)}
+/* 사전: 낱말 칸을 누르면 인물 사전처럼 따로 창 — 뜻, 자세히, 배경 이야기, 관련 사건·인물·낱말·구조도 */
+function openTerm(k){const p=$('kpage');const def=GLOSS[k]||'';
+ const evs=EVENTS.filter(e=>e.tp[0]!=='wld'||e.t.includes(k)).filter(e=>e.t===k||e.s===k||e.t.includes(k)||(e.x||'').includes(k)).sort((a,b)=>a.T-b.T).slice(0,24);
+ const main=EVENTS.find(e=>e.t===k||e.s===k)||evs.find(e=>e.t.includes(k));
+ const rows=(typeof DEEP!=='undefined'&&DEEP[k])||(main?[main.pp?['인물',main.pp]:null,main.vs?['대립',main.vs]:null,main.x?['내용',main.x]:null].filter(Boolean):[]);
+ const story=main&&typeof STORY!=='undefined'?STORY[main.t]:null;
+ const pc=new Map();evs.forEach(e=>(e.pp||'').split(/,\s*/).forEach(x=>{x=(typeof pbase==='function'?pbase(x):x).trim();if(x.length>1)pc.set(x,(pc.get(x)||0)+1)}));const pps=[...pc.entries()].sort((a,b)=>b[1]-a[1]).slice(0,14).map(x=>x[0]);
+ const txt=[def,...rows.map(r=>r[1]),story||'',...evs.slice(0,8).map(e=>e.x||'')].join(' ');const rel=Object.keys(GLOSS).filter(g=>g!==k&&g.length>1&&txt.includes(g)).sort((a,b)=>b.length-a.length).slice(0,16);
+ const t0=evs.length?evs[0].T:null,t1=evs.length?evs[evs.length-1].T:null;const tk=typeof TREE_OF!=='undefined'?TREE_OF[k]:null;
+ p.innerHTML=`<div class="kpbar"><button class="ib" data-kx aria-label="뒤로"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><span>용어 사전</span></div>
+ <div class="kpin" style="--kc:var(--seal)">
+  <div class="kph"><h1>${esc(k)}</h1></div>
+  <div class="kpsub">${t0!=null?`<span>관련 시기 ${yrTxt(t0)}${t1>t0+.5?' ~ '+yrTxt(t1):''}</span>`:''}${main&&typeof eventKing==='function'&&eventKing(main)?`<span>그때 ${esc(eventKing(main).txt)}</span>`:''}</div>
+  ${def?`<section><h3>뜻</h3><p class="kpd">${glx(def)}</p></section>`:''}
+  ${rows.length?`<section><h3>자세히</h3><div class="tmrows">${rows.map(([a,t])=>`<div class="gdr"><i>${esc(a)}</i><span>${glx(t)}</span></div>`).join('')}</div></section>`:''}
+  ${story?`<section><h3>배경 이야기</h3><p class="kpd">${glx(story)}</p></section>`:''}
+  ${tk?`<section><h3>구조도</h3><button class="ppgo" data-tmtree="${esc(tk)}">구조도로 보기 →</button></section>`:''}
+  ${evs.length?`<section><h3>관련 사건</h3><ul class="kpl">${evs.map(e=>`<li class="ev"><button data-kpe="${e.id}" style="--tc:var(--t-${e.tp[0]})"><em>${esc(shortYear(e))}</em>${e.treaty?'<i class="tseal">조</i>':''}${esc(e.t)}</button><p>${glx(e.x||'')}</p></li>`).join('')}</ul></section>`:''}
+  ${pps.length?`<section><h3>관련 인물</h3><div class="kpp">${pps.map(x=>`<button data-person="${esc(x)}" data-pt="${t0}"><i></i>${esc(x)}</button>`).join('')}</div></section>`:''}
+  ${rel.length?`<section><h3>관련 낱말</h3><div class="kpp">${rel.map(x=>`<button data-term="${esc(x)}"><i></i>${esc(x)}</button>`).join('')}</div></section>`:''}
+ </div>`;
+ p.hidden=false;p.scrollTop=0;p.querySelector('[data-kx]').onclick=()=>{p.hidden=true};try{if(!hLock)hPush({tm:k})}catch(_){}}
+document.addEventListener('click',ev=>{const t=ev.target.closest('[data-term]');if(t){ev.preventDefault();ev.stopPropagation();openTerm(t.dataset.term);return}
+ const tt=ev.target.closest('[data-tmtree]');if(tt){$('kpage').hidden=true;showView('tr');openTree(tt.dataset.tmtree);return}
+ const box=ev.target.closest('#dcbody .gl2>div[data-k]');if(!box||ev.target.closest('button,a,[data-gl],.hrt'))return;if(box.classList.contains('gp'))return;ev.preventDefault();ev.stopPropagation();openTerm(box.dataset.k)},true);
+{const ha=hApply;hApply=function(en){if(en.tm){hLock=true;try{openTerm(en.tm)}finally{hLock=false}hSync();return}return ha.apply(this,arguments)}}
+DEEP['단군왕검']=[['무엇','사람 이름이 아니라 고조선 지배자의 칭호(직책)'],['단군','하늘에 제사를 지내는 제사장'],['왕검','나라를 다스리는 정치적 지배자'],['뜻','제사와 정치를 한 사람이 맡음 = 제정일치 사회'],['나오는 곳','『삼국유사』(일연), 『제왕운기』(이승휴), 『동국통감』 등']];
+/* 태극기: 태극·괘가 깃발 천 밖으로 나오지 않게 — 조금 줄이고 천 모양으로 잘라 냄 */
+{const NS='http://www.w3.org/2000/svg';const cp=el('clipPath',{id:'tgcloth'},$('defs'));el('path',{d:'M0.8,-25.5C5,-28.5,9.5,-22,15,-25.2V-14.8C9.5,-11.6,5,-18.1,0.8,-15.1Z'},cp);
+ document.querySelectorAll('.pin.flagpin .tgk').forEach(t=>{if(t.querySelector(':scope>.tgin'))return;const g=document.createElementNS(NS,'g');g.setAttribute('class','tgin');g.setAttribute('transform','translate(7.9,-20.2) scale(.78) translate(-7.9,20.2)');while(t.firstChild)g.appendChild(t.firstChild);const w=document.createElementNS(NS,'g');w.setAttribute('clip-path','url(#tgcloth)');w.appendChild(g);t.appendChild(w)})}

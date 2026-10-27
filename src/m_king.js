@@ -211,7 +211,7 @@ function linkPeople(root){if(!root)return;const btn=(n,lab)=>`<button type="butt
  document.querySelectorAll('.tabs [data-view],.tabs button').forEach(b=>b.addEventListener('click',()=>{const k=$('kpage');if(k)k.hidden=true}))}
 /* 인물 국적 바로잡기 + 인물 페이지에서 나라별로 묶어 쉼표로 */
 const NAT_FIX=(()=>{const m={};const add=(n,l)=>l.split(',').forEach(x=>m[x.trim()]=n);
- add('고조선','단군왕검,부왕,준왕,위만,우거왕');add('가야','김수로');add('고구려','고국원왕,검모잠,고연무,안승,연남생');
+ add('고조선','부왕,준왕,위만,우거왕');add('가야','김수로');add('고구려','고국원왕,검모잠,고연무,안승,연남생');
  add('백제','비유왕,개로왕,계백,복신,도침,흑치상지,부여풍');add('신라','눌지 마립간,김무력,김품석,김춘추,김인문');add('후백제','신검');add('고려','신숭겸,정몽주,쌍기');
  add('중국','진개,진시황,한 무제,수 문제,수 양제,당 고조,당 태종,소정방,이세적,조광윤,주원장,이여송,진린,이자성,순치제,청 태종,누르하치,목극등,임칙서,홍수전,이홍장,증국번,좌종당,황쭌셴,캉유웨이,량치차오,광서제,쑨원,천두슈,리다자오,장제스,마오쩌둥,펑더화이');
  add('북방 민족','야율아보기,소손녕,소배압,아구다,칭기즈 칸,살리타,쿠빌라이');
