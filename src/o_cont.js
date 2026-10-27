@@ -429,7 +429,7 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
   if(!c.seq)c.mem.forEach(id=>rzSeen.add(id));
   rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,performance.now()+900+1000)}catch(_){}})();
 /* 나라 이름이 장면 중간에 바뀌는 경우 (후고구려 → 마진 → 태봉 → 고려) */
-const NAME_T={'후고구려':[[918,'고려']],'마한':[[-18,'백제']],'진한':[[-57,'신라']],'변한':[[42,'가야']]};
+const NAME_T={'후고구려':[[918,'고려']],'마한':[[369,'백제']],'진한':[[-57,'신라']],'변한':[[42,'가야']]};
 function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const tx=o.t;if(o.base==null||!(o.base in NAME_T)){const cur=tx.textContent;if(cur in NAME_T)o.base=cur;else return}
   let nm=o.base;for(const [y,n] of NAME_T[o.base])if(t>=y-1e-6)nm=n;if(tx.textContent!==nm){tx.textContent=nm;o.lc=null;schedLabels()}})}catch(_){}}
 {const ls=labStyle;labStyle=function(L,s){L.o.base=null;const r=ls.apply(this,arguments);applyNameT();return r}}
@@ -437,7 +437,7 @@ function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const 
 applyNameT();
 /* 장면 중간에 세워진 나라: 세운 해부터 땅이 생기고(그 전엔 신라 땅 색), 이름이 바뀌면 색도 바뀜.
    재생 중에는 도읍에서 사악 퍼지듯이 */
-const STATE_STEPS={taebong:{pre:'silla',steps:[[901,null,[126.55,37.97]],[918,'goryeo',[127.31,38.25]]]},goguryeo:{pre:null,steps:[[-37,null,[125.4,41.27]]]},mahan:{preTint:1,keepLab:1,steps:[[-18,null,[127.11,37.52]]]},jinhan:{preTint:1,keepLab:1,steps:[[-57,null,[129.21,35.83]]]},byeonhan:{preTint:1,keepLab:1,steps:[[42,null,[128.88,35.23]]]}};
+const STATE_STEPS={taebong:{pre:'silla',steps:[[901,null,[126.55,37.97]],[918,'goryeo',[127.31,38.25]]]},goguryeo:{pre:null,steps:[[-37,null,[125.4,41.27]]]},mahan:{preTint:1,keepLab:1,steps:[[369,null,[127.11,37.52]]],ban:{y:369,t:'백제, 마한 복속',tp:['pol'],ll:[127.11,37.52]}},jinhan:{preTint:1,keepLab:1,steps:[[-57,null,[129.21,35.83]]]},byeonhan:{preTint:1,keepLab:1,steps:[[42,null,[128.88,35.23]]]}};
 const tcol=k=>`color-mix(in srgb,var(--c-${k}) 66%,var(--land))`,lcol=k=>`color-mix(in srgb,var(--c-${k}) 52%,var(--ink))`;
 function spreadFill(c,fill,ll){const p=c.el;if(c.sp){c.sp.end()}if(!fill)fill=getComputedStyle(p).fill;
   const cid='sp'+Math.random().toString(36).slice(2,8),cp=el('clipPath',{id:cid},$('defs')),ci=el('circle',{cx:X(ll[0]),cy:Y(ll[1]),r:0},cp);
@@ -451,6 +451,7 @@ function applyStates(fresh){try{const t=curT();for(const [id,S] of Object.entrie
     const hid=k<0&&!S.pre&&!S.preTint;const fill=k<0?(S.preTint?`color-mix(in srgb,${c.base} 32%,var(--land))`:S.pre?tcol(S.pre):c.base):(S.steps[k][1]?tcol(S.steps[k][1]):c.base),lf=k<0?null:(S.steps[k][1]?lcol(S.steps[k][1]):c.lbase);
     const anim=!fresh&&c.stk!=null&&+key>+c.stk&&!reduceMotion;c.stk=key;
     c.lab.g.style.visibility=k<0&&!S.keepLab?'hidden':'';if(lf)c.lab.t.style.fill=lf;
+    if(anim&&S.ban&&k>=0){try{const b=Object.assign({T:S.ban.y,f:pos.i,id:-1},S.ban);topBanner(b)}catch(_){}}
     if(anim)spreadFill(c,fill,S.steps[k][2]);else{if(c.sp)c.sp.end();c.el.style.transition='none';c.el.style.fill=fill;c.el.style.opacity=hid?'0':''}}}catch(_){}}
 {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStates(false);return r}}
 {const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);applyStates(true);return r}}
@@ -559,8 +560,8 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
  const af=applyFrame;applyFrame=function(i,anim){const r=af.apply(this,arguments);const L=SEQ[i];if(!L||!anim||reduceMotion)return r;
    const cs=L.map(id=>shapes.get(id)).filter(Boolean);cs.forEach(c=>{c.el.style.visibility='hidden';c.lab.g.style.visibility='hidden'});
    const t0=performance.now(),H=playing?t0+WAIT+cs.length*GAP+900:0;holdUntil=Math.max(holdUntil,H);Promise.resolve().then(()=>{holdUntil=Math.max(holdUntil,H)});setTimeout(()=>{holdUntil=Math.max(holdUntil,H)},0);
-   cs.forEach((c,k)=>setTimeout(()=>{if(pos.i!==i){c.el.style.visibility='';c.lab.g.style.visibility='';return}reveal(c)},WAIT+k*GAP));
-   const fix=()=>{if(pos.i!==i)cs.forEach(c=>{c.el.style.visibility='';c.lab.g.style.visibility=''})};setTimeout(fix,WAIT+cs.length*GAP+50);return r}}
+   const W2=playing?WAIT:150,G2=playing?GAP:220;cs.forEach((c,k)=>setTimeout(()=>{if(pos.i!==i){c.el.style.visibility='';c.lab.g.style.visibility='';return}reveal(c)},W2+k*G2));
+   const fix=()=>{if(pos.i!==i)cs.forEach(c=>{c.el.style.visibility='';c.lab.g.style.visibility=''})};setTimeout(fix,(playing?WAIT+cs.length*GAP:150+cs.length*220)+50);return r}}
 /* 깃발 조금 짧게 */
 document.querySelectorAll('.pin.flagpin').forEach(g=>{const p=g.querySelector('.pole'),f=g.querySelector('.flg'),k=g.querySelector('.knob');if(p)p.setAttribute('d','M0,1.5V-22.5');if(f)f.setAttribute('transform','translate(0,5.2)');if(k)k.setAttribute('cy','-23.1')});
 /* 독립운동(만세 운동 등) 깃발은 태극기 */
