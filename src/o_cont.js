@@ -297,8 +297,8 @@ function rzCluster(e){const deg=X(1)-X(0),L=byFrame[pos.i]||[],k=L.indexOf(e),a=
   const minW=deg*(force?3:3.4);let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
   const pw=w*.18,ph=h*.22,fb=fitBox({x:x0-pw,y:y0-ph,w:w+2*pw,h:h+2*ph}),FV=fitVB(FRAMES[pos.i].view);if(fb.w*fb.h>FV.w*FV.h*.5)return null;fb.mem=new Set(mem);fb.last=mem[mem.length-1];return fb}
 const rzIn=(e,b)=>rzPts(e).every(([x,y])=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);
-function rzOut(){const now=performance.now(),fi=pos.i;holdUntil=Math.max(holdUntil,now+2200+900+600);clearTimeout(rzOut.t);
-  rzOut.t=setTimeout(()=>{if(pos.i!==fi||userMoved)return;rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900)},2200)}
+function rzOut(){const now=performance.now(),fi=pos.i;holdUntil=Math.max(holdUntil,now+2500+900+600);clearTimeout(rzOut.t);
+  rzOut.t=setTimeout(()=>{if(pos.i!==fi||userMoved)return;rzCur=null;animVB(fitVB(FRAMES[pos.i].view),900)},2500)}
 const RZ_SEQ=[[/^공산 전투/,/^고창 전투/,/^일리천 전투/]];
 function rzSeq(e){for(const sq of RZ_SEQ){if(!sq[0].test(e.t))continue;const evs=sq.map(r=>EVENTS.find(x=>r.test(x.t))).filter(Boolean);const pts=[].concat(...evs.map(rzPts));if(!pts.length)return null;
   const deg=X(1)-X(0);let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));const minW=deg*3.6;let w=x1-x0,h=y1-y0;if(w<minW){x0-=(minW-w)/2;w=minW}if(h<minW*.8){y0-=(minW*.8-h)/2;h=minW*.8}
@@ -425,7 +425,8 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
 /* 확대는 사건이 나타나기 "전"에: 다음 사건이 확대 묶음의 첫 사건이면 미리 확대하고 멈췄다가 그 사건을 보여 줌 */
 (function rzPre(){requestAnimationFrame(rzPre);try{if(!playing||userMoved||performance.now()<holdUntil)return;
   const t=curT(),ta=tOfF(pos.i,Math.min(1,pos.f+450/frameDur(pos.i)));const L=byFrame[pos.i]||[];if(rzCur&&rzCur.seq)return;let ev=null,c=null;const x=L.find(x=>x.T>t+1e-9);if(x&&!(rzCur&&rzCur.mem.has(x.id))&&!rzSeen.has(x.id)&&(x.ll||arrOf.has(x.id))){c=rzSeq(x)||rzCluster(x);ev=x}
-  if(!c)return;if(!c.seq)c.mem.forEach(id=>rzSeen.add(id));
+  if(!c)return;{const w=(window.__lastTick||0)+2000-performance.now();if(w>0){holdUntil=Math.max(holdUntil,performance.now()+w+30);return}} /* 앞 사건을 2초 보여 준 뒤 확대 */
+  if(!c.seq)c.mem.forEach(id=>rzSeen.add(id));
   rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,performance.now()+900+1000)}catch(_){}})();
 /* 나라 이름이 장면 중간에 바뀌는 경우 (후고구려 → 마진 → 태봉 → 고려) */
 const NAME_T={'후고구려':[[918,'고려']]};
@@ -492,7 +493,7 @@ document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')retu
 {const fOfT=(i,T)=>{let a=0,b=1;for(let k=0;k<30;k++){const m=(a+b)/2;if(tOfF(i,m)<T)a=m;else b=m}return a};
  const KEV=EVENTS.filter(e=>e.f!=null).slice().sort((a,b)=>a.T-b.T||a.id-b.id);
  const frameOf=T=>{let i=0;for(let j=0;j<FRAMES.length;j++)if(FRAMES[j].t<=T+1e-9)i=j;return i};
- const seekT=(T,fit)=>{T=Math.max(FRAMES[0].t,T);if(!playing&&typeof closeBubble==='function')try{closeBubble(true)}catch(_){}const i=frameOf(T);const f=Math.max(0,Math.min(.9999,fOfT(i,T)));const ch=i!==pos.i;userMoved=false;setPos(i,f,{fit:fit!==false&&ch});if(typeof lastT!=='undefined')lastT=curT();holdUntil=performance.now()+250};
+ const seekT=(T,fit)=>{T=Math.max(FRAMES[0].t,T);if(!playing&&typeof closeBubble==='function')try{closeBubble(true)}catch(_){}if(rzCur){rzCur=null;clearTimeout(rzOut.t);try{animVB(fitVB(FRAMES[frameOf(T)].view),500)}catch(_){}}rzSeen.clear();const i=frameOf(T);const f=Math.max(0,Math.min(.9999,fOfT(i,T)));const ch=i!==pos.i;userMoved=false;setPos(i,f,{fit:fit!==false&&ch});if(typeof lastT!=='undefined')lastT=curT();holdUntil=performance.now()+250};
  const KS=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'];let hk=null,hT=0,scr=0,rep=0,sLast=0,hStart=0;
  const stepOnce=k=>{const now=curT();
   if(k==='ArrowRight'){const e=KEV.find(x=>x.T>now+1e-6);if(e)seekT(e.T-1e-4)}
@@ -521,3 +522,9 @@ document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')retu
   try{flyVB(fitVB(FRAMES[pos.i].view))}catch(_){animVB(fitVB(FRAMES[pos.i].view),600)}
   document.querySelectorAll('#pbody,.pbody').forEach(n=>{try{n.scrollTo({top:0})}catch(_){}});try{if(typeof markListTime==='function')markListTime(true)}catch(_){}
   setTimeout(()=>app.classList.remove('reloading'),380)})}}
+
+/* 확대 타이밍용: 마지막으로 사건이 뜬 시각 */
+{const tk=ticker;ticker=function(){window.__lastTick=performance.now();return tk.apply(this,arguments)}}
+/* 나갔다 와서 다시 재생할 때 음악이 안 켜지던 문제: 늦게 실행된 '멈춤 처리'가 새로 켠 음악을 끄지 않게 */
+fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')BGA.pause()})};
+{const p0=play;play=function(){const r=p0.apply(this,arguments);try{if(AC&&AC.state!=='running')AC.resume();if(bgOn==='file'&&BGA&&BGA.paused){const pr=BGA.play();if(pr&&pr.catch)pr.catch(()=>{})}}catch(_){}return r}}
