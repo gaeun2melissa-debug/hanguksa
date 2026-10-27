@@ -414,7 +414,7 @@ function updateTime(changed){
   for(const o of OV){if(!o.pin)continue;const e=o.pin;const g=o.g;
     if(e.f!==pos.i){if(changed&&!g.classList.contains('hide')&&!g.classList.contains('wait')&&!reduceMotion){g.classList.add('fadeout');g.classList.remove('fresh','sel');clearTimeout(o.fo);o.fo=setTimeout(()=>{g.classList.remove('fadeout');if(o.pin.f!==pos.i)g.classList.add('hide')},620)}else if(!g.classList.contains('fadeout')){g.classList.add('hide');g.classList.remove('wait','fresh')}continue}
     g.classList.remove('hide');
-    const due=!playing||e.T<=t+1e-9;
+    const due=e.T<=t+1e-9||e.id===selId;
     if(e.found){if(!playing)g.classList.toggle('gone',e.id!==selId);else if(!due)g.classList.remove('gone')}
     if(playing&&due&&g.classList.contains('wait')&&!changed){g.classList.remove('wait');popPin(o)}
     else if(playing&&due&&changed&&Math.abs(e.T-F.t)<0.6){g.classList.remove('wait');clearTimeout(o.pz);o.pz=setTimeout(()=>{if(pos.i===e.f)popPin(o)},450)}
@@ -422,7 +422,7 @@ function updateTime(changed){
   }
   for(const e of EVENTS){if(!arrOf.has(e.id))continue;
     if(e.f!==pos.i){const ps=arrOf.get(e.id);if(changed&&!ps[0].g.classList.contains('hide')&&!reduceMotion){ps.forEach(p=>{p.g.classList.add('fadeout');p.hg.classList.add('fadeout')});clearTimeout(ps.fo);ps.fo=setTimeout(()=>{ps.forEach(p=>{p.g.classList.remove('fadeout');p.hg.classList.remove('fadeout')});if(e.f!==pos.i)setArrows(e,'hide')},620)}else if(!ps[0].g.classList.contains('fadeout'))setArrows(e,'hide');continue}
-    const due=!playing||e.T<=t+1e-9;const ps=arrOf.get(e.id);const wasHidden=ps[0].g.classList.contains('hide');
+    const due=e.T<=t+1e-9||e.id===selId;const ps=arrOf.get(e.id);const wasHidden=ps[0].g.classList.contains('hide');
     if(!due)setArrows(e,'hide');
     else if(playing&&wasHidden&&!changed)setArrows(e,'draw');
     else setArrows(e,(e.id===selId||e.id===freshId)?'on':'dim');
