@@ -4732,7 +4732,7 @@ function applyStates(fresh){try{const t=curT();for(const [id,S] of Object.entrie
     if(fresh||c.base==null){c.base=c.el.style.fill||getComputedStyle(c.el).fill;c.lbase=c.lab.t.style.fill;c.stk=null}
     let k=-1;S.steps.forEach(([y],i)=>{if(t>=y-1e-6)k=i});const key=String(k);if(c.stk===key)continue;
     const hid=k<0&&!S.pre&&!S.preTint;const fill=k<0?(S.preTint?`color-mix(in srgb,${c.base} 32%,var(--land))`:S.pre?tcol(S.pre):c.base):(S.steps[k][1]?tcol(S.steps[k][1]):c.base),lf=k<0?null:(S.steps[k][1]?lcol(S.steps[k][1]):c.lbase);
-    const anim=!fresh&&c.stk!=null&&+key>+c.stk&&playing&&!reduceMotion;c.stk=key;
+    const anim=!fresh&&c.stk!=null&&+key>+c.stk&&!reduceMotion;c.stk=key;
     c.lab.g.style.visibility=k<0&&!S.keepLab?'hidden':'';if(lf)c.lab.t.style.fill=lf;
     if(anim)spreadFill(c,fill,S.steps[k][2]);else{if(c.sp)c.sp.end();c.el.style.transition='none';c.el.style.fill=fill;c.el.style.opacity=hid?'0':''}}}catch(_){}}
 {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyStates(false);return r}}
@@ -4824,8 +4824,8 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
    let f=null;try{f=flubber.interpolate(d0,d1,{maxSegmentLength:7})}catch(_){}const l0=[c.lab.o.x,c.lab.o.y],t0=performance.now(),D=2000;c.d=d1;
    const st=now=>{const u=Math.min(1,(now-t0)/D),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;p.setAttribute('d',f?(u>=1?d1:f(e)):(e<.5?d0:d1));if(lab){c.lab.o.x=l0[0]+(lab[0]-l0[0])*e;c.lab.o.y=l0[1]+(lab[1]-l0[1])*e}placeOV();if(u<1)c.mr=requestAnimationFrame(st);else schedLabels()};c.mr=requestAnimationFrame(st)};
  function applyMid(fresh){if(pos.i!==6)return;try{const t=curT();for(const M of MID){const c=shapes.get(M.id);if(!c)continue;
-   if(M.until){const on=t<M.until-1e-6;const key=String(on);if(c.mk===key&&!fresh)continue;const anim=!fresh&&c.mk!=null&&playing;c.mk=key;c.el.style.transition=anim?'opacity 1.6s':'none';c.el.style.opacity=on?'':'0';c.lab.g.style.transition=anim?'opacity 1.2s':'none';c.lab.g.style.opacity=on?'':'0';continue}
-   let k=0;M.steps.forEach(([y],i)=>{if(t>=y-1e-6)k=i});const key=String(k);if(c.mk===key&&!fresh)continue;const anim=!fresh&&c.mk!=null&&+key>+c.mk&&playing;c.mk=key;mor(c,M.steps[k][1],M.steps[k][2],anim)}}catch(_){}}
+   if(M.until){const on=t<M.until-1e-6;const key=String(on);if(c.mk===key&&!fresh)continue;const anim=!fresh&&c.mk!=null;c.mk=key;c.el.style.transition=anim?'opacity 1.6s':'none';c.el.style.opacity=on?'':'0';c.lab.g.style.transition=anim?'opacity 1.2s':'none';c.lab.g.style.opacity=on?'':'0';continue}
+   let k=0;M.steps.forEach(([y],i)=>{if(t>=y-1e-6)k=i});const key=String(k);if(c.mk===key&&!fresh)continue;const anim=!fresh&&c.mk!=null&&+key>+c.mk;c.mk=key;mor(c,M.steps[k][1],M.steps[k][2],anim)}}catch(_){}}
  {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyMid(false);return r}}
  {const af=applyFrame;applyFrame=function(i){MID.forEach(M=>{const c=shapes.get(M.id);if(c){c.mk=null;c.el.style.opacity='';c.lab.g.style.opacity=''}});const r=af.apply(this,arguments);if(i===6)applyMid(true);return r}}
  if(pos.i===6){try{applyFrame(6,false)}catch(_){}}}
@@ -4839,9 +4839,9 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
    let R=400;try{const bb=p.getBBox();R=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))+10}catch(_){}
    p.setAttribute('clip-path',`url(#${cid})`);p.style.visibility='';c.lab.g.style.visibility='';c.lab.g.style.opacity='0';c.lab.g.style.transition='opacity .6s';setTimeout(()=>{c.lab.g.style.opacity=''},500);
    const t0=performance.now();const st=now=>{const u=Math.min(1,(now-t0)/D),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(R*k).toFixed(1));if(u<1)requestAnimationFrame(st);else{p.removeAttribute('clip-path');cp.remove()}};requestAnimationFrame(st)};
- const af=applyFrame;applyFrame=function(i,anim){const r=af.apply(this,arguments);const L=SEQ[i];if(!L||!anim||!playing||reduceMotion)return r;
+ const af=applyFrame;applyFrame=function(i,anim){const r=af.apply(this,arguments);const L=SEQ[i];if(!L||!anim||reduceMotion)return r;
    const cs=L.map(id=>shapes.get(id)).filter(Boolean);cs.forEach(c=>{c.el.style.visibility='hidden';c.lab.g.style.visibility='hidden'});
-   const t0=performance.now(),H=t0+WAIT+cs.length*GAP+900;holdUntil=Math.max(holdUntil,H);Promise.resolve().then(()=>{holdUntil=Math.max(holdUntil,H)});setTimeout(()=>{holdUntil=Math.max(holdUntil,H)},0);
+   const t0=performance.now(),H=playing?t0+WAIT+cs.length*GAP+900:0;holdUntil=Math.max(holdUntil,H);Promise.resolve().then(()=>{holdUntil=Math.max(holdUntil,H)});setTimeout(()=>{holdUntil=Math.max(holdUntil,H)},0);
    cs.forEach((c,k)=>setTimeout(()=>{if(pos.i!==i){c.el.style.visibility='';c.lab.g.style.visibility='';return}reveal(c)},WAIT+k*GAP));
    const fix=()=>{if(pos.i!==i)cs.forEach(c=>{c.el.style.visibility='';c.lab.g.style.visibility=''})};setTimeout(fix,WAIT+cs.length*GAP+50);return r}}
 /* 깃발 조금 짧게 */
