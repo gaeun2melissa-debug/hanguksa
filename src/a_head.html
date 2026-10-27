@@ -1085,7 +1085,7 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
       <svg id="map" aria-label="시대별 영토와 사건 지도">
         <defs id="defs">
           <mask id="seamask" maskUnits="userSpaceOnUse" x="-6000" y="-6000" width="14000" height="14000"><rect x="-6000" y="-6000" width="14000" height="14000" style="fill:#fff"/><path id="sm1" style="fill:#000"/><path id="sm2" style="fill:#000"/></mask>
-          <mask id="landmask" maskUnits="userSpaceOnUse" x="-6000" y="-6000" width="14000" height="14000"><path id="clipk" style="fill:#fff;stroke:none"/><path id="clipc" style="fill:#fff;stroke:#fff;stroke-width:7"/></mask>
+          <mask id="landmask" maskUnits="userSpaceOnUse" x="-6000" y="-6000" width="14000" height="14000"><path id="clipk" style="fill:#fff;stroke:#fff;stroke-width:1.4;stroke-linejoin:round"/><path id="clipc" style="fill:#fff;stroke:#fff;stroke-width:7"/></mask>
           <pattern id="h-han" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" style="fill:var(--land)"/><line x1="0" y1="0" x2="0" y2="9" style="stroke:var(--c-han);stroke-width:3;opacity:.7"/></pattern>
           <pattern id="h-yuan" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" style="fill:var(--land)"/><line x1="0" y1="0" x2="0" y2="9" style="stroke:var(--c-han);stroke-width:3;opacity:.75"/></pattern>
           <pattern id="h-japan" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="10" height="10" style="fill:color-mix(in srgb,var(--c-japan) 18%,var(--land))"/><line x1="0" y1="0" x2="0" y2="10" style="stroke:var(--c-japan);stroke-width:3.2;opacity:.75"/></pattern>
@@ -1356,3 +1356,4 @@ body,button,input,select,textarea{-webkit-font-smoothing:antialiased;-moz-osx-fo
 <style>.pin.flagpin .tgk .tgr{fill:#c41e28}.pin.flagpin .tgk .tgb{fill:#2f68a8}.pin.flagpin .tgk .tgt{stroke:#2f68a8!important;stroke-width:.62!important;stroke-linecap:butt!important}</style>
 <style>.tl>li.hlt h3::after,.elist li.bin .t::after{content:'★'!important;border:none!important;padding:0!important;font-size:.85em!important;color:#e0a100!important;margin-left:4px!important;vertical-align:0!important}</style>
 <style>.tl>li.hlt h3::after,.elist li.bin .t::after{font-size:1.25em!important;line-height:1!important;margin-left:5px!important;vertical-align:-1px!important;color:#f0ad00!important}</style>
+<style>#landk{stroke:var(--land)!important;stroke-width:1.4px!important;vector-effect:none!important;paint-order:stroke}</style>

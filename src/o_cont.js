@@ -469,8 +469,8 @@ applyStates(true);
  const sv=setVB;setVB=function(){const r=sv.apply(this,arguments);landLOD();return r}}
 /* 렉 줄이기: 움직이는 동안만 가벼운 클립, 멈추면 매끈한 마스크 */
 {const G2=['chn','terr'].map(id=>$(id));let mT=0,moving=false;const setM=m=>{G2.forEach(g=>{if(!g)return;if(m){g.removeAttribute('clip-path');g.setAttribute('mask','url(#landmask)')}else{g.removeAttribute('mask');g.setAttribute('clip-path','url(#landclip)')}})};setM(true);
- const sv=setVB;setVB=function(){const r=sv.apply(this,arguments);if(!moving){moving=true;setM(false)}clearTimeout(mT);mT=setTimeout(()=>{moving=false;if(!playing)setM(true)},220);return r};
- const p0=play,p1=pause;play=function(){const r=p0.apply(this,arguments);setM(false);return r};pause=function(){const r=p1.apply(this,arguments);if(!moving)setM(true);return r}}
+ const sv=setVB;setVB=function(){const r=sv.apply(this,arguments);if(!moving){moving=true;setM(false)}clearTimeout(mT);mT=setTimeout(()=>{moving=false;setM(true)},220);return r}
+ }
 /* 배경 음악이 효과음(건국 '둥' 등) 때문에 멈추면 다시 켜기 (모바일 브라우저에서 음악이 끊기는 문제) */
 {const want=()=>bgOn==='file'&&SND.bgm&&(SND.when==='always'||playing)&&!document.hidden;
  const kick=()=>{try{if(want()&&BGA&&BGA.paused){const pr=BGA.play();if(pr&&pr.catch)pr.catch(()=>{})}if(AC&&AC.state!=='running'&&AC.state!=='closed'&&(want()||bgOn===true))AC.resume()}catch(_){}};
