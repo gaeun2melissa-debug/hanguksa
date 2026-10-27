@@ -4831,6 +4831,17 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
 {const RE=/릉비|순수비|정계비|척화비|령비|비 건립/;
  const ST='<path class="stb" d="M-7,0.6H7V-2.6H-7Z"/><path class="sts" d="M-4.3,-2.6V-17.2Q-4.3,-21.6 0,-21.6Q4.3,-21.6 4.3,-17.2V-2.6Z"/><path class="stl" d="M-1.9,-17.5V-5.5M1.9,-17.5V-5.5"/>';
  EVENTS.filter(e=>RE.test(e.t)).forEach(e=>{const o=pinOf.get(e.id);if(!o)return;const gl=o.g.querySelector('.gl');if(!gl)return;gl.innerHTML=ST;o.g.classList.add('stelepin')})}
+/* 고조선 멸망 → 2초 보여 준 뒤 여러 나라가 차례로 사아악 생김 */
+{const SEQ={3:['nangnang','buyeo','okjeo','dongye','mahan','jinhan','byeonhan']},WAIT=2100,GAP=700,D=2000;
+ const reveal=(c)=>{const p=c.el;const cid='sq'+Math.random().toString(36).slice(2,8),cp=el('clipPath',{id:cid},$('defs'));const cx=c.lab.o.x,cy=c.lab.o.y,ci=el('circle',{cx,cy,r:0},cp);
+   let R=400;try{const bb=p.getBBox();R=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))+10}catch(_){}
+   p.setAttribute('clip-path',`url(#${cid})`);p.style.visibility='';c.lab.g.style.visibility='';c.lab.g.style.opacity='0';c.lab.g.style.transition='opacity .6s';setTimeout(()=>{c.lab.g.style.opacity=''},500);
+   const t0=performance.now();const st=now=>{const u=Math.min(1,(now-t0)/D),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(R*k).toFixed(1));if(u<1)requestAnimationFrame(st);else{p.removeAttribute('clip-path');cp.remove()}};requestAnimationFrame(st)};
+ const af=applyFrame;applyFrame=function(i,anim){const r=af.apply(this,arguments);const L=SEQ[i];if(!L||!anim||!playing||reduceMotion)return r;
+   const cs=L.map(id=>shapes.get(id)).filter(Boolean);cs.forEach(c=>{c.el.style.visibility='hidden';c.lab.g.style.visibility='hidden'});
+   const t0=performance.now(),H=t0+WAIT+cs.length*GAP+900;holdUntil=Math.max(holdUntil,H);Promise.resolve().then(()=>{holdUntil=Math.max(holdUntil,H)});setTimeout(()=>{holdUntil=Math.max(holdUntil,H)},0);
+   cs.forEach((c,k)=>setTimeout(()=>{if(pos.i!==i){c.el.style.visibility='';c.lab.g.style.visibility='';return}reveal(c)},WAIT+k*GAP));
+   const fix=()=>{if(pos.i!==i)cs.forEach(c=>{c.el.style.visibility='';c.lab.g.style.visibility=''})};setTimeout(fix,WAIT+cs.length*GAP+50);return r}}
 </script>
 <script type="module">
 /* 구글 로그인 + 하트·책갈피·설정 동기화 (GitHub 사이트 전용) */
