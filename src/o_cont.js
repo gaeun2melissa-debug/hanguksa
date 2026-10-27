@@ -528,3 +528,25 @@ document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')retu
 /* 나갔다 와서 다시 재생할 때 음악이 안 켜지던 문제: 늦게 실행된 '멈춤 처리'가 새로 켠 음악을 끄지 않게 */
 fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')BGA.pause()})};
 {const p0=play;play=function(){const r=p0.apply(this,arguments);try{if(AC&&AC.state!=='running')AC.resume();if(bgOn==='file'&&BGA&&BGA.paused){const pr=BGA.play();if(pr&&pr.catch)pr.catch(()=>{})}}catch(_){}return r}}
+/* 6세기: 장면 안에서 영토가 바뀜 — 553 신라 한강 장악(고구려 남쪽 땅이 신라로), 562 대가야 멸망(가야 → 신라) */
+{const F5=FRAMES[5],F6=FRAMES[6],g5=id=>F5&&F5.st.find(s=>s.id===id),g6=id=>F6&&F6.st.find(s=>s.id===id);
+ const MID=[];
+ if(g5('silla')&&g6('silla')&&g5('goguryeo')&&g6('goguryeo')&&g5('gaya')&&!g6('gaya')){
+  const s6=g6('silla'),k6=g6('goguryeo');
+  MID.push({id:'silla',steps:[[F6.t,g5('silla').d,g5('silla').lab],[553,s6.d,s6.lab]]});
+  MID.push({id:'goguryeo',steps:[[F6.t,g5('goguryeo').d,g5('goguryeo').lab],[553,k6.d,k6.lab]]});
+  const gy=Object.assign({},g5('gaya'));F6.st.push(gy);MID.push({id:'gaya',until:562})}
+ const mor=(c,d1,lab,anim)=>{const p=c.el,d0=p.getAttribute('d');if(d0===d1)return;cancelAnimationFrame(c.mr);
+   if(!anim||typeof flubber==='undefined'||reduceMotion){p.setAttribute('d',d1);c.d=d1;if(lab){c.lab.o.x=lab[0];c.lab.o.y=lab[1]}placeOV();schedLabels();return}
+   let f=null;try{f=flubber.interpolate(d0,d1,{maxSegmentLength:7})}catch(_){}const l0=[c.lab.o.x,c.lab.o.y],t0=performance.now(),D=2000;c.d=d1;
+   const st=now=>{const u=Math.min(1,(now-t0)/D),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;p.setAttribute('d',f?(u>=1?d1:f(e)):(e<.5?d0:d1));if(lab){c.lab.o.x=l0[0]+(lab[0]-l0[0])*e;c.lab.o.y=l0[1]+(lab[1]-l0[1])*e}placeOV();if(u<1)c.mr=requestAnimationFrame(st);else schedLabels()};c.mr=requestAnimationFrame(st)};
+ function applyMid(fresh){if(pos.i!==6)return;try{const t=curT();for(const M of MID){const c=shapes.get(M.id);if(!c)continue;
+   if(M.until){const on=t<M.until-1e-6;const key=String(on);if(c.mk===key&&!fresh)continue;const anim=!fresh&&c.mk!=null&&playing;c.mk=key;c.el.style.transition=anim?'opacity 1.6s':'none';c.el.style.opacity=on?'':'0';c.lab.g.style.transition=anim?'opacity 1.2s':'none';c.lab.g.style.opacity=on?'':'0';continue}
+   let k=0;M.steps.forEach(([y],i)=>{if(t>=y-1e-6)k=i});const key=String(k);if(c.mk===key&&!fresh)continue;const anim=!fresh&&c.mk!=null&&+key>+c.mk&&playing;c.mk=key;mor(c,M.steps[k][1],M.steps[k][2],anim)}}catch(_){}}
+ {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyMid(false);return r}}
+ {const af=applyFrame;applyFrame=function(i){MID.forEach(M=>{const c=shapes.get(M.id);if(c){c.mk=null;c.el.style.opacity='';c.lab.g.style.opacity=''}});const r=af.apply(this,arguments);if(i===6)applyMid(true);return r}}
+ if(pos.i===6){try{applyFrame(6,false)}catch(_){}}}
+/* 비석 사건은 진짜 비석 모양으로 땅에 세움 */
+{const RE=/릉비|순수비|정계비|척화비|령비|비 건립/;
+ const ST='<path class="stb" d="M-7,0.6H7V-2.6H-7Z"/><path class="sts" d="M-4.3,-2.6V-17.2Q-4.3,-21.6 0,-21.6Q4.3,-21.6 4.3,-17.2V-2.6Z"/><path class="stl" d="M-1.9,-17.5V-5.5M1.9,-17.5V-5.5"/>';
+ EVENTS.filter(e=>RE.test(e.t)).forEach(e=>{const o=pinOf.get(e.id);if(!o)return;const gl=o.g.querySelector('.gl');if(!gl)return;gl.innerHTML=ST;o.g.classList.add('stelepin')})}
