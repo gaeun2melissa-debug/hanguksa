@@ -429,7 +429,7 @@ addStb();['tlbody','tpbody'].forEach(id=>{const el=$(id);if(el)new MutationObser
   if(!c.seq)c.mem.forEach(id=>rzSeen.add(id));
   rzCur=c;animVB(c,900);holdUntil=Math.max(holdUntil,performance.now()+900+1000)}catch(_){}})();
 /* 나라 이름이 장면 중간에 바뀌는 경우 (후고구려 → 마진 → 태봉 → 고려) */
-const NAME_T={'후고구려':[[918,'고려']]};
+const NAME_T={'후고구려':[[918,'고려']],'마한':[[-18,'백제']],'진한':[[-57,'신라']],'변한':[[42,'가야']]};
 function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const tx=o.t;if(o.base==null||!(o.base in NAME_T)){const cur=tx.textContent;if(cur in NAME_T)o.base=cur;else return}
   let nm=o.base;for(const [y,n] of NAME_T[o.base])if(t>=y-1e-6)nm=n;if(tx.textContent!==nm){tx.textContent=nm;o.lc=null;schedLabels()}})}catch(_){}}
 {const ls=labStyle;labStyle=function(L,s){L.o.base=null;const r=ls.apply(this,arguments);applyNameT();return r}}
@@ -561,3 +561,27 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
    const t0=performance.now(),H=t0+WAIT+cs.length*GAP+900;holdUntil=Math.max(holdUntil,H);Promise.resolve().then(()=>{holdUntil=Math.max(holdUntil,H)});setTimeout(()=>{holdUntil=Math.max(holdUntil,H)},0);
    cs.forEach((c,k)=>setTimeout(()=>{if(pos.i!==i){c.el.style.visibility='';c.lab.g.style.visibility='';return}reveal(c)},WAIT+k*GAP));
    const fix=()=>{if(pos.i!==i)cs.forEach(c=>{c.el.style.visibility='';c.lab.g.style.visibility=''})};setTimeout(fix,WAIT+cs.length*GAP+50);return r}}
+/* 여러 나라 장면: 백제·신라·가야가 마한·진한·변한 안의 작은 나라로 생겨서 점점 커짐(복속) */
+{const NS='http://www.w3.org/2000/svg';const FR=3,FT1=FRAMES[4]?FRAMES[4].t:371;
+ const B=[{host:'mahan',c:'baekje',nm:'백제',T:-18,ll:[127.11,37.52],r0:.32,r1:1.25},{host:'jinhan',c:'silla',nm:'신라',T:-57,ll:[129.21,35.83],r0:.28,r1:.95},{host:'byeonhan',c:'gaya',nm:'금관가야',T:42,ll:[128.88,35.23],r0:.22,r1:.55}];
+ const deg=X(1)-X(0);const lay=el('g',{},G.terr);
+ B.forEach(b=>{const cid='bh'+b.c,cp=el('clipPath',{id:cid,clipPathUnits:'userSpaceOnUse'},$('defs'));b.cpp=el('path',{},cp);
+   b.ci=el('circle',{cx:X(b.ll[0]),cy:Y(b.ll[1]),r:0,'clip-path':`url(#${cid})`,style:`fill:color-mix(in srgb,var(--c-${b.c}) 78%,var(--land));stroke:none`},lay);
+   const g=el('g',{class:'bhlab'},labG);const t=el('text',{y:-14},g);t.textContent=b.nm;t.style.fill=`color-mix(in srgb,var(--c-${b.c}) 60%,var(--ink))`;b.lg=g;b.o=ovItem(g,X(b.ll[0]),Y(b.ll[1]));b.shown=false});
+ function upd(){try{const on=pos.i===FR,t=curT();lay.style.display=on?'':'none';if(G.terr.lastChild!==lay)G.terr.appendChild(lay);B.forEach(b=>{const h=shapes.get(b.host);if(!h)return;if(on){if(!h.el.dataset.tint){h.el.dataset.tint=1;h.el.dataset.tf=h.el.style.fill;h.el.style.fill=`color-mix(in srgb,var(--c-${b.c}) 30%,var(--land))`}}else if(h.el.dataset.tint){h.el.style.fill=h.el.dataset.tf;delete h.el.dataset.tint}});
+   B.forEach(b=>{const h=shapes.get(b.host);if(on&&h&&b.cpp.getAttribute('d')!==h.el.getAttribute('d'))b.cpp.setAttribute('d',h.el.getAttribute('d'));
+     const vis=on&&t>=b.T-1e-6;b.lg.style.display='none';if(!vis){b.ci.setAttribute('r',0);b.shown=false;cancelAnimationFrame(b.ra);return}
+     const prog=Math.max(0,Math.min(1,(t-b.T)/(FT1-b.T))),R=(b.r0+(b.r1-b.r0)*prog)*deg;
+     if(!b.shown){b.shown=true;if(playing&&!reduceMotion){const t0=performance.now();b.grow=1;const st=now=>{const u=Math.min(1,(now-t0)/2000),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;b.ci.setAttribute('r',(b.rt*k).toFixed(1));if(u<1)b.ra=requestAnimationFrame(st);else b.grow=0};b.rt=R;b.ra=requestAnimationFrame(st);return}}
+     b.rt=R;if(!b.grow)b.ci.setAttribute('r',R.toFixed(1))})}catch(_){}}
+ {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);upd();return r}}
+ {const af=applyFrame;applyFrame=function(){B.forEach(b=>{const h=shapes.get(b.host);if(h&&h.el.dataset.tint){h.el.style.fill=h.el.dataset.tf;delete h.el.dataset.tint}});const r=af.apply(this,arguments);B.forEach(b=>{b.shown=false;b.grow=0});upd();return r}}
+ upd()}
+
+/* 깃발 조금 짧게 */
+document.querySelectorAll('.pin.flagpin').forEach(g=>{const p=g.querySelector('.pole'),f=g.querySelector('.flg'),k=g.querySelector('.knob');if(p)p.setAttribute('d','M0,1.5V-22.5');if(f)f.setAttribute('transform','translate(0,3.5)');if(k)k.setAttribute('cy','-23.1')});
+/* 독립운동(만세 운동 등) 깃발은 태극기 */
+document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelector('.flg');if(!f||g.querySelector('.tgk'))return;f.classList.add('tgflag');
+ const t=document.createElementNS('http://www.w3.org/2000/svg','g');t.setAttribute('class','tgk');t.setAttribute('transform','translate(0,3.5)');
+ t.innerHTML='<path class="tgr" d="M5.4,-20.2A2.5,2.5 0 0 1 10.4,-20.2A1.25,1.25 0 0 1 7.9,-20.2A1.25,1.25 0 0 0 5.4,-20.2Z"/><path class="tgb" d="M5.4,-20.2A2.5,2.5 0 0 0 10.4,-20.2A1.25,1.25 0 0 0 7.9,-20.2A1.25,1.25 0 0 1 5.4,-20.2Z"/><path class="tgt" d="M2.4,-23.4l1.3,1.1M2.9,-24l1.3,1.1M12.1,-17.2l1.3,1.1M11.6,-16.6l1.3,1.1M12.2,-23.2l1.2,-1.2M12.8,-22.6l1.2,-1.2M2.6,-16.4l1.2,-1.2M3.2,-15.8l1.2,-1.2"/>';
+ f.after(t)});
