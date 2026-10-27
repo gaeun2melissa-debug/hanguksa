@@ -563,7 +563,7 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
    const W2=playing?WAIT:150,G2=playing?GAP:220;cs.forEach((c,k)=>setTimeout(()=>{if(pos.i!==i){c.el.style.visibility='';c.lab.g.style.visibility='';return}reveal(c)},W2+k*G2));
    const fix=()=>{if(pos.i!==i)cs.forEach(c=>{c.el.style.visibility='';c.lab.g.style.visibility=''})};setTimeout(fix,(playing?WAIT+cs.length*GAP:150+cs.length*220)+50);return r}}
 /* 깃발 조금 짧게 */
-document.querySelectorAll('.pin.flagpin').forEach(g=>{const p=g.querySelector('.pole'),f=g.querySelector('.flg'),k=g.querySelector('.knob');if(p)p.setAttribute('d','M0,1.5V-18.5');if(f){f.removeAttribute('transform');f.setAttribute('d','M0.8,-18.5C5,-21.5,9.5,-15,15,-18.2V-7.8C9.5,-4.6,5,-11.1,0.8,-8.1Z')}if(k)k.setAttribute('cy','-19.6')});
+document.querySelectorAll('.pin.flagpin').forEach(g=>{const p=g.querySelector('.pole'),f=g.querySelector('.flg'),k=g.querySelector('.knob');if(p)p.setAttribute('d','M0,1.5V-21');if(f){f.removeAttribute('transform');f.setAttribute('d','M0.8,-18.5C5,-21.5,9.5,-15,15,-18.2V-7.8C9.5,-4.6,5,-11.1,0.8,-8.1Z')}if(k)k.setAttribute('cy','-21.6')});
 /* 독립운동(만세 운동 등) 깃발은 태극기 */
 document.querySelectorAll('.pin.flagpin.k-ind').forEach(g=>{const f=g.querySelector('.flg');if(!f||g.querySelector('.tgk'))return;f.classList.add('tgflag');
  const t=document.createElementNS('http://www.w3.org/2000/svg','g');t.setAttribute('class','tgk');t.setAttribute('transform','translate(0,7)');
