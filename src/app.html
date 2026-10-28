@@ -5026,8 +5026,8 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
  const MID=[];
  if(g5('silla')&&g6('silla')&&g5('goguryeo')&&g6('goguryeo')&&g5('gaya')&&!g6('gaya')){
   const s6=g6('silla'),k6=g6('goguryeo');
-  MID.push({id:'silla',steps:[[F6.t,g5('silla').d,g5('silla').lab],[553,s6.d,s6.lab]]});
-  MID.push({id:'goguryeo',steps:[[F6.t,g5('goguryeo').d,g5('goguryeo').lab],[553,k6.d,k6.lab]]});
+  MID.push({id:'silla',steps:[[F6.t,g5('silla').d,g5('silla').lab],[551,s6.d,s6.lab]]});window.__S6=s6.d;
+  MID.push({id:'goguryeo',steps:[[F6.t,g5('goguryeo').d,g5('goguryeo').lab],[551,k6.d,k6.lab]]});
   const gy=Object.assign({},g5('gaya'));F6.st.push(gy);MID.push({id:'gaya',until:562})}
  MID.push({id:'goguryeo',fr:7,until:668});{const F3=FRAMES[3],F4=FRAMES[4],a=F3&&F3.st.find(x=>x.id==='goguryeo'),b=F4&&F4.st.find(x=>x.id==='goguryeo');const oj=['okjeo','dongye'].map(id=>(F3.st.find(x=>x.id===id)||{}).d).filter(Boolean).join(' ');if(a&&b)MID.push({id:'goguryeo',fr:3,steps:[[F3.t,a.d,a.lab],[56,a.d+' '+oj,a.lab,[127.3,40.9]],[313,b.d,b.lab]]});MID.push({id:'nangnang',fr:3,until:313});MID.push({id:'okjeo',fr:3,until:56,lag:1900});MID.push({id:'dongye',fr:3,until:56,lag:1900})}MID.push({id:'balhae',fr:10,until:926});
 /* 고조선: 연(진개) 침략(기원전 3세기)으로 서쪽 땅을 잃고, 위만 때 진번·임둔 복속 */
@@ -5333,4 +5333,16 @@ function hzTopScroll(){const sc=$('ovscroll');if(!sc)return;const cx=sc.getBound
   kp.addEventListener('click',e=>{const b=e.target.closest('[data-kpv]');if(!b)return;e.preventDefault();e.stopPropagation();go(+b.dataset.kpv)},true)}}
 /* 연대표 설명창 업적: 처음엔 한 줄, 누르면 펼침 */
 document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest('.hzach.fold');if(!c||e.target.closest('[data-king]')||e.target.closest('.gw'))return;e.stopPropagation();const op=!c.classList.contains('open');document.querySelectorAll('.hzach.open').forEach(x=>x.classList.remove('open'));if(op)c.classList.add('open')},true);
+
+/* 잠깐 남의 땅이 된 곳: 551~553 한강 하류(백제), 642~660 대야성 일대(백제) — 볼록 다각형으로 잘라 그 나라 색으로 덮음 */
+{const clipC=(d,poly)=>{const P0=poly.map(([lo,la])=>[X(lo),Y(la)]);let area=0;for(let i=0;i<P0.length;i++){const a=P0[i],b=P0[(i+1)%P0.length];area+=a[0]*b[1]-b[0]*a[1]}const sg=Math.sign(area);
+   return d.split('Z').map(x=>x.trim()).filter(Boolean).map(x=>{let P=x.replace(/^M/,'').split('L').map(t=>t.split(',').map(Number));for(let e=0;e<P0.length&&P.length;e++){const A=P0[e],B=P0[(e+1)%P0.length],sd=p=>((B[0]-A[0])*(p[1]-A[1])-(B[1]-A[1])*(p[0]-A[0]))*sg,o=[];for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length],sp=sd(p),sq=sd(q);if(sp>=0){o.push(p);if(sq<0){const u=sp/(sp-sq);o.push([p[0]+(q[0]-p[0])*u,p[1]+(q[1]-p[1])*u])}}else if(sq>=0){const u=sp/(sp-sq);o.push([p[0]+(q[0]-p[0])*u,p[1]+(q[1]-p[1])*u])}}P=o}return P.length>2?'M'+P.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L')+'Z':''}).join('')};
+ const sil=fr=>(FRAMES[fr].st.find(s=>s.id==='silla')||{}).d||'';
+ const PT=[{fr:6,s:551,e:553,own:'baekje',ll:[126.95,37.5],d:clipC(window.__S6||sil(6),[[125.9,38.2],[127.35,38.2],[127.35,36.85],[125.9,36.85]])},
+   {fr:7,s:642,e:660,own:'baekje',ll:[128.17,35.57],d:clipC(sil(7),[[127.25,36.05],[128.42,35.95],[128.5,35.4],[128.35,34.85],[127.25,34.85]])}].filter(p=>p.d);
+ const NS='http://www.w3.org/2000/svg';PT.forEach(p=>{const e=document.createElementNS(NS,'path');e.setAttribute('d',p.d);e.setAttribute('class','terr tpatch');e.style.pointerEvents='none';e.style.display='none';G.terr.appendChild(e);p.el=e;p.on=null});
+ const sync=(anim)=>{const t=curT();PT.forEach(p=>{const on=pos.i===p.fr&&t>=p.s-1e-6&&t<p.e-1e-6;if(on===p.on&&!anim)return;const was=p.on;p.on=on;const o=shapes.get(p.own);if(!on){p.el.style.display='none';return}if(G.terr.lastChild!==p.el)G.terr.appendChild(p.el);p.el.style.display='';const f=o?getComputedStyle(o.el).fill:'';p.el.style.fill=f;p.el.style.stroke=f;
+   if(was===false&&playing&&!reduceMotion){try{spreadFill({el:p.el,sp:null},f,p.ll)}catch(_){}}})};
+ {const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);sync(false);return r}}
+ {const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);PT.forEach(p=>p.on=null);sync(true);setTimeout(()=>sync(true),2200);return r}}sync(true)}
 </script>
