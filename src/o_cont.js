@@ -735,3 +735,5 @@ DEEP['단군왕검']=[['무엇','사람 이름이 아니라 고조선 지배자�
 /* 태극기: 태극·괘가 깃발 천 밖으로 나오지 않게 — 조금 줄이고 천 모양으로 잘라 냄 */
 {const NS='http://www.w3.org/2000/svg';const cp=el('clipPath',{id:'tgcloth'},$('defs'));el('path',{d:'M0.8,-25.5C5,-28.5,9.5,-22,15,-25.2V-14.8C9.5,-11.6,5,-18.1,0.8,-15.1Z'},cp);
  document.querySelectorAll('.pin.flagpin .tgk').forEach(t=>{if(t.querySelector(':scope>.tgin'))return;const g=document.createElementNS(NS,'g');g.setAttribute('class','tgin');g.setAttribute('transform','translate(7.9,-20.2) scale(.78) translate(-7.9,20.2)');while(t.firstChild)g.appendChild(t.firstChild);const w=document.createElementNS(NS,'g');w.setAttribute('clip-path','url(#tgcloth)');w.appendChild(g);t.appendChild(w)})}
+/* 태극기도 펄럭이게: 천과 그림을 한 묶음으로 같이 흔듦 (그림이 천 밖으로 안 나감) */
+document.querySelectorAll('.pin.flagpin .flg.tgflag').forEach(f=>{if(f.parentNode.classList.contains('tgwrap'))return;const t=f.parentNode.querySelector('.tgk');const w=document.createElementNS('http://www.w3.org/2000/svg','g');w.setAttribute('class','tgwrap');f.before(w);w.appendChild(f);if(t)w.appendChild(t)});
