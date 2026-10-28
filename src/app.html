@@ -5042,6 +5042,14 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
 
  {const F4=FRAMES[4],g4=id=>F4&&F4.st.find(s=>s.id===id);['goguryeo','baekje'].forEach(id=>{const a=g4(id),b=g5(id);if(a&&b&&a.d!==b.d)MID.push({id,fr:5,steps:[[F5.t,a.d,a.lab],[475,b.d,b.lab]]})});
   const a=g4('silla'),b=g5('silla');if(a&&b&&a.d!==b.d)MID.push({id:'silla',fr:5,steps:[[F5.t,a.d,a.lab],[475,b.d,b.lab]]})}
+ /* 광개토 대왕(400년 무렵) 요동·북방 확장 → 475 한강 / 부여는 494년까지 따로 */
+ {try{const F4=FRAMES[4],F5=FRAMES[5];const ga=F4.st.find(s=>s.id==='goguryeo'),gb=F5.st.find(s=>s.id==='goguryeo'),by=F4.st.find(s=>s.id==='buyeo');
+  const A=[X(120.5),Y(38.0)],B=[X(131),Y(41.8)],sd=p=>(B[0]-A[0])*(p[1]-A[1])-(B[1]-A[1])*(p[0]-A[0]),nref=Math.sign(sd([X(124),Y(42)]));
+  const cut=(p,q)=>{const a=sd(p),b=sd(q),u=a/(a-b);return [p[0]+(q[0]-p[0])*u,p[1]+(q[1]-p[1])*u]};
+  const clip=(d,north)=>d.split('Z').map(x=>x.trim()).filter(Boolean).map(x=>{const P=x.replace(/^M/,'').split('L').map(t=>t.split(',').map(Number));const inn=p=>(sd(p)*nref>=0)===north;const o=[];for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length];if(inn(p)){o.push(p);if(!inn(q))o.push(cut(p,q))}else if(inn(q))o.push(cut(p,q))}return o.length>2?'M'+o.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L')+'Z':''}).join('');
+  if(ga&&gb){const mix=clip(gb.d,true)+' '+clip(ga.d,false);const M=MID.find(m=>m.id==='goguryeo'&&m.fr===5);if(M)M.steps=[[F5.t,ga.d,ga.lab],[400,mix,gb.lab,[124.6,41.3]],[475,gb.d,gb.lab]]}
+  if(by&&!F5.st.some(s=>s.id==='buyeo')){F5.st.push(Object.assign({},by,{from:undefined}));MID.push({id:'buyeo',fr:5,until:494})}
+ }catch(_){}}
  const mor=(c,d1,lab,anim)=>{{const tk=(typeof morphTasks!=='undefined'&&morphTasks||[]).find(k=>k.cur===c);if(tk){tk.to=d1;try{tk.f=flubber.interpolate(tk.from,d1,{maxSegmentLength:7})}catch(_){tk.f=null}if(lab)tk.l1=lab;c.d=d1;return}}const p=c.el,d0=p.getAttribute('d');if(d0===d1)return;cancelAnimationFrame(c.mr);
    if(!anim||typeof flubber==='undefined'||reduceMotion){p.setAttribute('d',d1);c.d=d1;if(lab){c.lab.o.x=lab[0];c.lab.o.y=lab[1]}placeOV();schedLabels();return}
    let f=null;try{f=flubber.interpolate(d0,d1,{maxSegmentLength:7})}catch(_){}const l0=[c.lab.o.x,c.lab.o.y],t0=performance.now(),D=2000;c.d=d1;
