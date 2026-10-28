@@ -1,7 +1,7 @@
 /* 삼국~남북국 사건은 나라 색으로 */
 function hzSt(e){if(e.T>936)return '';const t=(e.st||'')+' '+e.t+' '+(e.vs||'');const L=[['고구려','goguryeo'],['백제','baekje'],['신라','silla'],['가야','gaya'],['발해','balhae'],['고조선','gojoseon'],['부여','buyeo']];for(const [k,c] of L)if((e.st||'').includes(k)||e.t.startsWith(k)||e.t.includes(k+','))return c;for(const [k,c] of L)if(t.includes(k))return c;return ''}
 /* ───────── 연대표 가로: 필기 노트처럼 (위: 조약·개혁안 / 가운데: 시기·축·사건 이름 / 아래: 왕·주요 사건 풀이) ───────── */
-function drawHZ(k){$('v-ov').classList.add('hzsplit');const sr=$('ovscroll').getBoundingClientRect();const avail=Math.max(300,(sr.top>0?innerHeight-sr.top:$('ovscroll').clientHeight)-14);HZAV=avail;let sc=1,res=layHZ(k,1);for(let it=0;it<9&&res&&res.H>avail;it++){sc*=1.3;const nx=layHZ(k,sc);if(nx.H>=res.H-2)break;res=nx}if(res){$('ovchart').innerHTML=res.html;$('v-ov').classList.add('hzsplit');$('ovsum').innerHTML=''}}
+function drawHZ(k){$('v-ov').classList.add('hzsplit');const sr=$('ovscroll').getBoundingClientRect();const avail=Math.max(300,(sr.top>0?innerHeight-sr.top:$('ovscroll').clientHeight)-14);HZAV=avail;let sc=1,res=layHZ(k,1);for(let it=0;it<9&&res&&res.H>avail;it++){sc*=1.3;const nx=layHZ(k,sc);if(sc>2.3)break;if(nx.H<res.H-2)res=nx;else break}if(res){$('ovchart').innerHTML=res.html;$('v-ov').classList.add('hzsplit');$('ovsum').innerHTML=''}}
 let HZAV=9999;
 /* 연대표 아래 칸: 사건 설명 속 꼭 알아 둘 낱말(척화비 같은 것)을 그 사건 자리에 */
 function hzTerms(evs,xT,fitSep){if(typeof GLOSS==='undefined')return [];const used=new Set(),out=[];const titles=evs.map(e=>e.t);
@@ -61,16 +61,16 @@ function layHZ(k,SC){
   const nm=evs.map((e,i)=>({e,x:xs[i],a:xs[i]-twe(e)/2,b:xs[i]+twe(e)/2})).filter(o=>!isUp(o.e)).map(o=>fitSep(o,o.x)).sort((p,q)=>p.a-q.a);const NL=lanes(nm,6);
   const nmTop=axY+20;const NLc=Math.max(2,Math.min(NL,Math.floor((HALF-30)/24)));
   nm.filter(o=>o.li<NLc).forEach(o=>{const y=nmTop+o.li*24;h+=`<i class="hzld" style="left:${o.x}px;top:${axY+6}px;height:${y-axY-2}px"></i><button class="hzn${o.ra?' ra':''}${isMajor(o.e)?' mj':''}${o.e.top?' bin':''}${hzSt(o.e)?' st-'+hzSt(o.e):''}${HEARTS.has(o.e.t)?' hearted':''}" data-ev="${o.e.id}" style="left:${o.a}px;top:${y}px;width:${o.b-o.a}px;--tc:var(--t-${o.e.tp[0]});--gc:${gcAt(o.x)}"><span>${o.e.treaty?'<i class="tseal">조</i>':''}${esc(o.e.t)}</span></button>`});
-  const topH0=nmTop+NLc*24+10,aboveH=axY+3,belowH=topH0-axY-3,half=Math.max(aboveH,belowH),padT=half-aboveH,topH=half*2;
+  const topH0=nmTop+NLc*24+10,aboveH=axY+3,belowH=topH0-axY-3,padT=0,topH=aboveH+belowH;
   // 아래 칸: 왕 줄 + 주요 사건 풀이
   let b='';const kr=ALL?[]:REIGNS.map(D=>({D,rs:D.r.filter(r=>Math.min(r.e,t1)-Math.max(r.s,t0)>.3)})).filter(x=>x.rs.length);
   /* 나라별 줄: 왕 재위 막대 + 그 밑에 왕 이름·업적 (교과서 정리표처럼) */
   let KY=6;kr.forEach(({D,rs},j)=>{const y0=KY;const cw=12.2;
     rs.forEach(r=>{const a=xT(Math.max(r.s,t0)),bb=xT(Math.min(r.e,t1));if(bb-a<2)return;const n=r.name.replace('대통령 ','');b+=`<div class="hzk" data-king="${esc(D.n)}|${D.r.indexOf(r)}" style="left:${a}px;top:${y0+18}px;width:${bb-a-2}px;--rc:var(--c-${D.c})" title="${esc(n)}"><span>${(bb-a-2)>=n.length*11.5+8?esc(n):((bb-a-2)>=26?esc(n[0]):"")}</span></div>`});
     const blk=rs.map(r=>{const ach=(typeof kAch==='function'?kAch(D,r):[])||[];if(!ach.length)return null;const a=xT(Math.max(r.s,t0));const n=r.name.replace('대통령 ','');const L=Math.max(n.length*15,...ach.map(x=>x.length*cw));const w=Math.min(250,Math.max(120,L+22));const lines=ach.reduce((s,x)=>s+Math.max(1,Math.ceil(x.length*cw/(w-22))),0);return {r,n,ach,a,b:a+w,w,h:26+lines*17}}).filter(Boolean);
-    const lanesB=[];blk.forEach(o=>{let li=lanesB.findIndex(L=>L.end<o.a-6);if(li<0){li=lanesB.length;lanesB.push({end:-1e9,h:0})}lanesB[li].end=o.b;lanesB[li].h=Math.max(lanesB[li].h,o.h);o.li=li});
-    let yy=y0+42;const ly=lanesB.map(L=>{const v=yy;yy+=L.h+6;return v});
-    blk.forEach(o=>{b+=`<div class="hzach" style="left:${o.a}px;top:${ly[o.li]}px;width:${o.w}px;--rc:var(--c-${D.c})"><button data-king="${esc(D.n)}|${D.r.indexOf(o.r)}">${esc(o.n)}</button>${o.ach.map(x=>`<p>${glx(x)}</p>`).join('')}</div>`});
+    const PL=[],Y0=y0+42;blk.forEach(o=>{const hit=y=>PL.some(p=>p.a<o.b+6&&o.a<p.b+6&&p.y<y+o.h+6&&y<p.y+p.h+6);const cs=[Y0,...PL.map(p=>p.y+p.h+6)].sort((p,q)=>p-q);o.y=cs.find(y=>!hit(y));PL.push({a:o.a,b:o.b,y:o.y,h:o.h})});
+    let yy=PL.length?Math.max(...PL.map(p=>p.y+p.h+6)):Y0;
+    blk.forEach(o=>{b+=`<div class="hzach" style="left:${o.a}px;top:${o.y}px;width:${o.w}px;--rc:var(--c-${D.c})"><button data-king="${esc(D.n)}|${D.r.indexOf(o.r)}">${esc(o.n)}</button>${o.ach.map(x=>`<p>${glx(x)}</p>`).join('')}</div>`});
     const bh=Math.max(36,yy-y0);const bA=xT(Math.max(t0,Math.min(...rs.map(r=>r.s)))),bB=Math.max(bA+60,xT(Math.min(t1,Math.max(...rs.map(r=>r.e)))),...blk.map(o=>o.b+6));b+=`<div class="hzband" style="top:${y0}px;height:${bh}px;left:${Math.max(0,bA-4)}px;width:${bB-Math.max(0,bA-4)+4}px;right:auto;--rc:var(--c-${D.c})"><b>${esc(D.n==='남한'?'대한민국':D.n)}</b></div>`;KY=y0+bh+6});
   const KH=KY+6;
   const shownT=new Set(tops.filter(o=>o.li<TLc&&o.e).map(o=>o.e.id));

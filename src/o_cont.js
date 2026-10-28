@@ -796,3 +796,22 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 
 /* 자세히 칸 이름 다듬기: 누가 → 주도 … */
 {const LM={'누가':'주도','왜':'배경','무엇을':'내용','무엇':'정체','결과':'결과','흐름':'전개','일본과':'외세 관계','내용':'내용'};try{Object.values(DEEP).forEach(R=>{if(Array.isArray(R))R.forEach(r=>{if(r&&LM[r[0]])r[0]=LM[r[0]]})})}catch(_){}}
+/* 연대표 설명창: 같은 나라 줄은 시대 경계를 넘어 같은 높이로 이어지게 (나라마다 고정 줄, 끝난 나라 자리는 다음 나라가 씀) */
+function hzLink(){try{const secs=[...document.querySelectorAll('#ovscroll .hzall .hzbot')];if(secs.length<2)return;
+  const span={};(typeof REIGNS!=='undefined'?REIGNS:[]).forEach(D=>{const n=D.n==='남한'?'대한민국':D.n;const s0=Math.min(...D.r.map(r=>r.s)),e0=Math.max(...D.r.map(r=>r.e));span[n]=[s0,e0]});
+  const LN={};{const ends=[];Object.entries(span).sort((a,b)=>a[1][0]-b[1][0]).forEach(([n,[s0,e0]])=>{let L=-1,be=-1e9;ends.forEach((v,i)=>{if(v<=s0+.5&&v>be){be=v;L=i}});if(L<0){L=ends.length;ends.push(0)}ends[L]=e0;LN[n]=L})}
+  const S=secs.map(hb=>{const kids=[...hb.children];const bands=kids.filter(e=>e.classList.contains('hzband')).map(e=>({e,n:(e.querySelector('b')||{}).textContent||'',t:parseFloat(e.style.top)||0,h:parseFloat(e.style.height)||0}));
+    const blocks=bands.map(B=>({B,els:[B.e],d:0,L:LN[B.n]??99}));const tail={els:[],d:0};let bot=0;
+    kids.forEach(e=>{if(e.classList.contains('hzband')||e.classList.contains('hzsep'))return;const t=parseFloat(e.style.top);if(isNaN(t))return;const bl=blocks.find(x=>t>=x.B.t&&t<x.B.t+x.B.h);(bl||tail).els.push(e)});
+    blocks.sort((p,q)=>(p.L-q.L)||((span[p.B.n]||[0])[0]-(span[q.B.n]||[0])[0]));let cur=6;blocks.forEach(bl=>{bl.d=cur-bl.B.t;cur+=bl.B.h+6});const bandsEnd=bands.length?Math.max(...bands.map(B=>B.t+B.h))+6:6;tail.d=cur-bandsEnd;
+    return {hb,blocks,tail}});
+  const NOL=new Set();const top=(s,i)=>s.blocks[i].B.t+s.blocks[i].d;
+  const push=(s,i,dy)=>{for(let j=i;j<s.blocks.length;j++)s.blocks[j].d+=dy;s.tail.d+=dy};
+  for(let it=0;it<8;it++){let ch=0;for(let k=0;k+1<S.length;k++){const A=S[k],B=S[k+1];A.blocks.forEach((ba,i)=>{const j=B.blocks.findIndex(bb=>bb.B.n===ba.B.n);if(j<0)return;if(NOL.has(k+'|'+ba.B.n))return;const ta=top(A,i),tb=top(B,j);if(Math.abs(ta-tb)<.5)return;if(Math.abs(ta-tb)>150){NOL.add(k+'|'+ba.B.n);return}ch=1;if(ta<tb)push(A,i,tb-ta);else push(B,j,ta-tb)})}if(!ch)break}
+  S.forEach((s,k)=>{const P=S[k-1],N=S[k+1];s.blocks.concat([s.tail]).forEach(bl=>{if(bl.d)bl.els.forEach(e=>{const t=parseFloat(e.style.top)||0;e.style.top=(t+bl.d)+'px'})});
+    const W=s.hb.scrollWidth||s.hb.clientWidth;s.blocks.forEach(bl=>{const e=bl.B.e,n=bl.B.n,inP=P&&!NOL.has((k-1)+'|'+n)&&P.blocks.some(x=>x.B.n===n),inN=N&&!NOL.has(k+'|'+n)&&N.blocks.some(x=>x.B.n===n);let L=parseFloat(e.style.left)||0,Wd=parseFloat(e.style.width)||0;
+      if(inP){Wd+=L;L=0;e.classList.add('cl')}if(inN){Wd=W-L;e.classList.add('cr')}e.style.left=L+'px';e.style.width=Wd+'px'})});
+  S.forEach(s=>{const bl=s.blocks.map(b=>({e:b.B.e,t:parseFloat(b.B.e.style.top)})).sort((p,q)=>p.t-q.t);bl.forEach((b,i)=>{if(i+1<bl.length){const h=bl[i+1].t-6-b.t;if(h>parseFloat(b.e.style.height))b.e.style.height=h+'px'}})});
+  S.forEach((s,k)=>{const P=S[k-1];const cont=P&&s.blocks.some(b=>P.blocks.some(x=>x.B.n===b.B.n));s.hb.classList.toggle('hzcont',!!cont);const sec=s.hb.closest('.hsec');if(sec)sec.classList.toggle('hzcont',!!cont)});
+ }catch(_){}}
+{const bc=buildCont;buildCont=function(){const r=bc.apply(this,arguments);if(ovDir!=='v')hzLink();return r}}
