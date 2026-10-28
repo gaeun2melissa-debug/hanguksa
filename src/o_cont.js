@@ -514,7 +514,7 @@ document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')retu
   const F=FRAMES[pos.i],span=(FRAMES[pos.i+1]?FRAMES[pos.i+1].t:tOfF(pos.i,1))-F.t;const hold=(now-hStart)/1000,mul=Math.min(40,8+hold*16);const rate=span/frameDur(pos.i)*mul; // 꾹 누를수록 빨라짐 (8배 → 40배)
   const T=curT()+dir*rate*dt;const last=tOfF(FRAMES.length-1,.9999);seekT(Math.min(last,T),true);holdUntil=performance.now()+120;scr=requestAnimationFrame(scrub)};
  const stopHold=()=>{clearTimeout(hT);clearInterval(rep);cancelAnimationFrame(scr);scr=0;if(hk){hk=null;holdUntil=performance.now()+200}};
- window.addEventListener('keydown',ev=>{const k=ev.key;if(!KS.includes(k)||ev.ctrlKey||ev.metaKey||ev.altKey)return;const vm=$('v-map');if(!vm||vm.hidden)return;if([...document.querySelectorAll('#kpage,#ovpop,.modal,[role=dialog]')].some(x=>!x.hidden&&x.offsetParent!==null))return;
+ window.addEventListener('keydown',ev=>{const k=ev.key;if(k==='ArrowUp'||k==='ArrowDown')return;if(!KS.includes(k)||ev.ctrlKey||ev.metaKey||ev.altKey)return;const vm=$('v-map');if(!vm||vm.hidden)return;if([...document.querySelectorAll('#kpage,#ovpop,.modal,[role=dialog]')].some(x=>!x.hidden&&x.offsetParent!==null))return;
   const t=ev.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;ev.preventDefault();ev.stopImmediatePropagation();
   if(ev.repeat||hk===k)return;stopHold();hk=k;stepOnce(k);
   hT=setTimeout(()=>{if(hk!==k)return;if(k==='ArrowLeft'||k==='ArrowRight'){sLast=hStart=performance.now();scr=requestAnimationFrame(scrub)}else rep=setInterval(()=>{if(hk===k)stepOnce(k)},550)},240)},true);
@@ -764,3 +764,32 @@ document.querySelectorAll('.pin.flagpin .flg.tgflag').forEach(f=>{if(f.parentNod
  const GR='<path class="grb" d="M0,-12.6C4,-12.6,5.2,-9.2,5.2,-6.2C5.2,-2.4,3,0.6,0,0.6C-3,0.6,-5.2,-2.4,-5.2,-6.2C-5.2,-9.2,-4,-12.6,0,-12.6Z"/><path class="grl" d="M-5,-6.2H5M-4.2,-9.4H4.2M-4.2,-3H4.2M0,-12.4V0.4"/><path class="grc" d="M-2.2,-12.6V-14.8H2.2V-12.6Z"/><path class="grs" d="M2.2,-14.2Q6.8,-14.4,5.8,-9.4"/><circle class="grr" cx="-3.2" cy="-15.4" r="1.4"/>';
  const M={'6·25 전쟁 발발':TK,'서울 수복':TK,'평양 점령':TK,'1·4 후퇴':TK,'낙동강 방어선':GR,'중국군 참전':GR,'국군, 압록강 도달':TK};
  EVENTS.forEach(e=>{const s=M[e.t];if(!s||e.T<1950)return;const o=pinOf.get(e.id);if(!o)return;const gl=o.g.querySelector('.gl');if(!gl)return;gl.innerHTML=s;o.g.classList.add('stelepin','warpin')})}
+/* 나만의 사론: "사신은 논한다," — 주인(나)만 쓰고, 다른 사람은 보기만 (claude.ai 공유 저장소) */
+{let NT={},canW=false,DB=null;
+ const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const hid=k=>[...new TextEncoder().encode(k)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,300);
+ const inner=k=>{const v=NT[k];return v?`<span class="snh">사신은 논한다,</span> <span class="snv">${E(v).replace(/\n/g,'<br>')}</span>`:(canW?'<span class="sna">✎ 사신은 논한다…</span>':'')};
+ const cls=k=>'snote'+(NT[k]?' has':'')+(canW?' mine':'');
+ const html=k=>`<div class="${cls(k)}" data-sk="${E(k)}">${inner(k)}</div>`;
+ const refresh=()=>document.querySelectorAll('.snote[data-sk]').forEach(b=>{if(b.querySelector('textarea'))return;const k=b.dataset.sk;b.className=cls(k);b.innerHTML=inner(k)});
+ const put=async(k,v)=>{const old=NT[k];if(v)NT[k]=v;else delete NT[k];refresh();if(!DB)return;try{const r=DB.collection('sanon').doc(hid(k));if(v)await r.set({k,v,at:Date.now()});else await r.delete()}catch(_){if(old)NT[k]=old;else delete NT[k];refresh()}};
+ const ed=box=>{if(!canW||box.querySelector('textarea'))return;const k=box.dataset.sk;box.classList.add('ed');box.innerHTML='<span class="snh">사신은 논한다,</span><textarea rows="2" placeholder="내 생각을 적어 보세요"></textarea>';const ta=box.querySelector('textarea');ta.value=NT[k]||'';const fit=()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px'};ta.addEventListener('input',fit);fit();ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);
+   ta.addEventListener('blur',()=>{const v=ta.value.trim();box.classList.remove('ed');ta.remove();if(v!==(NT[k]||''))put(k,v);else refresh()})};
+ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.snote.mine');if(!b||e.target.tagName==='TEXTAREA')return;e.stopPropagation();ed(b)},true);
+ window.addEventListener('keydown',e=>{const t=e.target;if(!(t&&t.closest&&t.closest('.snote')))return;e.stopImmediatePropagation();if(e.key==='Escape'||(e.key==='Enter'&&!e.shiftKey&&!e.isComposing)){e.preventDefault();t.blur()}},true);
+ ['keyup','keypress'].forEach(ev=>window.addEventListener(ev,e=>{const t=e.target;if(t&&t.closest&&t.closest('.snote'))e.stopImmediatePropagation()},true));
+ const ev0=evDetailHTML;evDetailHTML=function(e){return ev0.apply(this,arguments)+html('e:'+(e.id!=null?e.id:e.t))};
+ const kp=$('kpage');if(kp){const add=()=>{if(kp.querySelector('.snote'))return;const h=kp.querySelector('h2,h1,.kn,.ttl');const key=(h?h.textContent:'').trim();if(!key)return;const host=kp.querySelector('.kpin,.kbody,.pbody')||kp;host.insertAdjacentHTML('beforeend',html('k:'+key))};new MutationObserver(()=>{clearTimeout(add.t);add.t=setTimeout(add,30)}).observe(kp,{childList:true,subtree:false})}
+ (async()=>{try{if(!window.claude||!claude.use)return;const [db,us]=await Promise.all([claude.use('db'),claude.use('user')]);canW=!!(us&&await us.isOwner());DB=canW?db:null;refresh();
+   if(db)db.collection('sanon').onSnapshot(q=>{const n={};q.docs.forEach(d=>{const x=d.data();if(x&&x.k&&x.v)n[x.k]=String(x.v)});NT=n;refresh()},()=>{})}catch(_){}})()}
+/* ↑↓: 지금 보이는 설명창 위아래로 움직이기 (Ctrl+방향키는 지도 이동 그대로) */
+{let mx=-1,my=-1;document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY},{passive:true});
+ const canS=el=>{const cs=getComputedStyle(el);return /(auto|scroll)/.test(cs.overflowY)&&el.scrollHeight>el.clientHeight+2};
+ const vis=el=>{const r=el.getBoundingClientRect();const w=Math.min(r.right,innerWidth)-Math.max(r.left,0),h=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);return w>20&&h>20?w*h:0};
+ const pick=()=>{if(mx>=0){let e=document.elementFromPoint(mx,my);while(e&&e!==document.body){if(canS(e)&&vis(e))return e;e=e.parentElement}}
+   let best=null,ba=0;document.querySelectorAll('#pbody,.pbody,.hzbot,#ovread,#ovscroll,#tlread,#kpage,.kbody,.ovside,[id$="read"],[class*="body"]').forEach(e=>{if(e.offsetParent===null||!canS(e))return;const a=vis(e);if(a>ba){ba=a;best=e}});return best};
+ window.addEventListener('keydown',e=>{if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;if(e.ctrlKey||e.metaKey||e.altKey||e.shiftKey)return;const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+   const el=pick();if(!el)return;e.preventDefault();e.stopImmediatePropagation();el.scrollBy({top:(e.key==='ArrowDown'?1:-1)*Math.max(60,el.clientHeight*.18),behavior:e.repeat?'auto':'smooth'})},true)}
+
+/* 사전 인물 카드: '자세히 →' 바로 인물 화면으로 */
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-pdeep]');if(!b)return;e.preventDefault();e.stopPropagation();try{openPerson(b.dataset.pdeep)}catch(_){}},true);
