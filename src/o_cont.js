@@ -444,7 +444,7 @@ function applyNameT(){try{const t=curT();OV.forEach(o=>{if(!o.slab)return;const 
 applyNameT();
 /* 장면 중간에 세워진 나라: 세운 해부터 땅이 생기고(그 전엔 신라 땅 색), 이름이 바뀌면 색도 바뀜.
    재생 중에는 도읍에서 사악 퍼지듯이 */
-const STATE_STEPS={taebong:{pre:'silla',steps:[[901,null,[126.55,37.97]],[918,'goryeo',[127.31,38.25]]]},goguryeo:{pre:null,steps:[[-37,null,[125.4,41.27]]]},baekje:{fr:7,keepLab:1,hideLab:1,steps:[[660,'silla',[126.92,36.28]]]},mahan:{preTint:1,keepLab:1,steps:[[369,null,[127.11,37.52]]],ban:{y:369,t:'백제, 마한 복속',tp:['pol'],ll:[127.11,37.52]}},jinhan:{preTint:1,keepLab:1,steps:[[-57,null,[129.21,35.83]]]},byeonhan:{preTint:1,keepLab:1,steps:[[42,null,[128.88,35.23]]]}};
+const STATE_STEPS={taebong:{pre:'silla',steps:[[901,null,[126.55,37.97]],[918,'goryeo',[127.31,38.25]]]},goguryeo:{pre:null,steps:[[-37,null,[125.4,41.27]]]},baekje:{fr:7,keep:1,keepLab:1,hideLab:1,steps:[[660,'silla',[126.92,36.28]]]},mahan:{preTint:1,keepLab:1,steps:[[369,null,[127.11,37.52]]],ban:{y:369,t:'백제, 마한 복속',tp:['pol'],ll:[127.11,37.52]}},jinhan:{preTint:1,keepLab:1,steps:[[-57,null,[129.21,35.83]]]},byeonhan:{preTint:1,keepLab:1,steps:[[42,null,[128.88,35.23]]]}};
 const tcol=k=>`color-mix(in srgb,var(--c-${k}) 66%,var(--land))`,lcol=k=>`color-mix(in srgb,var(--c-${k}) 52%,var(--ink))`;
 function spreadFill(c,fill,ll){const p=c.el;if(c.sp){c.sp.end()}if(!fill)fill=getComputedStyle(p).fill;
   const cid='sp'+Math.random().toString(36).slice(2,8),cp=el('clipPath',{id:cid},$('defs')),ci=el('circle',{cx:X(ll[0]),cy:Y(ll[1]),r:0},cp);
@@ -456,7 +456,7 @@ function applyStates(fresh){try{const t=curT();for(const [id,S] of Object.entrie
     if(S.fr!=null&&pos.i!==S.fr){if(c.stk!=null){c.stk=null;c.lab.g.style.visibility=''}continue}
     if(fresh||c.base==null){c.base=c.el.style.fill||getComputedStyle(c.el).fill;c.lbase=c.lab.t.style.fill;c.stk=null}
     let k=-1;S.steps.forEach(([y],i)=>{if(t>=y-1e-6)k=i});const key=String(k);if(c.stk===key)continue;
-    const hid=k<0&&!S.pre&&!S.preTint;const fill=k<0?(S.preTint?`color-mix(in srgb,${c.base} 32%,var(--land))`:S.pre?tcol(S.pre):c.base):(S.steps[k][1]?tcol(S.steps[k][1]):c.base),lf=k<0?null:(S.steps[k][1]?lcol(S.steps[k][1]):c.lbase);
+    const hid=k<0&&!S.pre&&!S.preTint&&!S.keep;const fill=k<0?(S.preTint?`color-mix(in srgb,${c.base} 32%,var(--land))`:S.pre?tcol(S.pre):c.base):(S.steps[k][1]?tcol(S.steps[k][1]):c.base),lf=k<0?null:(S.steps[k][1]?lcol(S.steps[k][1]):c.lbase);
     const anim=!fresh&&c.stk!=null&&+key>+c.stk&&!reduceMotion;c.stk=key;
     c.lab.g.style.visibility=(k<0&&!S.keepLab)||(k>=0&&S.hideLab)?'hidden':'';if(lf)c.lab.t.style.fill=lf;
     if(anim&&S.ban&&k>=0){try{const b=Object.assign({T:S.ban.y,f:pos.i,id:-1},S.ban);topBanner(b)}catch(_){}}
