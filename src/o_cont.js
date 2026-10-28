@@ -549,18 +549,28 @@ fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')B
   MID.push({id:'goguryeo',steps:[[F6.t,g5('goguryeo').d,g5('goguryeo').lab],[553,k6.d,k6.lab]]});
   const gy=Object.assign({},g5('gaya'));F6.st.push(gy);MID.push({id:'gaya',until:562})}
  MID.push({id:'goguryeo',fr:7,until:668});{const F3=FRAMES[3],F4=FRAMES[4],a=F3&&F3.st.find(x=>x.id==='goguryeo'),b=F4&&F4.st.find(x=>x.id==='goguryeo');const oj=['okjeo','dongye'].map(id=>(F3.st.find(x=>x.id===id)||{}).d).filter(Boolean).join(' ');if(a&&b)MID.push({id:'goguryeo',fr:3,steps:[[F3.t,a.d,a.lab],[56,a.d+' '+oj,a.lab,[127.3,40.9]],[313,b.d,b.lab]]});MID.push({id:'nangnang',fr:3,until:313});MID.push({id:'okjeo',fr:3,until:56,lag:1900});MID.push({id:'dongye',fr:3,until:56,lag:1900})}MID.push({id:'balhae',fr:10,until:926});
+/* 고조선: 연(진개) 침략(기원전 3세기)으로 서쪽 땅을 잃고, 위만 때 진번·임둔 복속 */
+{try{const F2=FRAMES[2],F3=FRAMES[3],g=F2&&F2.st.find(s=>s.id==='gojoseon');if(g&&!g._cut){
+ const A=[X(121.0),Y(38.5)],B=[X(122.9),Y(44.6)],sd=p=>(B[0]-A[0])*(p[1]-A[1])-(B[1]-A[1])*(p[0]-A[0]),ref=Math.sign(sd([X(125),Y(41)]));
+ const inn=p=>sd(p)*ref>=0,cut=(p,q)=>{const a=sd(p),b=sd(q),u=a/(a-b);return [p[0]+(q[0]-p[0])*u,p[1]+(q[1]-p[1])*u]};
+ const clip=d=>d.split('Z').map(x=>x.trim()).filter(Boolean).map(x=>{const P=x.replace(/^M/,'').split('L').map(t=>t.split(',').map(Number));const o=[];for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length];if(inn(p)){o.push(p);if(!inn(q))o.push(cut(p,q))}else if(inn(q))o.push(cut(p,q))}return o.length>2?'M'+o.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L')+'Z':''}).join('');
+ const d1=clip(g.d);const add=['nangnang','dongye'].map(id=>(F3.st.find(x=>x.id===id)||{}).d).filter(Boolean).join(' ');g._cut=1;
+ MID.push({id:'gojoseon',fr:2,steps:[[F2.t,g.d,g.lab],[-300,d1,g.lab],[-190,d1+' '+add,g.lab,[125.75,39.02]]]});
+ {const af=applyFrame;let lk=null;const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);try{if(pos.i===2){const t=curT(),k=t>=-190;if(lk===false&&k&&playing)topBanner({T:-190,f:2,id:-1,t:'위만 조선, 진번·임둔 복속',tp:['war','pol'],ll:[125.75,39.02]});lk=k}else lk=null}catch(_){}return r}}
+}}catch(_){}}
+
  {const F4=FRAMES[4],g4=id=>F4&&F4.st.find(s=>s.id===id);['goguryeo','baekje'].forEach(id=>{const a=g4(id),b=g5(id);if(a&&b&&a.d!==b.d)MID.push({id,fr:5,steps:[[F5.t,a.d,a.lab],[475,b.d,b.lab]]})});
   const a=g4('silla'),b=g5('silla');if(a&&b&&a.d!==b.d)MID.push({id:'silla',fr:5,steps:[[F5.t,a.d,a.lab],[475,b.d,b.lab]]})}
  const mor=(c,d1,lab,anim)=>{{const tk=(typeof morphTasks!=='undefined'&&morphTasks||[]).find(k=>k.cur===c);if(tk){tk.to=d1;try{tk.f=flubber.interpolate(tk.from,d1,{maxSegmentLength:7})}catch(_){tk.f=null}if(lab)tk.l1=lab;c.d=d1;return}}const p=c.el,d0=p.getAttribute('d');if(d0===d1)return;cancelAnimationFrame(c.mr);
    if(!anim||typeof flubber==='undefined'||reduceMotion){p.setAttribute('d',d1);c.d=d1;if(lab){c.lab.o.x=lab[0];c.lab.o.y=lab[1]}placeOV();schedLabels();return}
    let f=null;try{f=flubber.interpolate(d0,d1,{maxSegmentLength:7})}catch(_){}const l0=[c.lab.o.x,c.lab.o.y],t0=performance.now(),D=2000;c.d=d1;
    const st=now=>{const u=Math.min(1,(now-t0)/D),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;p.setAttribute('d',f?(u>=1?d1:f(e)):(e<.5?d0:d1));if(lab){c.lab.o.x=l0[0]+(lab[0]-l0[0])*e;c.lab.o.y=l0[1]+(lab[1]-l0[1])*e}placeOV();if(u<1)c.mr=requestAnimationFrame(st);else schedLabels()};c.mr=requestAnimationFrame(st)};
- function applyMid(fresh){if(![3,5,6,7,10].includes(pos.i))return;try{const t=curT();for(const M of MID){if((M.fr||6)!==pos.i)continue;const c=shapes.get(M.id);if(!c)continue;
+ function applyMid(fresh){if(![2,3,5,6,7,10].includes(pos.i))return;try{const t=curT();for(const M of MID){if((M.fr||6)!==pos.i)continue;const c=shapes.get(M.id);if(!c)continue;
    if(M.until){const on=t<M.until-1e-6;const key=String(on);if(c.mk===key&&!fresh)continue;const anim=!fresh&&c.mk!=null;c.mk=key;clearTimeout(c.ut);if(anim&&!on&&M.lag){c.el.style.transition='none';c.lab.g.style.transition='opacity .8s';c.lab.g.style.opacity='0';c.ut=setTimeout(()=>{c.el.style.opacity='0';c.lab.g.style.visibility='hidden';c.lab.g.style.opacity=''},M.lag);continue}c.el.style.transition=anim&&!M.lag?'opacity 1.6s':'none';c.el.style.opacity=on?'':'0';c.lab.g.style.opacity='';c.lab.g.style.visibility=on?'':'hidden';continue}
    let k=0;M.steps.forEach(([y],i)=>{if(t>=y-1e-6)k=i});const key=String(k);if(c.mk===key&&!fresh)continue;const anim=!fresh&&c.mk!=null&&+key>+c.mk;c.mk=key;if(c.sm)c.sm.end(false);const S=M.steps[k];if(anim&&S[3]&&!reduceMotion)spreadMor(c,S[1],S[2],S[3]);else mor(c,S[1],S[2],anim)}}catch(_){}}
  function spreadMor(c,d1,lab,ll){const p=c.el;cancelAnimationFrame(c.mr);const cid='sm'+Math.random().toString(36).slice(2,8),cp=el('clipPath',{id:cid},$('defs')),cx=X(ll[0]),cy=Y(ll[1]),ci=el('circle',{cx,cy,r:0},cp);const cl=p.cloneNode(false);cl.removeAttribute('id');cl.setAttribute('d',d1);cl.style.transition='none';cl.style.opacity='1';cl.style.pointerEvents='none';cl.setAttribute('clip-path',`url(#${cid})`);p.parentNode.appendChild(cl);let R=600;try{const bb=cl.getBBox();R=Math.max(...[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]].map(([x,y])=>Math.hypot(x-cx,y-cy)))+10}catch(_){}let raf=0;const t0=performance.now(),D=2000;const end=(fin)=>{cancelAnimationFrame(raf);cl.remove();cp.remove();c.sm=null;if(fin!==false)mor(c,d1,lab,false)};c.sm={end};const st=now=>{const u=Math.min(1,(now-t0)/D),k=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;ci.setAttribute('r',(R*k).toFixed(1));if(u<1)raf=requestAnimationFrame(st);else end()};raf=requestAnimationFrame(st)}
  window.__applyMid=applyMid;{const ut=updateTime;updateTime=function(){const r=ut.apply(this,arguments);applyMid(false);return r}}
- {const af=applyFrame;applyFrame=function(i){MID.forEach(M=>{const c=shapes.get(M.id);if(c){c.mk=null;c.el.style.opacity='';c.lab.g.style.opacity='';c.lab.g.style.visibility=''}});const r=af.apply(this,arguments);if([3,5,6,7,10].includes(i))applyMid(true);return r}}
+ {const af=applyFrame;applyFrame=function(i){MID.forEach(M=>{const c=shapes.get(M.id);if(c){c.mk=null;c.el.style.opacity='';c.lab.g.style.opacity='';c.lab.g.style.visibility=''}});const r=af.apply(this,arguments);if([2,3,5,6,7,10].includes(i))applyMid(true);return r}}
  if(pos.i===6){try{applyFrame(6,false)}catch(_){}}}
 /* 비석 사건은 진짜 비석 모양으로 땅에 세움 */
 {const RE=/릉비|순수비|정계비|척화비|령비|비 건립/;
@@ -740,3 +750,17 @@ DEEP['단군왕검']=[['무엇','사람 이름이 아니라 고조선 지배자�
  document.querySelectorAll('.pin.flagpin .tgk').forEach(t=>{if(t.querySelector(':scope>.tgin'))return;const g=document.createElementNS(NS,'g');g.setAttribute('class','tgin');g.setAttribute('transform','translate(7.9,-20.2) scale(.78) translate(-7.9,20.2)');while(t.firstChild)g.appendChild(t.firstChild);const w=document.createElementNS(NS,'g');w.setAttribute('clip-path','url(#tgcloth)');w.appendChild(g);t.appendChild(w)})}
 /* 태극기도 펄럭이게: 천과 그림을 한 묶음으로 같이 흔듦 (그림이 천 밖으로 안 나감) */
 document.querySelectorAll('.pin.flagpin .flg.tgflag').forEach(f=>{if(f.parentNode.classList.contains('tgwrap'))return;const t=f.parentNode.querySelector('.tgk');const w=document.createElementNS('http://www.w3.org/2000/svg','g');w.setAttribute('class','tgwrap');f.before(w);w.appendChild(f);if(t)w.appendChild(t)});
+
+/* 비파형 동검 출토지 (청동기·고조선 장면) */
+{const NS='http://www.w3.org/2000/svg',SITES=[[120.45,41.57,'조양 십이대영자'],[123.43,41.8,'선양 정가와자'],[121.62,38.98,'다롄 강상'],[125.55,39.35,'평양 부근'],[127.66,34.78,'여수 적량동']];
+ const DG='<path class="bpb" d="M0,-15.5C1.7,-13.4,2.9,-11.6,2.3,-9.6C1.8,-8.2,3.4,-6.8,3,-5.1C2.6,-3.6,1,-2.9,0.6,-2.2H-0.6C-1,-2.9,-2.6,-3.6,-3,-5.1C-3.4,-6.8,-1.8,-8.2,-2.3,-9.6C-2.9,-11.6,-1.7,-13.4,0,-15.5Z"/><path class="bpr" d="M0,-14V-3"/><path class="bph" d="M-2.4,-2.2H2.4M0,-2.2V1.6"/>';
+ const gs=SITES.map(([lo,la,nm],i)=>{const g=document.createElementNS(NS,'g');g.setAttribute('class','bpin');g.innerHTML=DG+(i===1?'<text class="bpt" x="5" y="-6">비파형 동검</text>':'')+`<title>비파형 동검 · ${nm}</title>`;G.pins.insertBefore(g,G.pins.firstChild);const o={g,x:X(lo),y:Y(la)};OV.push(o);return g});
+ const sync=()=>{const on=pos.i===2;gs.forEach(g=>g.style.display=on?'':'none')};
+ {const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);sync();return r}}sync();placeOV()}
+/* 고조선 장면은 밑깔개 없이 (서쪽 잃은 땅이 밑에 남지 않게) */
+{const af=applyFrame;const sy=()=>{const b=G.terr.querySelector('.terrbase');if(b)b.style.display=pos.i===2?'none':''};applyFrame=function(){const r=af.apply(this,arguments);sy();return r};sy()}
+/* 6·25 전쟁: 탱크·수류탄 아이콘 */
+{const TK='<path class="tkt" d="M-10,-1.2Q-10.8,-4.2,-8,-4.6H8Q10.8,-4.2,10,-1.2Q9.2,0.6,7,0.6H-7Q-9.2,0.6,-10,-1.2Z"/><circle class="tkw" cx="-6" cy="-2" r="1.3"/><circle class="tkw" cx="-2" cy="-2" r="1.3"/><circle class="tkw" cx="2" cy="-2" r="1.3"/><circle class="tkw" cx="6" cy="-2" r="1.3"/><path class="tkb" d="M-7.6,-4.6L-6.4,-7.6H6.4L7.6,-4.6Z"/><path class="tkh" d="M-4,-7.6Q-3.6,-11.2,0,-11.2Q3.6,-11.2,4,-7.6Z"/><path class="tkg" d="M2.6,-9.6H13.2"/>';
+ const GR='<path class="grb" d="M0,-12.6C4,-12.6,5.2,-9.2,5.2,-6.2C5.2,-2.4,3,0.6,0,0.6C-3,0.6,-5.2,-2.4,-5.2,-6.2C-5.2,-9.2,-4,-12.6,0,-12.6Z"/><path class="grl" d="M-5,-6.2H5M-4.2,-9.4H4.2M-4.2,-3H4.2M0,-12.4V0.4"/><path class="grc" d="M-2.2,-12.6V-14.8H2.2V-12.6Z"/><path class="grs" d="M2.2,-14.2Q6.8,-14.4,5.8,-9.4"/><circle class="grr" cx="-3.2" cy="-15.4" r="1.4"/>';
+ const M={'6·25 전쟁 발발':TK,'서울 수복':TK,'평양 점령':TK,'1·4 후퇴':TK,'낙동강 방어선':GR,'중국군 참전':GR,'국군, 압록강 도달':TK};
+ EVENTS.forEach(e=>{const s=M[e.t];if(!s||e.T<1950)return;const o=pinOf.get(e.id);if(!o)return;const gl=o.g.querySelector('.gl');if(!gl)return;gl.innerHTML=s;o.g.classList.add('stelepin','warpin')})}
