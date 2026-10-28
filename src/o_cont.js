@@ -538,6 +538,8 @@ document.addEventListener('keydown',ev=>{if(ev.code!=='Space'&&ev.key!==' ')retu
 /* 나갔다 와서 다시 재생할 때 음악이 안 켜지던 문제: 늦게 실행된 '멈춤 처리'가 새로 켠 음악을 끄지 않게 */
 fileStop=function(){if(BGA&&!BGA.paused)fadeTo(BGA,0,600,()=>{if(bgOn!=='file')BGA.pause()})};
 {const p0=play;play=function(){const r=p0.apply(this,arguments);try{if(AC&&AC.state!=='running')AC.resume();if(bgOn==='file'&&BGA&&BGA.paused){const pr=BGA.play();if(pr&&pr.catch)pr.catch(()=>{})}}catch(_){}return r}}
+/* 옥저·동예는 고구려에 복속 — 4세기부터 그 땅도 고구려 땅으로 */
+(function(){try{const F3=FRAMES[3],F4=FRAMES[4];const g=F4&&F4.st.find(s=>s.id==='goguryeo');if(!g||g._oj)return;const add=['okjeo','dongye'].map(id=>(F3.st.find(s=>s.id===id)||{}).d).filter(Boolean);g.d=g.d+' '+add.join(' ');g._oj=1;if(pos.i===4){const c=shapes.get('goguryeo');if(c){c.el.setAttribute('d',g.d);c.d=g.d}}}catch(_){}})();
 /* 6세기: 장면 안에서 영토가 바뀜 — 553 신라 한강 장악(고구려 남쪽 땅이 신라로), 562 대가야 멸망(가야 → 신라) */
 {const F5=FRAMES[5],F6=FRAMES[6],g5=id=>F5&&F5.st.find(s=>s.id===id),g6=id=>F6&&F6.st.find(s=>s.id===id);
  const MID=[];
