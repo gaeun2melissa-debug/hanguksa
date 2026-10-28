@@ -803,15 +803,39 @@ function hzLink(){try{const secs=[...document.querySelectorAll('#ovscroll .hzall
   const S=secs.map(hb=>{const kids=[...hb.children];const bands=kids.filter(e=>e.classList.contains('hzband')).map(e=>({e,n:(e.querySelector('b')||{}).textContent||'',t:parseFloat(e.style.top)||0,h:parseFloat(e.style.height)||0}));
     const blocks=bands.map(B=>({B,els:[B.e],d:0,L:LN[B.n]??99}));const tail={els:[],d:0};let bot=0;
     kids.forEach(e=>{if(e.classList.contains('hzband')||e.classList.contains('hzsep'))return;const t=parseFloat(e.style.top);if(isNaN(t))return;const bl=blocks.find(x=>t>=x.B.t&&t<x.B.t+x.B.h);(bl||tail).els.push(e)});
-    blocks.sort((p,q)=>(p.L-q.L)||((span[p.B.n]||[0])[0]-(span[q.B.n]||[0])[0]));let cur=6;blocks.forEach(bl=>{bl.d=cur-bl.B.t;cur+=bl.B.h+6});const bandsEnd=bands.length?Math.max(...bands.map(B=>B.t+B.h))+6:6;tail.d=cur-bandsEnd;
+    blocks.sort((p,q)=>(p.L-q.L)||((span[p.B.n]||[0])[0]-(span[q.B.n]||[0])[0]));let cur=6,lastL=null,lt=6,lb=6;blocks.forEach(bl=>{if(bl.L===lastL&&bl.L!==99){bl.d=lt-bl.B.t;lb=Math.max(lb,lt+bl.B.h+6);cur=lb}else{lt=cur;bl.d=cur-bl.B.t;lb=cur+bl.B.h+6;cur=lb}lastL=bl.L});const bandsEnd=bands.length?Math.max(...bands.map(B=>B.t+B.h))+6:6;tail.d=cur-bandsEnd;
     return {hb,blocks,tail}});
   const NOL=new Set();const top=(s,i)=>s.blocks[i].B.t+s.blocks[i].d;
   const push=(s,i,dy)=>{for(let j=i;j<s.blocks.length;j++)s.blocks[j].d+=dy;s.tail.d+=dy};
-  for(let it=0;it<8;it++){let ch=0;for(let k=0;k+1<S.length;k++){const A=S[k],B=S[k+1];A.blocks.forEach((ba,i)=>{const j=B.blocks.findIndex(bb=>bb.B.n===ba.B.n);if(j<0)return;if(NOL.has(k+'|'+ba.B.n))return;const ta=top(A,i),tb=top(B,j);if(Math.abs(ta-tb)<.5)return;if(Math.abs(ta-tb)>150){NOL.add(k+'|'+ba.B.n);return}ch=1;if(ta<tb)push(A,i,tb-ta);else push(B,j,ta-tb)})}if(!ch)break}
+  for(let it=0;it<8;it++){let ch=0;for(let k=0;k+1<S.length;k++){const A=S[k],B=S[k+1];A.blocks.forEach((ba,i)=>{const j=B.blocks.findIndex(bb=>bb.B.n===ba.B.n);if(j<0)return;if(NOL.has(k+'|'+ba.B.n))return;const ta=top(A,i),tb=top(B,j);if(Math.abs(ta-tb)<.5)return;ch=1;if(ta<tb)push(A,i,tb-ta);else push(B,j,ta-tb)})}if(!ch)break}
   S.forEach((s,k)=>{const P=S[k-1],N=S[k+1];s.blocks.concat([s.tail]).forEach(bl=>{if(bl.d)bl.els.forEach(e=>{const t=parseFloat(e.style.top)||0;e.style.top=(t+bl.d)+'px'})});
     const W=s.hb.scrollWidth||s.hb.clientWidth;s.blocks.forEach(bl=>{const e=bl.B.e,n=bl.B.n,inP=P&&!NOL.has((k-1)+'|'+n)&&P.blocks.some(x=>x.B.n===n),inN=N&&!NOL.has(k+'|'+n)&&N.blocks.some(x=>x.B.n===n);let L=parseFloat(e.style.left)||0,Wd=parseFloat(e.style.width)||0;
       if(inP){Wd+=L;L=0;e.classList.add('cl')}if(inN){Wd=W-L;e.classList.add('cr')}e.style.left=L+'px';e.style.width=Wd+'px'})});
   S.forEach(s=>{const bl=s.blocks.map(b=>({e:b.B.e,t:parseFloat(b.B.e.style.top)})).sort((p,q)=>p.t-q.t);bl.forEach((b,i)=>{if(i+1<bl.length){const h=bl[i+1].t-6-b.t;if(h>parseFloat(b.e.style.height))b.e.style.height=h+'px'}})});
   S.forEach((s,k)=>{const P=S[k-1];const cont=P&&s.blocks.some(b=>P.blocks.some(x=>x.B.n===b.B.n));s.hb.classList.toggle('hzcont',!!cont);const sec=s.hb.closest('.hsec');if(sec)sec.classList.toggle('hzcont',!!cont)});
  }catch(_){}}
-{const bc=buildCont;buildCont=function(){const r=bc.apply(this,arguments);if(ovDir!=='v')hzLink();return r}}
+let hzSyncing=false;const hzBots=()=>[...document.querySelectorAll('#ovscroll .hzall .hzbot')];
+function hzSetTop(y){hzSyncing=true;hzBots().forEach(h=>{if(Math.abs(h.scrollTop-y)>1)h.scrollTop=y});requestAnimationFrame(()=>{hzSyncing=false})}
+function hzTopScroll(){const sc=$('ovscroll');if(!sc)return;const cx=sc.getBoundingClientRect().left+sc.clientWidth*.35;const hb=hzBots().find(h=>{const r=h.getBoundingClientRect();return r.left<=cx&&r.right>cx});if(!hb)return;const ts=[...hb.querySelectorAll('.hzband')].map(b=>parseFloat(b.style.top)||0);hzSetTop(ts.length?Math.max(0,Math.min(...ts)-6):0)}
+{const sc=$('ovscroll');if(sc){sc.addEventListener('scroll',e=>{const t=e.target;if(hzSyncing||!t.classList||!t.classList.contains('hzbot'))return;hzSetTop(t.scrollTop)},true);let lx=sc.scrollLeft,tm=0;sc.addEventListener('scroll',e=>{if(e.target!==sc)return;clearTimeout(tm);tm=setTimeout(()=>{if(Math.abs(sc.scrollLeft-lx)>300)hzTopScroll();lx=sc.scrollLeft},220)},{passive:true})}}
+{const bc=buildCont;buildCont=function(){const r=bc.apply(this,arguments);if(ovDir!=='v'){hzLink();hzTopScroll();setTimeout(hzTopScroll,50)}return r}}
+/* 자세히 화면 위쪽 ‹ › : 사전·인물·왕계표 순서대로 옆 항목으로 */
+{let CUR=null,dep=0;const vis=id=>{const v=$(id);return v&&!v.hidden&&v.offsetParent!==null};
+ const wrap=(name,mk)=>{const f=window[name];if(typeof f!=='function')return;window[name]=function(){const top=dep===0;dep++;try{if(top&&!CUR_LOCK)CUR=mk.apply(null,arguments)}catch(_){}try{return f.apply(this,arguments)}finally{dep--}}};
+ let CUR_LOCK=false;
+ const src=()=>vis('v-pp')?'pp':vis('v-dc')?'dc':null;
+ wrap('openTerm',k=>({t:'term',k,src:'dc'}));
+ wrap('openPerson',(n,T)=>({t:'person',k:n,T,src:src()||'dc'}));
+ wrap('openKing',(dn,i)=>({t:'king',dn,i,src:src()==='pp'?'pp':'king'}));
+ const dcList=()=>[...document.querySelectorAll('#dcbody [data-k]')].map(e=>({k:e.dataset.k,p:e.classList.contains('gp')}));
+ const ppList=()=>{const s=new Set();return [...document.querySelectorAll('#ppbody [data-person]')].filter(b=>!s.has(b.dataset.person)&&s.add(b.dataset.person)).map(b=>({k:b.dataset.person,T:b.dataset.pt!=null?+b.dataset.pt:undefined}))};
+ const go=dir=>{if(!CUR)return;CUR_LOCK=true;let next=null;try{
+   if(CUR.t==='king'&&CUR.src==='king'){const D=DYN[CUR.dn];const j=CUR.i+dir;if(D&&D.r[j]){openKing(CUR.dn,j);next={...CUR,i:j}}}
+   else if(CUR.src==='pp'){const L=ppList();const nm=CUR.t==='king'?(DYN[CUR.dn].r[CUR.i]||{}).name:CUR.k;let i=L.findIndex(x=>x.k===nm||x.k===CUR.k);if(i<0&&CUR.t==='king')i=L.findIndex(x=>nm&&nm.startsWith(x.k));const o=L[i+dir];if(o){next={t:'person',k:o.k,T:o.T,src:'pp'};openPerson(o.k,o.T)}}
+   else{const L=dcList();const i=L.findIndex(x=>x.k===CUR.k);const o=L[i+dir];if(o){next={t:o.p?'person':'term',k:o.k,src:'dc'};o.p?openPerson(o.k):openTerm(o.k)}}
+  }catch(_){}finally{CUR_LOCK=false}if(next)CUR=next};
+ const kp=$('kpage');if(kp){const add=()=>{const bar=kp.querySelector('.kpbar');if(!bar||bar.querySelector('.kpnav'))return;bar.insertAdjacentHTML('beforeend','<span class="kpnav"><button type="button" class="ib" data-kpv="-1" aria-label="이전 항목"><svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="ib" data-kpv="1" aria-label="다음 항목"><svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></span>')};
+  new MutationObserver(add).observe(kp,{childList:true});add();
+  kp.addEventListener('click',e=>{const b=e.target.closest('[data-kpv]');if(!b)return;e.preventDefault();e.stopPropagation();go(+b.dataset.kpv)},true)}}
+/* 연대표 설명창 업적: 처음엔 한 줄, 누르면 펼침 */
+document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest('.hzach.fold');if(!c||e.target.closest('[data-king]')||e.target.closest('.gw'))return;e.stopPropagation();const op=!c.classList.contains('open');document.querySelectorAll('.hzach.open').forEach(x=>x.classList.remove('open'));if(op)c.classList.add('open')},true);
