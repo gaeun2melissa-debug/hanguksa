@@ -1071,6 +1071,15 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 #kpage .kpin .tmrows .gdr{padding:6px 0;border-bottom:1px dashed color-mix(in srgb,var(--ink) 10%,transparent)}#kpage .kpin .tmrows .gdr:last-child{border-bottom:0}
 #kpage .kpin .kpl li{padding:8px 0;border-bottom:1px dashed color-mix(in srgb,var(--ink) 10%,transparent)}#kpage .kpin .kpl li:last-child{border-bottom:0}
 #kpage{background:color-mix(in srgb,var(--ink) 4%,var(--paper))}
+
+.gdr{display:grid!important;grid-template-columns:76px 1fr;gap:12px;align-items:start}
+.gdr>i{font-style:normal;justify-self:start;font-size:11.5px;font-weight:800;letter-spacing:.04em;line-height:1;padding:5px 10px;border-radius:999px;margin-top:2px;color:var(--lc,#64748b);background:color-mix(in srgb,var(--lc,#64748b) 12%,var(--panel));white-space:nowrap}
+.gdr>span{line-height:1.65}
+.gdr[data-l="주도"],.gdr[data-l="인물"]{--lc:#2563eb}.gdr[data-l="배경"]{--lc:#c2410c}.gdr[data-l="내용"],.gdr[data-l="정체"]{--lc:#15803d}.gdr[data-l="결과"]{--lc:#7c3aed}.gdr[data-l="전개"]{--lc:#0e7490}.gdr[data-l="외세 관계"],.gdr[data-l="대립"]{--lc:#be123c}.gdr[data-l="시기"]{--lc:#a16207}
+#kpage .kpin .tmrows .gdr{padding:9px 0}
+.kpp button.pchip{padding:3px 12px 3px 3px;gap:7px;background:color-mix(in srgb,var(--kc,var(--seal)) 7%,var(--panel));border-color:color-mix(in srgb,var(--kc,var(--seal)) 25%,transparent);font-weight:700;letter-spacing:.02em}
+.kpp button.pchip i{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font-style:normal;font-size:12px;font-weight:800;color:#fff;background:var(--kc,var(--seal))}
+.kpp button.pchip:hover{background:color-mix(in srgb,var(--kc,var(--seal)) 14%,var(--panel))}
 </style>
 
 <div class="app">
@@ -5180,7 +5189,7 @@ const DEEP={
  new MutationObserver(()=>{if(gp.hidden||gp.querySelector('.gdmore'))return;const dc=gp.querySelector('[data-dc]');if(!dc)return;const k=dc.dataset.dc;const R=DEEP[k]||rowsAuto(k);dc.textContent='사전에서 보기 →';if(!R.length)return;
    dc.insertAdjacentHTML('beforebegin',`<button type="button" class="ppgo gdmore">더 자세히 ▾</button>`)}).observe(gp,{childList:true,subtree:true});
  gp.addEventListener('click',ev=>{const b=ev.target.closest('.gdmore');if(!b)return;ev.stopPropagation();ev.preventDefault();const dc=gp.querySelector('[data-dc]');const k=dc&&dc.dataset.dc;let d=gp.querySelector('.gdeep');if(d){d.remove();b.textContent='더 자세히 ▾';return}
-   const R=DEEP[k]||rowsAuto(k);b.insertAdjacentHTML('beforebegin',`<div class="gdeep">${R.map(([a,t])=>`<div class="gdr"><i>${esc(a)}</i><span>${typeof glx==='function'?glx(t):esc(t)}</span></div>`).join('')}</div>`);b.textContent='접기 ▴';const r=gp.getBoundingClientRect();if(r.bottom>innerHeight-8)gp.style.top=Math.max(8,innerHeight-8-r.height)+'px'},true)}
+   const R=DEEP[k]||rowsAuto(k);b.insertAdjacentHTML('beforebegin',`<div class="gdeep">${R.map(([a,t])=>`<div class="gdr" data-l="${esc(a)}"><i>${esc(a)}</i><span>${typeof glx==='function'?glx(t):esc(t)}</span></div>`).join('')}</div>`);b.textContent='접기 ▴';const r=gp.getBoundingClientRect();if(r.bottom>innerHeight-8)gp.style.top=Math.max(8,innerHeight-8-r.height)+'px'},true)}
 /* 이전 버튼: 모든 화면에서 — 열린 창 먼저 닫고, 사전 낱말·구조도·지도 사건 이동도 되돌림 */
 {const dcJump=k=>{showView('dc');try{dcShow();dcOnlyBk=false;dcFilter()}catch(_){}setTimeout(()=>{const c=$('dcbody').querySelector(`.gl2>div[data-k="${CSS.escape(k)}"]`);if(c){c.scrollIntoView({block:'center'});c.classList.remove('flash');void c.offsetWidth;c.classList.add('flash')}},120)};
  const ha=hApply;hApply=function(en){if(en.d||en.t||en.e!=null){hLock=true;try{if(en.d)dcJump(en.d);else if(en.t){$('kpage').hidden=true;showView('tr');openTree(en.t)}else{$('kpage').hidden=true;showView('map');const e=EVENTS.find(x=>x.id===en.e);if(e)selectEvent(e,{pan:!!e.ll})}}finally{hLock=false}hSync();return}return ha.apply(this,arguments)};
@@ -5205,11 +5214,11 @@ function openTerm(k){const p=$('kpage');const def=GLOSS[k]||'';
   <div class="kph"><h1>${esc(k)}</h1></div>
   <div class="kpsub">${t0!=null?`<span>관련 시기 ${yrTxt(t0)}${t1>t0+.5?' ~ '+yrTxt(t1):''}</span>`:''}${main&&typeof eventKing==='function'&&eventKing(main)?`<span>그때 ${esc(eventKing(main).txt)}</span>`:''}</div>
   ${def?`<section><h3>뜻</h3><p class="kpd">${glx(def)}</p></section>`:''}
-  ${rows.length?`<section><h3>자세히</h3><div class="tmrows">${rows.map(([a,t])=>`<div class="gdr"><i>${esc(a)}</i><span>${glx(t)}</span></div>`).join('')}</div></section>`:''}
+  ${rows.length?`<section><h3>자세히</h3><div class="tmrows">${rows.map(([a,t])=>`<div class="gdr" data-l="${esc(a)}"><i>${esc(a)}</i><span>${glx(t)}</span></div>`).join('')}</div></section>`:''}
   ${story?`<section><h3>배경 이야기</h3><p class="kpd">${glx(story)}</p></section>`:''}
   ${tk?`<section><h3>구조도</h3><button class="ppgo" data-tmtree="${esc(tk)}">구조도로 보기 →</button></section>`:''}
   ${evs.length?`<section><h3>관련 사건</h3><ul class="kpl">${evs.map(e=>`<li class="ev"><button data-kpe="${e.id}" style="--tc:var(--t-${e.tp[0]})"><em>${esc(shortYear(e))}</em>${e.treaty?'<i class="tseal">조</i>':''}${esc(e.t)}</button><p>${glx(e.x||'')}</p></li>`).join('')}</ul></section>`:''}
-  ${pps.length?`<section><h3>관련 인물</h3><div class="kpp">${pps.map(x=>`<button data-person="${esc(x)}" data-pt="${t0}"><i></i>${esc(x)}</button>`).join('')}</div></section>`:''}
+  ${pps.length?`<section><h3>관련 인물</h3><div class="kpp">${pps.map(x=>`<button class="pchip" data-person="${esc(x)}" data-pt="${t0}"><i>${esc([...x][0]||'')}</i>${esc(x)}</button>`).join('')}</div></section>`:''}
   ${rel.length?`<section><h3>관련 낱말</h3><div class="kpp">${rel.map(x=>`<button data-term="${esc(x)}"><i></i>${esc(x)}</button>`).join('')}</div></section>`:''}
  </div>`;
  p.hidden=false;p.scrollTop=0;p.querySelector('[data-kx]').onclick=()=>{p.hidden=true};try{if(!hLock)hPush({tm:k})}catch(_){}}
@@ -5240,7 +5249,7 @@ document.querySelectorAll('.pin.flagpin .flg.tgflag').forEach(f=>{if(f.parentNod
 /* 나만의 사론: "사신은 논한다," — 주인(나)만 쓰고, 다른 사람은 보기만 (claude.ai 공유 저장소) */
 {let NT={},canW=false,DB=null;
  const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
- const hid=k=>[...new TextEncoder().encode(k)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,300);
+ const hid=k=>[...new TextEncoder().encode(k)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,190);
  const inner=k=>{const v=NT[k];return v?`<span class="snh">사신은 논한다,</span> <span class="snv">${E(v).replace(/\n/g,'<br>')}</span>`:(canW?'<span class="sna">✎ 사신은 논한다…</span>':'')};
  const cls=k=>'snote'+(NT[k]?' has':'')+(canW?' mine':'');
  const html=k=>`<div class="${cls(k)}" data-sk="${E(k)}">${inner(k)}</div>`;
@@ -5266,6 +5275,9 @@ document.querySelectorAll('.pin.flagpin .flg.tgflag').forEach(f=>{if(f.parentNod
 
 /* 사전 인물 카드: '자세히 →' 바로 인물 화면으로 */
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-pdeep]');if(!b)return;e.preventDefault();e.stopPropagation();try{openPerson(b.dataset.pdeep)}catch(_){}},true);
+
+/* 자세히 칸 이름 다듬기: 누가 → 주도 … */
+{const LM={'누가':'주도','왜':'배경','무엇을':'내용','무엇':'정체','결과':'결과','흐름':'전개','일본과':'외세 관계','내용':'내용'};try{Object.values(DEEP).forEach(R=>{if(Array.isArray(R))R.forEach(r=>{if(r&&LM[r[0]])r[0]=LM[r[0]]})})}catch(_){}}
 </script>
 <script type="module">
 /* 구글 로그인 + 하트·책갈피·설정 동기화 (GitHub 사이트 전용) */

@@ -1070,6 +1070,15 @@ html,html *{font-synthesis-weight:none!important;font-synthesis:none!important}
 #kpage .kpin .tmrows .gdr{padding:6px 0;border-bottom:1px dashed color-mix(in srgb,var(--ink) 10%,transparent)}#kpage .kpin .tmrows .gdr:last-child{border-bottom:0}
 #kpage .kpin .kpl li{padding:8px 0;border-bottom:1px dashed color-mix(in srgb,var(--ink) 10%,transparent)}#kpage .kpin .kpl li:last-child{border-bottom:0}
 #kpage{background:color-mix(in srgb,var(--ink) 4%,var(--paper))}
+
+.gdr{display:grid!important;grid-template-columns:76px 1fr;gap:12px;align-items:start}
+.gdr>i{font-style:normal;justify-self:start;font-size:11.5px;font-weight:800;letter-spacing:.04em;line-height:1;padding:5px 10px;border-radius:999px;margin-top:2px;color:var(--lc,#64748b);background:color-mix(in srgb,var(--lc,#64748b) 12%,var(--panel));white-space:nowrap}
+.gdr>span{line-height:1.65}
+.gdr[data-l="주도"],.gdr[data-l="인물"]{--lc:#2563eb}.gdr[data-l="배경"]{--lc:#c2410c}.gdr[data-l="내용"],.gdr[data-l="정체"]{--lc:#15803d}.gdr[data-l="결과"]{--lc:#7c3aed}.gdr[data-l="전개"]{--lc:#0e7490}.gdr[data-l="외세 관계"],.gdr[data-l="대립"]{--lc:#be123c}.gdr[data-l="시기"]{--lc:#a16207}
+#kpage .kpin .tmrows .gdr{padding:9px 0}
+.kpp button.pchip{padding:3px 12px 3px 3px;gap:7px;background:color-mix(in srgb,var(--kc,var(--seal)) 7%,var(--panel));border-color:color-mix(in srgb,var(--kc,var(--seal)) 25%,transparent);font-weight:700;letter-spacing:.02em}
+.kpp button.pchip i{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font-style:normal;font-size:12px;font-weight:800;color:#fff;background:var(--kc,var(--seal))}
+.kpp button.pchip:hover{background:color-mix(in srgb,var(--kc,var(--seal)) 14%,var(--panel))}
 </style>
 
 <div class="app">
