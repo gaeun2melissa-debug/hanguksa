@@ -104,7 +104,7 @@ let capItems=[],nbItems=[];
 let revealN=0;const shapes=new Map(); let morphRAF=0, morphTasks=[];
 function styleTerr(path,s){
   path.setAttribute('class','terr'+(s.hatch?' hatch':''));
-  const fc=`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`;path.style.fill=s.hatch?`url(#${s.hatch})`:fc;path.style.setProperty('--tbc',s.hatch?'none':fc);path.style.stroke=(s.c==='south'||s.c==='north')?fc:'';
+  const fc=`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`;path.style.fill=s.hatch?`url(#${s.hatch})`:fc;path.style.setProperty('--tbc',s.hatch?'none':fc);path.style.stroke='none';
 }
 function makeLabel(s){const g=el('g',{class:'slab'},labG);const ln=el('line',{class:'lead',x1:0,y1:0,x2:0,y2:0},g);el('circle',{class:'ldot',r:2.6},g);const t=el('text',{},g);const o=ovItem(g,s.lab[0],s.lab[1]);o.slab=true;o.t=t;o.ln=ln;const L={g,t,o};labStyle(L,s);return L}
 function labStyle(L,s){if(/ /.test(s.name)){L.t.textContent='';(()=>{const W=s.name.replace(/ →/g,'\u00a0→').split(' ');let bi=1,bm=1e9;for(let i=1;i<W.length;i++){const m=Math.max(W.slice(0,i).join(' ').length,W.slice(i).join(' ').length);if(m<bm){bm=m;bi=i}}return [W.slice(0,bi).join(' '),W.slice(bi).join(' ')]})().forEach((w,i)=>{const sp=document.createElementNS('http://www.w3.org/2000/svg','tspan');sp.textContent=w;sp.setAttribute('dy',i?'1.12em':'-.56em');L.t.appendChild(sp)})}else L.t.textContent=s.name;L.o.area=s.area;L.t.style.fill=`color-mix(in srgb,var(--c-${s.c}) 52%,var(--ink))`;L.t.style.stroke=s.hatch?'var(--land)':`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`}
