@@ -4085,7 +4085,7 @@ const LINES=[{n:'38도선',s:1945.62,e:1953.57,pts:[[124.3,38],[125,38],[126,38]
  {n:'휴전선',s:1953.57,e:3000,pts:[[125.9,37.7],[126.2,37.75],[126.7,37.95],[127.1,38.25],[127.6,38.3],[128.1,38.35],[128.37,38.62]],lab:[129.2,38.7]}];
 const lineG=el('g',{class:'dmz'},G.arr);
 LINES.forEach(L=>{L.p=el('path',{class:'dml',d:'M'+L.pts.map(xy).join('L')},lineG);const g=el('g',{class:'dmlab'},$('ovl'));const t=el('text',{},g);t.textContent=L.n;L.o=ovItem(g,X(L.lab[0]),Y(L.lab[1]));L.g=g});
-function updateLines(){const t=curT();LINES.forEach(L=>{const on=t>=L.s&&t<L.e;L.p.classList.toggle('on',on);L.g.classList.toggle('on',on)})}
+function updateLines(){LINES.forEach(L=>{L.p.classList.remove('on');L.g.classList.remove('on')})}
 {const ut2=updateTime;updateTime=function(ch){ut2(ch);updateLines()}}
 updateLines();placeOV();
 
