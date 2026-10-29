@@ -866,8 +866,10 @@ document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest
  {const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);PT.forEach(p=>p.on=null);sync(true);setTimeout(()=>sync(true),2200);return r}}sync(true)}
 /* 해안선을 영토 위로: 확대해도 영토 색에 덮여 안 사라지게 */
 {const all=[...document.querySelectorAll('svg#map .coastl')];if(all.length&&G.terr){let at=G.terr;all.forEach(c=>{at.after(c);at=c;c.classList.add('ontop')})}}
-/* 위로 올린 해안선에서 압록강·두만강(땅끼리 맞닿은 국경) 부분은 지움 */
-document.querySelectorAll('svg .coastl.ontop').forEach(cl=>{{const d=cl.getAttribute('d')||'';const x1=X(124.3),x2=X(130.75),y1=Y(39.9);let out='';
- d.split('M').filter(Boolean).forEach(sub=>{const closed=/Z\s*$/.test(sub);const pts=sub.replace(/Z/g,'').trim().split(/[ L]+/).filter(Boolean);let cur=[];const flush=()=>{if(cur.length>1)out+='M'+cur.join(' ');cur=[]};let cut=false;
-  pts.forEach(t=>{const [x,y]=t.split(',').map(Number);if((x>x1&&x<x2&&y<y1)||(x>X(126.75)&&x<X(128.3)&&y>Y(38.75)&&y<Y(37.6))){cut=true;flush()}else cur.push(t)});if(!cut&&closed){out+='M'+cur.join(' ')+'Z';cur=[]}else flush()});
- cl.setAttribute('d',out)}});
+/* 북쪽 국경선은 백두산 주변만 좁게 끊고, 동해안 해안선은 유지 */
+document.querySelectorAll('svg .coastl.ontop').forEach(cl=>{const d=cl.getAttribute('d')||'';const x1=X(126.75),x2=X(128.3),y1=Y(43.4),y2=Y(41.2);let out='';
+ d.split('M').filter(Boolean).forEach(sub=>{const pts=sub.replace(/Z/g,'').trim().split(/[ L]+/).filter(Boolean);let cur=[];
+ const flush=()=>{if(cur.length>1)out+='M'+cur.join(' ');cur=[]};
+ pts.forEach(t=>{const [x,y]=t.split(',').map(Number);if(x>x1&&x<x2&&y>y1&&y<y2){flush()}else cur.push(t)});
+ flush()});
+ cl.setAttribute('d',out)});
