@@ -1,0 +1,29 @@
+name: Build map site
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build generated HTML
+        run: bash src/build.sh
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html src/app.html
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+          else
+            git commit -m "Build published map from src"
+            git push
+          fi
