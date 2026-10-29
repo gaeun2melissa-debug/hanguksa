@@ -70,7 +70,7 @@ svg.ic{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke
 .chl text{opacity:.7;font-style:normal;font-weight:600}
 .coastl{fill:none;stroke:var(--coast);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;pointer-events:none}
 .coast{fill:var(--land);stroke:var(--land);stroke-width:1;vector-effect:non-scaling-stroke;stroke-linejoin:round}
-.terr{stroke:none!important;stroke-width:1.2;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .8s,stroke .8s,opacity .7s}
+.terr{stroke:var(--tbon,var(--tbc));stroke-width:1.2;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .8s,stroke .8s,opacity .7s}
 .lsh{fill:var(--shadow);stroke:none}
 .terr.hatch{fill-opacity:1}
 .terr.out{opacity:0}
@@ -545,7 +545,7 @@ svg.ic{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke
 .kname{height:40px}
 .pin.stale,.arw.stale,.ahd.stale{opacity:0!important;pointer-events:none!important;transition:opacity 1.2s}.pin.stale *{pointer-events:none!important}
 #insvg{--tbon:none}
-.dml,.dmlab{display:none!important}.dml{fill:none;stroke:#d62b2b;stroke-width:2.4;stroke-dasharray:7 5;vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:0;transition:opacity .6s}.dml.on{opacity:.9}
+.dml{fill:none;stroke:#d62b2b;stroke-width:2.4;stroke-dasharray:7 5;vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:0;transition:opacity .6s}.dml.on{opacity:.9}
 .dmlab{opacity:0;transition:opacity .6s}.dmlab.on{opacity:1}.dmlab text{fill:#d62b2b;font-size:13px;font-weight:800;paint-order:stroke;stroke:var(--halo);stroke-width:3px;text-anchor:middle}
 .kgscroll{overflow:visible!important;margin:0!important;padding:0!important}
 .kgl{padding-top:0!important;width:auto!important}
@@ -1374,7 +1374,7 @@ body,button,input,select,textarea{-webkit-font-smoothing:antialiased;-moz-osx-fo
 <style>.pin.flagpin .tgk .tgr{fill:#c41e28}.pin.flagpin .tgk .tgb{fill:#2f68a8}.pin.flagpin .tgk .tgt{stroke:#2f68a8!important;stroke-width:.62!important;stroke-linecap:butt!important}</style>
 <style>.tl>li.hlt h3::after,.elist li.bin .t::after{content:'★'!important;border:none!important;padding:0!important;font-size:.85em!important;color:#e0a100!important;margin-left:4px!important;vertical-align:0!important}</style>
 <style>.tl>li.hlt h3::after,.elist li.bin .t::after{font-size:1.25em!important;line-height:1!important;margin-left:5px!important;vertical-align:-1px!important;color:#f0ad00!important}</style>
-<style>#landk{stroke:none!important;stroke-width:0!important;vector-effect:none!important;paint-order:normal}</style>
+<style>#landk{stroke:var(--land)!important;stroke-width:1.4px!important;vector-effect:none!important;paint-order:stroke}</style>
 <style>.hzrg2.thin{height:12px!important;line-height:12px!important;font-size:10px!important;border-radius:4px!important}</style>
 <style>.bjlab text{font-size:14px!important}</style>
 <style>html #v-map svg#map .bhlab text{stroke:none!important}.bhlab text{font-family:var(--display);font-weight:700}</style>
@@ -3007,7 +3007,7 @@ let capItems=[],nbItems=[];
 let revealN=0;const shapes=new Map(); let morphRAF=0, morphTasks=[];
 function styleTerr(path,s){
   path.setAttribute('class','terr'+(s.hatch?' hatch':''));
-  const fc=`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`;path.style.fill=s.hatch?`url(#${s.hatch})`:fc;path.style.setProperty('--tbc',s.hatch?'none':fc);path.style.setProperty('stroke','none','important');path.style.strokeWidth='0';
+  const fc=`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`;path.style.fill=s.hatch?`url(#${s.hatch})`:fc;path.style.setProperty('--tbc',s.hatch?'none':fc);path.style.stroke='';
 }
 function makeLabel(s){const g=el('g',{class:'slab'},labG);const ln=el('line',{class:'lead',x1:0,y1:0,x2:0,y2:0},g);el('circle',{class:'ldot',r:2.6},g);const t=el('text',{},g);const o=ovItem(g,s.lab[0],s.lab[1]);o.slab=true;o.t=t;o.ln=ln;const L={g,t,o};labStyle(L,s);return L}
 function labStyle(L,s){if(/ /.test(s.name)){L.t.textContent='';(()=>{const W=s.name.replace(/ →/g,'\u00a0→').split(' ');let bi=1,bm=1e9;for(let i=1;i<W.length;i++){const m=Math.max(W.slice(0,i).join(' ').length,W.slice(i).join(' ').length);if(m<bm){bm=m;bi=i}}return [W.slice(0,bi).join(' '),W.slice(bi).join(' ')]})().forEach((w,i)=>{const sp=document.createElementNS('http://www.w3.org/2000/svg','tspan');sp.textContent=w;sp.setAttribute('dy',i?'1.12em':'-.56em');L.t.appendChild(sp)})}else L.t.textContent=s.name;L.o.area=s.area;L.t.style.fill=`color-mix(in srgb,var(--c-${s.c}) 52%,var(--ink))`;L.t.style.stroke=s.hatch?'var(--land)':`color-mix(in srgb,var(--c-${s.c}) 66%,var(--land))`}
@@ -4085,7 +4085,7 @@ const LINES=[{n:'38도선',s:1945.62,e:1953.57,pts:[[124.3,38],[125,38],[126,38]
  {n:'휴전선',s:1953.57,e:3000,pts:[[125.9,37.7],[126.2,37.75],[126.7,37.95],[127.1,38.25],[127.6,38.3],[128.1,38.35],[128.37,38.62]],lab:[129.2,38.7]}];
 const lineG=el('g',{class:'dmz'},G.arr);
 LINES.forEach(L=>{L.p=el('path',{class:'dml',d:'M'+L.pts.map(xy).join('L')},lineG);const g=el('g',{class:'dmlab'},$('ovl'));const t=el('text',{},g);t.textContent=L.n;L.o=ovItem(g,X(L.lab[0]),Y(L.lab[1]));L.g=g});
-function updateLines(){LINES.forEach(L=>{L.p.classList.remove('on');L.g.classList.remove('on')})}
+function updateLines(){const t=curT();LINES.forEach(L=>{const on=t>=L.s&&t<L.e;L.p.classList.toggle('on',on);L.g.classList.toggle('on',on)})}
 {const ut2=updateTime;updateTime=function(ch){ut2(ch);updateLines()}}
 updateLines();placeOV();
 
@@ -5348,7 +5348,11 @@ document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest
  {const af=applyFrame;applyFrame=function(){const r=af.apply(this,arguments);PT.forEach(p=>p.on=null);sync(true);setTimeout(()=>sync(true),2200);return r}}sync(true)}
 /* 해안선을 영토 위로: 확대해도 영토 색에 덮여 안 사라지게 */
 {const all=[...document.querySelectorAll('svg#map .coastl')];if(all.length&&G.terr){let at=G.terr;all.forEach(c=>{at.after(c);at=c;c.classList.add('ontop')})}}
-/* 좌표 범위로 선을 자르면 한반도에 인위적인 분단선/틈이 생길 수 있어 임의 절단을 하지 않음. */
+/* 위로 올린 해안선에서 압록강·두만강(땅끼리 맞닿은 국경) 부분은 지움 */
+document.querySelectorAll('svg .coastl.ontop').forEach(cl=>{{const d=cl.getAttribute('d')||'';const x1=X(124.3),x2=X(130.75),y1=Y(39.9);let out='';
+ d.split('M').filter(Boolean).forEach(sub=>{const closed=/Z\s*$/.test(sub);const pts=sub.replace(/Z/g,'').trim().split(/[ L]+/).filter(Boolean);let cur=[];const flush=()=>{if(cur.length>1)out+='M'+cur.join(' ');cur=[]};let cut=false;
+  pts.forEach(t=>{const [x,y]=t.split(',').map(Number);if((x>x1&&x<x2&&y<y1)||(x>X(126.75)&&x<X(128.3)&&y>Y(38.75)&&y<Y(37.6))){cut=true;flush()}else cur.push(t)});if(!cut&&closed){out+='M'+cur.join(' ')+'Z';cur=[]}else flush()});
+ cl.setAttribute('d',out)}});
 </script>
 <script type="module">
 /* 구글 로그인 + 하트·책갈피·설정 동기화 (GitHub 사이트 전용) */

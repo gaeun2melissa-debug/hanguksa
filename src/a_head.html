@@ -69,7 +69,7 @@ svg.ic{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke
 .chl text{opacity:.7;font-style:normal;font-weight:600}
 .coastl{fill:none;stroke:var(--coast);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;pointer-events:none}
 .coast{fill:var(--land);stroke:var(--land);stroke-width:1;vector-effect:non-scaling-stroke;stroke-linejoin:round}
-.terr{stroke:none!important;stroke-width:1.2;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .8s,stroke .8s,opacity .7s}
+.terr{stroke:var(--tbon,var(--tbc));stroke-width:1.2;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .8s,stroke .8s,opacity .7s}
 .lsh{fill:var(--shadow);stroke:none}
 .terr.hatch{fill-opacity:1}
 .terr.out{opacity:0}
@@ -544,7 +544,7 @@ svg.ic{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke
 .kname{height:40px}
 .pin.stale,.arw.stale,.ahd.stale{opacity:0!important;pointer-events:none!important;transition:opacity 1.2s}.pin.stale *{pointer-events:none!important}
 #insvg{--tbon:none}
-.dml,.dmlab{display:none!important}.dml{fill:none;stroke:#d62b2b;stroke-width:2.4;stroke-dasharray:7 5;vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:0;transition:opacity .6s}.dml.on{opacity:.9}
+.dml{fill:none;stroke:#d62b2b;stroke-width:2.4;stroke-dasharray:7 5;vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:0;transition:opacity .6s}.dml.on{opacity:.9}
 .dmlab{opacity:0;transition:opacity .6s}.dmlab.on{opacity:1}.dmlab text{fill:#d62b2b;font-size:13px;font-weight:800;paint-order:stroke;stroke:var(--halo);stroke-width:3px;text-anchor:middle}
 .kgscroll{overflow:visible!important;margin:0!important;padding:0!important}
 .kgl{padding-top:0!important;width:auto!important}
@@ -1373,7 +1373,7 @@ body,button,input,select,textarea{-webkit-font-smoothing:antialiased;-moz-osx-fo
 <style>.pin.flagpin .tgk .tgr{fill:#c41e28}.pin.flagpin .tgk .tgb{fill:#2f68a8}.pin.flagpin .tgk .tgt{stroke:#2f68a8!important;stroke-width:.62!important;stroke-linecap:butt!important}</style>
 <style>.tl>li.hlt h3::after,.elist li.bin .t::after{content:'★'!important;border:none!important;padding:0!important;font-size:.85em!important;color:#e0a100!important;margin-left:4px!important;vertical-align:0!important}</style>
 <style>.tl>li.hlt h3::after,.elist li.bin .t::after{font-size:1.25em!important;line-height:1!important;margin-left:5px!important;vertical-align:-1px!important;color:#f0ad00!important}</style>
-<style>#landk{stroke:none!important;stroke-width:0!important;vector-effect:none!important;paint-order:normal}</style>
+<style>#landk{stroke:var(--land)!important;stroke-width:1.4px!important;vector-effect:none!important;paint-order:stroke}</style>
 <style>.hzrg2.thin{height:12px!important;line-height:12px!important;font-size:10px!important;border-radius:4px!important}</style>
 <style>.bjlab text{font-size:14px!important}</style>
 <style>html #v-map svg#map .bhlab text{stroke:none!important}.bhlab text{font-family:var(--display);font-weight:700}</style>
